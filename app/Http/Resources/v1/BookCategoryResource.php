@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Resources\v1;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/**
+ * BookCategoryResource - Version 1
+ *
+ * Resource for transforming book category data in the College Management System.
+ * This resource handles the API response format for book categories.
+ *
+ * @package App\Http\Resources\v1
+ * @version 1.0.0
+ * @author Softmax Technologies
+ */
+class BookCategoryResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @param Request $request
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            /**
+             * The unique identifier of the book category.
+             * @var int $id
+             * @example 1
+             */
+            'id' => $this->id,
+
+            /**
+             * The title of the book category.
+             * @var string $title
+             * @example "Computer Science"
+             */
+            'title' => $this->title,
+
+            /**
+             * The description of the book category.
+             * @var string|null $description
+             * @example "Books related to computer science and programming"
+             */
+            'description' => $this->description,
+
+            /**
+             * The status of the category (active/inactive).
+             * @var string $status
+             * @example "active"
+             */
+            'status' => $this->status,
+
+            /**
+             * The number of books in this category (computed when relationship is loaded).
+             * @var int|null $books_count
+             * @example 25
+             */
+            'books_count' => $this->when(isset($this->books_count), $this->books_count),
+
+            /**
+             * The creation timestamp.
+             * @var string|null $created_at
+             * @example "2023-12-01 10:30:00"
+             */
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * The last update timestamp.
+             * @var string|null $updated_at
+             * @example "2023-12-01 15:45:00"
+             */
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+        ];
+    }
+}
