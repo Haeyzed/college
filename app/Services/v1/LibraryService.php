@@ -12,7 +12,8 @@ use App\Models\v1\IdCardSetting;
 use App\Models\v1\IssueReturn;
 use App\Traits\v1\FileUploader;
 use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -42,10 +43,10 @@ class LibraryService
     /**
      * Get a paginated list of books.
      */
-    public function getBooks(int $perPage, ?int $categoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?bool $available = null): \Illuminate\Pagination\LengthAwarePaginator
+    public function getBooks(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?bool $available = null): LengthAwarePaginator
     {
-        $query = Book::with(['category', 'issues'])
-            ->when($categoryId, fn ($q) => $q->filterByCategory($categoryId))
+        $query = Book::with(['bookCategory', 'issues'])
+            ->when($bookCategoryId, fn ($q) => $q->filterByBookCategory($bookCategoryId))
             ->when($status, fn ($q) => $q->filterByStatus($status))
             ->when($author, fn ($q) => $q->filterByAuthor($author))
             ->when($search, fn ($q) => $q->search($search))
@@ -59,7 +60,7 @@ class LibraryService
      */
     public function getBookById(int $id): Book
     {
-        return Book::with(['category', 'issues.member'])->findOrFail($id);
+        return Book::with(['bookCategory', 'issues.member'])->findOrFail($id);
     }
 
     /**
@@ -68,22 +69,18 @@ class LibraryService
     public function createBook(array $data): Book
     {
         return DB::transaction(function () use ($data) {
-            // Handle image upload if provided
-            if (isset($data['image']) && $data['image']) {
-                $data['image'] = $this->uploadImage(
-                    file: $data['image'],
+            if (isset($data['cover_image_path']) && $data['cover_image_path']) {
+                $data['cover_image_path'] = $this->uploadImage(
+                    file: $data['cover_image_path'],
                     directory: 'books',
-                    disk: 'public',
                     width: 100,
-                    height: 150,
-                    maintainAspectRatio: true,
-                    fit: 'contain'
+                    height: 150
                 );
             }
 
-            $book = Book::create($data);
+            $book = Book::query()->create($data);
 
-            return $book->load(['category']);
+            return $book->load(['bookCategory']);
         });
     }
 
@@ -93,40 +90,30 @@ class LibraryService
     public function updateBook(int $id, array $data): Book
     {
         return DB::transaction(function () use ($data, $id) {
-            $book = Book::findOrFail($id);
-
-            // Handle image upload/update if provided
-            if (isset($data['image']) && $data['image']) {
-                if ($book->image) {
-                    // Update existing image
-                    $data['image'] = $this->updateImage(
-                        file: $data['image'],
+            $book = Book::query()->findOrFail($id);
+            if (isset($data['cover_image_path']) && $data['cover_image_path']) {
+                if ($book->cover_image_path) {
+                    $data['cover_image_path'] = $this->updateImage(
+                        file: $data['cover_image_path'],
                         directory: 'books',
-                        disk: 'public',
                         width: 100,
                         height: 150,
-                        maintainAspectRatio: true,
-                        fit: 'contain',
                         model: $book,
-                        field: 'image'
+                        field: 'cover_image_path'
                     );
                 } else {
-                    // Upload new image
-                    $data['image'] = $this->uploadImage(
-                        file: $data['image'],
+                    $data['cover_image_path'] = $this->uploadImage(
+                        file: $data['cover_image_path'],
                         directory: 'books',
-                        disk: 'public',
                         width: 100,
-                        height: 150,
-                        maintainAspectRatio: true,
-                        fit: 'contain'
+                        height: 150
                     );
                 }
             }
 
             $book->update($data);
 
-            return $book->load(['category']);
+            return $book->load(['bookCategory']);
         });
     }
 
@@ -136,20 +123,14 @@ class LibraryService
     public function deleteBook(int $id): bool
     {
         return DB::transaction(function () use ($id) {
-            $book = Book::findOrFail($id);
+            $book = Book::query()->findOrFail($id);
 
-            // Check if book has any active issues
-            $activeIssues = IssueReturn::where('book_id', $id)
+            $activeIssues = IssueReturn::query()->where('book_id', $id)
                 ->where('status', IssueStatus::ISSUED->value)
                 ->count();
 
             if ($activeIssues > 0) {
                 throw new Exception('Cannot delete book with active issues');
-            }
-
-            // Delete associated image if exists
-            if ($book->image) {
-                $this->deleteImage($book->image, 'books', 'public');
             }
 
             $book->delete();
@@ -164,7 +145,7 @@ class LibraryService
     public function bulkUpdateBookStatus(array $ids, string $status): int
     {
         return DB::transaction(function () use ($ids, $status) {
-            return Book::whereIn('id', $ids)->update(['status' => $status]);
+            return Book::query()->whereIn('id', $ids)->update(['status' => $status]);
         });
     }
 
@@ -174,22 +155,16 @@ class LibraryService
     public function bulkDeleteBooks(array $ids): int
     {
         return DB::transaction(function () use ($ids) {
-            $books = Book::whereIn('id', $ids)->get();
+            $books = Book::query()->whereIn('id', $ids)->get();
             $deletedCount = 0;
 
             foreach ($books as $book) {
-                // Check if book has any active issues
-                $activeIssues = IssueReturn::where('book_id', $book->id)
+                $activeIssues = IssueReturn::query()->where('book_id', $book->id)
                     ->where('status', IssueStatus::ISSUED->value)
                     ->count();
 
                 if ($activeIssues > 0) {
-                    continue; // Skip books with active issues
-                }
-
-                // Delete associated image if exists
-                if ($book->image) {
-                    $this->deleteImage($book->image, 'books', 'public');
+                    continue;
                 }
 
                 $book->delete();
@@ -203,10 +178,10 @@ class LibraryService
     /**
      * Import books from Excel file.
      */
-    public function importBooks(\Illuminate\Http\UploadedFile $file, int $categoryId): array
+    public function importBooks(UploadedFile $file, int $bookCategoryId): array
     {
         try {
-            $data = ['category' => $categoryId];
+            $data = ['category' => $bookCategoryId];
             $import = new BookImport($data);
             Excel::import($import, $file);
 
@@ -217,13 +192,7 @@ class LibraryService
                     'imported_count' => $import->getRowCount() ?? 0,
                 ],
             ];
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return [
-                'success' => false,
-                'message' => 'Validation failed: '.implode(', ', $e->errors()),
-                'errors' => $e->errors(),
-            ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'message' => 'Import failed: '.$e->getMessage(),
@@ -237,27 +206,34 @@ class LibraryService
     public function getBookImportTemplate(): array
     {
         return [
-            'headers' => ['title', 'isbn', 'author', 'publisher', 'edition', 'publish_year', 'language', 'price', 'quantity', 'code', 'section', 'column', 'row', 'description', 'note'],
+            'headers' => [
+                'title', 'isbn', 'author', 'publisher', 'edition', 'publication_year', 'language',
+                'price', 'quantity', 'accession_number', 'shelf_location', 'shelf_column', 'shelf_row',
+                'description', 'note'
+            ],
             'sample_data' => [
-                ['Introduction to Programming', '978-0-123456-78-9', 'John Doe', 'Tech Publications', '2nd Edition', 2023, 'English', 29.99, 10, 'BK001', 'A1', 'Column 1', 'Row 1', 'A comprehensive guide', 'Special edition'],
-                ['Advanced Algorithms', '978-0-987654-32-1', 'Jane Smith', 'Academic Press', '1st Edition', 2022, 'English', 49.99, 5, 'BK002', 'A2', 'Column 2', 'Row 1', 'Advanced programming concepts', null],
+                ['Introduction to Programming', '978-0-123456-78-9', 'John Doe', 'Tech Publications', '2nd Edition', 2023, 'English', 29.99, 10, 'LMS-90021', 'Science-A', 'C-2', 'R-5', 'A comprehensive guide', 'Special edition'],
+                ['Advanced Algorithms', '978-0-987654-32-1', 'Jane Smith', 'Academic Press', '1st Edition', 2022, 'English', 49.99, 5, 'LMS-90022', 'Math-B', 'C-1', 'R-1', 'Advanced programming concepts', null],
             ],
             'required_fields' => ['title', 'isbn', 'author', 'quantity'],
-            'optional_fields' => ['publisher', 'edition', 'publish_year', 'language', 'price', 'code', 'section', 'column', 'row', 'description', 'note'],
+            'optional_fields' => [
+                'publisher', 'edition', 'publication_year', 'language', 'price', 'accession_number',
+                'shelf_location', 'shelf_column', 'shelf_row', 'description', 'note'
+            ],
             'instructions' => [
                 'title' => 'Book title (required)',
                 'isbn' => 'ISBN number (required, must be unique)',
                 'author' => 'Author name (required)',
                 'publisher' => 'Publisher name (optional)',
                 'edition' => 'Book edition (optional)',
-                'publish_year' => 'Publication year (optional)',
+                'publication_year' => 'Publication year (optional, numeric)',
                 'language' => 'Book language (optional)',
                 'price' => 'Book price (optional, numeric)',
                 'quantity' => 'Available quantity (required, numeric)',
-                'code' => 'Book code (optional)',
-                'section' => 'Library section (optional)',
-                'column' => 'Library column (optional)',
-                'row' => 'Library row (optional)',
+                'accession_number' => 'Book Accession Number (optional, unique)',
+                'shelf_location' => 'Library Shelf Location (optional)',
+                'shelf_column' => 'Library Shelf Column (optional)',
+                'shelf_row' => 'Library Shelf Row (optional)',
                 'description' => 'Book description (optional)',
                 'note' => 'Additional notes (optional)',
             ],
@@ -277,16 +253,13 @@ class LibraryService
     /**
      * Get a paginated list of book requests.
      */
-    public function getBookRequests(int $perPage, ?string $status = null, ?string $search = null): \Illuminate\Pagination\LengthAwarePaginator
+    public function getBookRequests(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null): LengthAwarePaginator
     {
-        $query = BookRequest::with(['category'])
-            ->when($status, fn ($q) => $q->where('status', $status))
-            ->when($search, fn ($q) => $q->where(function ($query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('author', 'like', "%{$search}%")
-                    ->orWhere('request_by', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            }));
+        $query = BookRequest::with(['bookCategory'])
+            ->when($bookCategoryId, fn ($q) => $q->filterByBookCategory($bookCategoryId))
+            ->when($status, fn ($q) => $q->filterByStatus($status))
+            ->when($author, fn ($q) => $q->filterByAuthor($author))
+            ->when($search, fn ($q) => $q->search($search));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
@@ -296,7 +269,7 @@ class LibraryService
      */
     public function getBookRequestById(int $id): BookRequest
     {
-        return BookRequest::with(['category'])->findOrFail($id);
+        return BookRequest::with(['bookCategory'])->findOrFail($id);
     }
 
     /**
@@ -305,22 +278,18 @@ class LibraryService
     public function createBookRequest(array $data): BookRequest
     {
         return DB::transaction(function () use ($data) {
-            // Handle image upload if provided
-            if (isset($data['image']) && $data['image']) {
-                $data['image'] = $this->uploadImage(
-                    file: $data['image'],
+            if (isset($data['cover_image_path']) && $data['cover_image_path']) {
+                $data['cover_image_path'] = $this->uploadImage(
+                    file: $data['cover_image_path'],
                     directory: 'book-requests',
-                    disk: 'public',
                     width: 100,
-                    height: 150,
-                    maintainAspectRatio: true,
-                    fit: 'contain'
+                    height: 150
                 );
             }
 
-            $bookRequest = BookRequest::create($data);
+            $bookRequest = BookRequest::query()->create($data);
 
-            return $bookRequest->load(['category']);
+            return $bookRequest->load(['bookCategory']);
         });
     }
 
@@ -330,40 +299,30 @@ class LibraryService
     public function updateBookRequest(int $id, array $data): BookRequest
     {
         return DB::transaction(function () use ($data, $id) {
-            $bookRequest = BookRequest::findOrFail($id);
-
-            // Handle image upload/update if provided
-            if (isset($data['image']) && $data['image']) {
-                if ($bookRequest->image) {
-                    // Update existing image
-                    $data['image'] = $this->updateImage(
-                        file: $data['image'],
+            $bookRequest = BookRequest::query()->findOrFail($id);
+            if (isset($data['cover_image_path']) && $data['cover_image_path']) {
+                if ($bookRequest->cover_image_path) {
+                    $data['cover_image_path'] = $this->updateImage(
+                        file: $data['cover_image_path'],
                         directory: 'book-requests',
-                        disk: 'public',
                         width: 100,
                         height: 150,
-                        maintainAspectRatio: true,
-                        fit: 'contain',
                         model: $bookRequest,
-                        field: 'image'
+                        field: 'cover_image_path'
                     );
                 } else {
-                    // Upload new image
-                    $data['image'] = $this->uploadImage(
-                        file: $data['image'],
+                    $data['cover_image_path'] = $this->uploadImage(
+                        file: $data['cover_image_path'],
                         directory: 'book-requests',
-                        disk: 'public',
                         width: 100,
-                        height: 150,
-                        maintainAspectRatio: true,
-                        fit: 'contain'
+                        height: 150
                     );
                 }
             }
 
             $bookRequest->update($data);
 
-            return $bookRequest->load(['category']);
+            return $bookRequest->load(['bookCategory']);
         });
     }
 
@@ -373,12 +332,7 @@ class LibraryService
     public function deleteBookRequest(int $id): bool
     {
         return DB::transaction(function () use ($id) {
-            $bookRequest = BookRequest::findOrFail($id);
-
-            // Delete associated image if exists
-            if ($bookRequest->image) {
-                $this->deleteImage($bookRequest->image, 'book-requests', 'public');
-            }
+            $bookRequest = BookRequest::query()->findOrFail($id);
 
             $bookRequest->delete();
 
@@ -392,7 +346,7 @@ class LibraryService
     public function bulkUpdateBookRequestStatus(array $ids, string $status): int
     {
         return DB::transaction(function () use ($ids, $status) {
-            return BookRequest::whereIn('id', $ids)->update(['status' => $status]);
+            return BookRequest::query()->whereIn('id', $ids)->update(['status' => $status]);
         });
     }
 
@@ -402,15 +356,10 @@ class LibraryService
     public function bulkDeleteBookRequests(array $ids): int
     {
         return DB::transaction(function () use ($ids) {
-            $bookRequests = BookRequest::whereIn('id', $ids)->get();
+            $bookRequests = BookRequest::query()->whereIn('id', $ids)->get();
             $deletedCount = 0;
 
             foreach ($bookRequests as $bookRequest) {
-                // Delete associated image if exists
-                if ($bookRequest->image) {
-                    $this->deleteImage($bookRequest->image, 'book-requests', 'public');
-                }
-
                 $bookRequest->delete();
                 $deletedCount++;
             }
@@ -424,17 +373,16 @@ class LibraryService
     | Book Category Methods
     |--------------------------------------------------------------------------
     |
-    | These methods handle all book category-related operations including CRUD
-    | operations for book categories and category statistics.
+    | These methods handle all book category-related operations including CRUD.
     |
     */
 
     /**
      * Get a paginated list of book categories.
      */
-    public function getBookCategories(int $perPage, ?string $status = null, ?string $search = null): \Illuminate\Pagination\LengthAwarePaginator
+    public function getBookCategories(int $perPage, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
-        $query = BookCategory::withCount('books')
+        $query = BookCategory::query()->withCount('books')
             ->when($status, fn ($q) => $q->filterByStatus($status))
             ->when($search, fn ($q) => $q->search($search));
 
@@ -446,7 +394,7 @@ class LibraryService
      */
     public function getBookCategoryById(int $id): BookCategory
     {
-        return BookCategory::withCount('books')->findOrFail($id);
+        return BookCategory::query()->withCount('books')->findOrFail($id);
     }
 
     /**
@@ -455,9 +403,7 @@ class LibraryService
     public function createBookCategory(array $data): BookCategory
     {
         return DB::transaction(function () use ($data) {
-            $category = BookCategory::create($data);
-
-            return $category;
+            return BookCategory::query()->create($data);
         });
     }
 
@@ -467,7 +413,8 @@ class LibraryService
     public function updateBookCategory(int $id, array $data): BookCategory
     {
         return DB::transaction(function () use ($data, $id) {
-            $category = BookCategory::findOrFail($id);
+            $category = BookCategory::query()->findOrFail($id);
+
             $category->update($data);
 
             return $category;
@@ -475,16 +422,15 @@ class LibraryService
     }
 
     /**
-     * Delete a book category.
+     * Delete a book category (Soft Delete).
      */
     public function deleteBookCategory(int $id): bool
     {
         return DB::transaction(function () use ($id) {
-            $category = BookCategory::findOrFail($id);
+            $category = BookCategory::query()->findOrFail($id);
 
-            // Check if category has books
-            if ($category->books()->count() > 0) {
-                throw new Exception('Cannot delete category with existing books');
+            if ($category->books()->exists()) {
+                throw new Exception('Cannot soft-delete a category that contains books. Please re-assign or delete all books first.');
             }
 
             $category->delete();
@@ -499,23 +445,22 @@ class LibraryService
     public function bulkUpdateBookCategoryStatus(array $ids, string $status): int
     {
         return DB::transaction(function () use ($ids, $status) {
-            return BookCategory::whereIn('id', $ids)->update(['status' => $status]);
+            return BookCategory::query()->whereIn('id', $ids)->update(['status' => $status]);
         });
     }
 
     /**
-     * Bulk delete book categories.
+     * Bulk delete book categories (Soft Delete).
      */
     public function bulkDeleteBookCategories(array $ids): int
     {
         return DB::transaction(function () use ($ids) {
-            $categories = BookCategory::whereIn('id', $ids)->get();
+            $categories = BookCategory::query()->whereIn('id', $ids)->get();
             $deletedCount = 0;
 
             foreach ($categories as $category) {
-                // Check if category has books
-                if ($category->books()->count() > 0) {
-                    continue; // Skip categories with books
+                if ($category->books()->exists()) {
+                    continue;
                 }
 
                 $category->delete();
@@ -542,7 +487,7 @@ class LibraryService
     public function issueBook(array $data): array
     {
         return DB::transaction(function () use ($data) {
-            $book = Book::findOrFail($data['book_id']);
+            $book = Book::query()->findOrFail($data['book_id']);
 
             // Check availability
             if ($book->quantity <= 0) {
@@ -550,7 +495,7 @@ class LibraryService
             }
 
             // Check if member already has this book
-            $existingIssue = IssueReturn::where('book_id', $data['book_id'])
+            $existingIssue = IssueReturn::query()->where('book_id', $data['book_id'])
                 ->where('member_id', $data['member_id'])
                 ->where('status', IssueStatus::ISSUED->value)
                 ->first();
@@ -560,7 +505,7 @@ class LibraryService
             }
 
             // Create issue record
-            $issue = IssueReturn::create([
+            $issue = IssueReturn::query()->create([
                 'book_id' => $data['book_id'],
                 'member_id' => $data['member_id'],
                 'issue_date' => now(),
@@ -585,7 +530,7 @@ class LibraryService
     public function returnBook(array $data): array
     {
         return DB::transaction(function () use ($data) {
-            $issue = IssueReturn::where('book_id', $data['book_id'])
+            $issue = IssueReturn::query()->where('book_id', $data['book_id'])
                 ->where('member_id', $data['member_id'])
                 ->where('status', IssueStatus::ISSUED->value)
                 ->firstOrFail();
@@ -604,7 +549,7 @@ class LibraryService
             ]);
 
             // Update book quantity
-            $book = Book::findOrFail($data['book_id']);
+            $book = Book::query()->findOrFail($data['book_id']);
             $book->increment('quantity');
 
             return [
@@ -619,7 +564,7 @@ class LibraryService
     /**
      * Get all book issues with filtering and pagination.
      */
-    public function getBookIssues(int $perPage, ?string $status = null, ?int $memberId = null, ?int $bookId = null): \Illuminate\Pagination\LengthAwarePaginator
+    public function getBookIssues(int $perPage, ?string $status = null, ?int $memberId = null, ?int $bookId = null): LengthAwarePaginator
     {
         $query = IssueReturn::with(['book', 'member'])
             ->when($status, fn ($q) => $q->where('status', $status))
@@ -627,50 +572,6 @@ class LibraryService
             ->when($bookId, fn ($q) => $q->where('book_id', $bookId));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
-    }
-
-    /**
-     * Get book availability.
-     */
-    public function getBookAvailability(int $bookId): array
-    {
-        $book = Book::findOrFail($bookId);
-
-        $availableQuantity = $book->quantity;
-        $issuedQuantity = IssueReturn::where('book_id', $bookId)
-            ->where('status', IssueStatus::ISSUED->value)
-            ->count();
-
-        return [
-            'book_id' => $bookId,
-            'title' => $book->title,
-            'total_quantity' => $book->quantity + $issuedQuantity,
-            'available_quantity' => $availableQuantity,
-            'issued_quantity' => $issuedQuantity,
-            'is_available' => $availableQuantity > 0,
-        ];
-    }
-
-    /**
-     * Get book category statistics.
-     */
-    public function getBookCategoryStatistics(): array
-    {
-        $total = BookCategory::count();
-        $active = BookCategory::filterByStatus(BookCategoryStatus::ACTIVE->value)->count();
-        $inactive = BookCategory::filterByStatus(BookCategoryStatus::INACTIVE->value)->count();
-
-        $categoriesWithBooks = BookCategory::has('books')->count();
-        $categoriesWithoutBooks = BookCategory::doesntHave('books')->count();
-
-        return [
-            'total' => $total,
-            'active' => $active,
-            'inactive' => $inactive,
-            'with_books' => $categoriesWithBooks,
-            'without_books' => $categoriesWithoutBooks,
-            'active_rate' => $total > 0 ? round(($active / $total) * 100, 2) : 0,
-        ];
     }
 
     /*
@@ -689,7 +590,7 @@ class LibraryService
      */
     public function getIdCardSetting(): IdCardSetting
     {
-        return IdCardSetting::first();
+        return IdCardSetting::query()->where('slug', 'library-card')->first();
     }
 
     /**
@@ -698,7 +599,7 @@ class LibraryService
     public function updateOrCreateIdCardSetting(array $data): IdCardSetting
     {
         return DB::transaction(function () use ($data) {
-            return IdCardSetting::updateOrCreate(['id' => 1], $data);
+            return IdCardSetting::query()->updateOrCreate(['id' => 1], $data);
         });
     }
 }

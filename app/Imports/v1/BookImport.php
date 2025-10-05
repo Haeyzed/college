@@ -23,7 +23,7 @@ class BookImport implements ToCollection, WithHeadingRow
 {
     protected $data;
 
-    protected $rowCount = 0;
+    protected int $rowCount = 0;
 
     /**
      * @return void
@@ -36,40 +36,43 @@ class BookImport implements ToCollection, WithHeadingRow
     /**
      * @return void
      */
-    public function collection(Collection $rows)
+    public function collection(Collection $rows): void
     {
         $this->rowCount = $rows->count();
 
         Validator::make($rows->toArray(), [
             '*.title' => 'required|max:255',
-            '*.isbn' => 'required|max:30|unique:books,isbn',
-            '*.price' => 'nullable|numeric',
-            '*.quantity' => 'required|numeric',
+            '*.isbn' => 'nullable|max:30|unique:books,isbn',
+            '*.accession_number' => 'nullable|max:50|unique:books,accession_number',
+            '*.author' => 'required|max:255',
+            '*.publication_year' => 'nullable|integer|max:' . date('Y'),
+            '*.price' => 'nullable|numeric|min:0',
+            '*.quantity' => 'required|integer|min:0',
         ])->validate();
 
         foreach ($rows as $row) {
-            Book::updateOrCreate(
+            Book::query()->updateOrCreate(
                 [
                     'isbn' => $row['isbn'],
+                    'accession_number' => $row['accession_number'] ?? null,
                 ],
                 [
-                    'category_id' => $this->data['category'],
+                    'book_category_id' => $this->data['category'],
                     'title' => $row['title'],
-                    'isbn' => $row['isbn'],
-                    'code' => $row['code'] ?? null,
+                    'isbn' => $row['isbn'] ?? null,
+                    'accession_number' => $row['accession_number'] ?? null,
                     'author' => $row['author'],
                     'publisher' => $row['publisher'] ?? null,
                     'edition' => $row['edition'] ?? null,
-                    'publish_year' => $row['publish_year'] ?? null,
+                    'publication_year' => $row['publication_year'] ?? null,
                     'language' => $row['language'] ?? null,
                     'price' => $row['price'] ?? null,
                     'quantity' => $row['quantity'],
-                    'section' => $row['section'] ?? null,
-                    'column' => $row['column'] ?? null,
-                    'row' => $row['row'] ?? null,
+                    'shelf_location' => $row['shelf_location'] ?? null,
+                    'shelf_column' => $row['shelf_column'] ?? null,
+                    'shelf_row' => $row['shelf_row'] ?? null,
                     'description' => $row['description'] ?? null,
                     'note' => $row['note'] ?? null,
-                    // 'created_by' => Auth::guard('api')->id() ?? 1,
                 ]
             );
         }

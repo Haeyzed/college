@@ -19,6 +19,16 @@ use Illuminate\Validation\Rule;
 class BookCategoryRequest extends BaseRequest
 {
     /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
@@ -39,6 +49,18 @@ class BookCategoryRequest extends BaseRequest
                 'string',
                 'max:255',
                 $isUpdate ? Rule::unique('book_categories', 'title')->ignore($categoryId) : 'unique:book_categories,title'
+            ],
+
+            /**
+             * The internal short code for the category (optional).
+             * @var string|null $code
+             * @example "CS"
+             */
+            'code' => [
+                'nullable',
+                'string',
+                'max:20',
+                $isUpdate ? Rule::unique('book_categories', 'code')->ignore($categoryId) : 'unique:book_categories,code'
             ],
 
             /**
@@ -73,15 +95,25 @@ class BookCategoryRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'The category title is required.',
-            'title.string' => 'The category title must be a string.',
-            'title.max' => 'The category title cannot exceed 255 characters.',
-            'title.unique' => 'A category with this title already exists.',
-            'description.string' => 'The description must be a string.',
-            'description.max' => 'The description cannot exceed 1000 characters.',
-            'status.required' => 'The category status is required.',
-            'status.string' => 'The status must be a string.',
-            'status.enum' => 'The status must be a valid book category status.',
+            // Title
+            'title.required' => 'The book category title is required.',
+            'title.string' => 'The book category title must be a string.',
+            'title.max' => 'The book category title cannot exceed 255 characters.',
+            'title.unique' => 'A book category with this title already exists.',
+
+            // Code
+            'code.string' => 'The book category code must be a string.',
+            'code.max' => 'The book category code cannot exceed 20 characters.',
+            'code.unique' => 'A book category with this code already exists.',
+
+            // Description
+            'description.string' => 'The book category description must be a string.',
+            'description.max' => 'The book category description cannot exceed 1000 characters.',
+
+            // Status
+            'status.required' => 'The book category status is required.',
+            'status.string' => 'The book category status must be a string.',
+            'status.enum' => 'The book category status must be a valid book category status.',
         ];
     }
 
@@ -93,9 +125,10 @@ class BookCategoryRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'title' => 'category title',
-            'description' => 'category description',
-            'status' => 'category status',
+            'title' => 'book category title',
+            'code' => 'book category code',
+            'description' => 'book category description',
+            'status' => 'book category status',
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests\v1;
 
 use App\Http\Requests\BaseRequest;
 use App\Enums\v1\BookRequestStatus;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 /**
@@ -19,22 +20,31 @@ use Illuminate\Validation\Rule;
 class BookRequestRequest extends BaseRequest
 {
     /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, mixed>
      */
     public function rules(): array
     {
-        $bookRequestId = $this->route('id');
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
 
         return [
             /**
              * The category ID for the book request.
-             * @var int $category_id
+             * @var int $book_category_id
              * @example 1
              */
-            'category_id' => [
+            'book_category_id' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'exists:book_categories,id'
@@ -63,23 +73,23 @@ class BookRequestRequest extends BaseRequest
             ],
 
             /**
-             * The unique code of the book.
-             * @var string|null $code
-             * @example "BK001"
+             * The accession number of the book.
+             * @var string|null $accession_number
+             * @example "A00123"
              */
-            'code' => [
+            'accession_number' => [
                 'nullable',
                 'string',
-                'max:191'
+                'max:50'
             ],
 
             /**
              * The author of the book.
-             * @var string $author
+             * @var string|null $author
              * @example "John Doe"
              */
             'author' => [
-                $isUpdate ? 'sometimes' : 'required',
+                'nullable',
                 'string',
                 'max:255'
             ],
@@ -87,7 +97,7 @@ class BookRequestRequest extends BaseRequest
             /**
              * The publisher of the book.
              * @var string|null $publisher
-             * @example "Tech Publications"
+             * @example "Prentice Hall"
              */
             'publisher' => [
                 'nullable',
@@ -98,24 +108,24 @@ class BookRequestRequest extends BaseRequest
             /**
              * The edition of the book.
              * @var string|null $edition
-             * @example "2nd Edition"
+             * @example "3rd Edition"
              */
             'edition' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:50'
             ],
 
             /**
              * The publication year of the book.
-             * @var int|null $publish_year
+             * @var int|null $publication_year
              * @example 2023
              */
-            'publish_year' => [
+            'publication_year' => [
                 'nullable',
                 'integer',
                 'min:1900',
-                'max:' . date('Y')
+                'max:' . (date('Y'))
             ],
 
             /**
@@ -126,24 +136,25 @@ class BookRequestRequest extends BaseRequest
             'language' => [
                 'nullable',
                 'string',
-                'max:100'
+                'max:50'
             ],
 
             /**
-             * The price of the book.
+             * The estimated price of the book.
              * @var float|null $price
-             * @example 29.99
+             * @example 50.99
              */
             'price' => [
                 'nullable',
                 'numeric',
-                'min:0'
+                'min:0',
+                'max:999999.99'
             ],
 
             /**
-             * The requested quantity of the book.
+             * The quantity of copies requested.
              * @var int $quantity
-             * @example 5
+             * @example 1
              */
             'quantity' => [
                 $isUpdate ? 'sometimes' : 'required',
@@ -152,11 +163,11 @@ class BookRequestRequest extends BaseRequest
             ],
 
             /**
-             * The name of the person requesting the book.
-             * @var string $request_by
-             * @example "John Smith"
+             * The name of the person/department requesting the book.
+             * @var string $requester_name
+             * @example "Faculty of Science"
              */
-            'request_by' => [
+            'requester_name' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:255'
@@ -164,10 +175,10 @@ class BookRequestRequest extends BaseRequest
 
             /**
              * The phone number of the requester.
-             * @var string|null $phone
-             * @example "+1234567890"
+             * @var string|null $requester_phone
+             * @example "0123456789"
              */
-            'phone' => [
+            'requester_phone' => [
                 'nullable',
                 'string',
                 'max:20'
@@ -175,46 +186,43 @@ class BookRequestRequest extends BaseRequest
 
             /**
              * The email address of the requester.
-             * @var string|null $email
-             * @example "john@example.com"
+             * @var string|null $requester_email
+             * @example "request@college.edu"
              */
-            'email' => [
+            'requester_email' => [
                 'nullable',
                 'email',
                 'max:255'
             ],
 
             /**
-             * The description of the book request.
+             * Detailed description/justification for the request.
              * @var string|null $description
-             * @example "A comprehensive guide to programming fundamentals"
              */
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             /**
-             * Additional notes about the book request.
+             * Internal notes about the request.
              * @var string|null $note
-             * @example "Urgent request for next semester"
              */
             'note' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             /**
-             * The book image file (optional).
-             * @var \Illuminate\Http\UploadedFile|null $image
-             * @example "book_cover.jpg"
+             * An image of the book cover (optional).
+             * @var UploadedFile|string|null $cover_image_path
              */
-            'image' => [
+            'cover_image_path' => [
                 'nullable',
                 'file',
                 'image',
                 'mimes:jpeg,png,jpg,gif,svg,webp',
-                'max:10240' // 10MB
+                'max:10240'
             ],
 
             /**
@@ -223,7 +231,7 @@ class BookRequestRequest extends BaseRequest
              * @example "pending"
              */
             'status' => [
-                'nullable',
+                $isUpdate ? 'sometimes' : 'nullable',
                 'string',
                 Rule::enum(BookRequestStatus::class)
             ],
@@ -238,27 +246,77 @@ class BookRequestRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            'category_id.required' => 'Book category is required.',
-            'category_id.exists' => 'Selected book category does not exist.',
-            'title.required' => 'Book title is required.',
-            'title.max' => 'Book title may not be greater than 255 characters.',
-            'author.required' => 'Author name is required.',
-            'author.max' => 'Author name may not be greater than 255 characters.',
-            'quantity.required' => 'Quantity is required.',
-            'quantity.integer' => 'Quantity must be an integer.',
-            'quantity.min' => 'Quantity must be at least 1.',
-            'request_by.required' => 'Requester name is required.',
-            'request_by.max' => 'Requester name may not be greater than 255 characters.',
-            'email.email' => 'Email must be a valid email address.',
-            'publish_year.min' => 'Publication year must be at least 1900.',
-            'publish_year.max' => 'Publication year cannot be in the future.',
-            'price.numeric' => 'Price must be a number.',
-            'price.min' => 'Price must be at least 0.',
-            'image.file' => 'Image must be a valid file.',
-            'image.image' => 'Image must be an image.',
-            'image.mimes' => 'Image must be a file of type: jpeg, png, jpg, gif, svg, webp.',
-            'image.max' => 'Image may not be greater than 10MB.',
-            'status.enum' => 'Status must be one of: pending, in_progress, approved, rejected.',
+            // Book Category
+            'book_category_id.required' => 'The book category is required.',
+            'book_category_id.integer' => 'The book category must be a valid integer ID.',
+            'book_category_id.exists' => 'The selected book category is invalid or does not exist.',
+
+            // Title
+            'title.required' => 'The book title is required.',
+            'title.string' => 'The book title must be a string.',
+            'title.max' => 'The book title cannot exceed 255 characters.',
+
+            // ISBN
+            'isbn.string' => 'The ISBN must be a string.',
+            'isbn.max' => 'The ISBN cannot exceed 30 characters.',
+
+            // Accession Number
+            'accession_number.string' => 'The accession number must be a string.',
+            'accession_number.max' => 'The accession number cannot exceed 50 characters.',
+
+            // Author
+            'author.string' => 'The author name must be a string.',
+            'author.max' => 'The author name cannot exceed 255 characters.',
+
+            // Publisher
+            'publisher.string' => 'The publisher name must be a string.',
+            'publisher.max' => 'The publisher name cannot exceed 255 characters.',
+
+            // Edition
+            'edition.string' => 'The edition must be a string.',
+            'edition.max' => 'The edition cannot exceed 50 characters.',
+
+            // Publication Year
+            'publication_year.integer' => 'The publication year must be a valid whole number.',
+            'publication_year.min' => 'The publication year must be 1900 or later.',
+            'publication_year.max' => 'The publication year cannot be later than the current year (' . date('Y') . ').',
+
+            // Language
+            'language.string' => 'The language must be a string.',
+            'language.max' => 'The language cannot exceed 50 characters.',
+
+            // Price
+            'price.numeric' => 'The price must be a valid number.',
+            'price.min' => 'The price must be a non-negative value.',
+            'price.max' => 'The price cannot exceed 999,999.99.',
+
+            // Quantity
+            'quantity.required' => 'The quantity is required.',
+            'quantity.integer' => 'The quantity must be a whole number.',
+            'quantity.min' => 'The quantity must be at least 1.',
+
+            // Requester Details
+            'requester_name.required' => 'The requester name is required.',
+            'requester_name.string' => 'The requester name must be a string.',
+            'requester_name.max' => 'The requester name cannot exceed 255 characters.',
+            'requester_phone.string' => 'The requester phone number must be a string.',
+            'requester_phone.max' => 'The requester phone number cannot exceed 20 characters.',
+            'requester_email.email' => 'The requester email address must be a valid email format.',
+            'requester_email.max' => 'The requester email address cannot exceed 255 characters.',
+
+            // Description and Note
+            'description.string' => 'The description must be a string.',
+            'note.string' => 'The notes must be a string.',
+
+            // Cover Image
+            'cover_image_path.file' => 'The cover image file must be a valid file.',
+            'cover_image_path.image' => 'The cover image file must be an image.',
+            'cover_image_path.mimes' => 'The cover image must be one of the following types: :values.',
+            'cover_image_path.max' => 'The cover image file size cannot exceed 10MB.',
+
+            // Status
+            'status.string' => 'The status must be a string.',
+            'status.enum' => 'The status must be a valid book request status.',
         ];
     }
 
@@ -270,23 +328,23 @@ class BookRequestRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'category_id' => 'book category',
+            'book_category_id' => 'book category',
             'title' => 'book title',
             'isbn' => 'ISBN',
-            'code' => 'book code',
+            'accession_number' => 'accession number',
             'author' => 'author',
             'publisher' => 'publisher',
             'edition' => 'edition',
-            'publish_year' => 'publication year',
+            'publication_year' => 'publication year',
             'language' => 'language',
             'price' => 'price',
             'quantity' => 'quantity',
-            'request_by' => 'requester name',
-            'phone' => 'phone number',
-            'email' => 'email address',
+            'requester_name' => 'requester name',
+            'requester_phone' => 'requester phone number',
+            'requester_email' => 'requester email address',
             'description' => 'description',
             'note' => 'notes',
-            'image' => 'book image',
+            'cover_image_path' => 'cover image file',
             'status' => 'status',
         ];
     }

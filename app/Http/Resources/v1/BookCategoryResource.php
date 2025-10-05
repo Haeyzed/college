@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * BookCategoryResource - Version 1
+ * BookCategoryResource - Version 2.0.0
  *
- * Resource for transforming book category data in the College Management System.
- * This resource handles the API response format for book categories.
+ * Resource for transforming book category data in the College Management System,
+ * adapted for new fields and soft delete status.
  *
  * @package App\Http\Resources\v1
- * @version 1.0.0
+ * @version 2.0.0
  * @author Softmax Technologies
  */
 class BookCategoryResource extends JsonResource
@@ -39,6 +39,20 @@ class BookCategoryResource extends JsonResource
              * @example "Computer Science"
              */
             'title' => $this->title,
+
+            /**
+             * The URL-friendly slug for the category.
+             * @var string $slug
+             * @example "computer-science"
+             */
+            'slug' => $this->slug,
+
+            /**
+             * The internal short code for the category.
+             * @var string|null $code
+             * @example "CS"
+             */
+            'code' => $this->code,
 
             /**
              * The description of the book category.
@@ -74,6 +88,13 @@ class BookCategoryResource extends JsonResource
              * @example "2023-12-01 15:45:00"
              */
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * Timestamp when the record was soft deleted. Null if not deleted.
+             * @var string|null $deleted_at
+             * @example "2024-05-15T10:00:00.000000Z"
+             */
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

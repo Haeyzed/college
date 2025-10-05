@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,45 +11,58 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Enums\v1\BookStatus;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
- * Book Model - Version 1
+ * Book Model - Version 2.0.0
  *
  * Represents a book in the College Management System.
- * This model handles book information and relationships with categories and issues.
+ * This model handles book information and relationships with categories and issues,
+ * and implements soft deletes.
  *
  * @package App\Models\v1
- * @version 1.0.0
+ * @version 2.0.0
  * @author Softmax Technologies
  *
  * @property int $id
  * @property int $category_id
  * @property string $title
  * @property string $isbn
- * @property string $code
+ * @property string|null $accession_number
  * @property string $author
- * @property string $publisher
- * @property string $edition
- * @property int $publish_year
- * @property string $language
+ * @property string|null $publisher
+ * @property string|null $edition
+ * @property int|null $publication_year
+ * @property string|null $language
  * @property float $price
  * @property int $quantity
- * @property string $section
- * @property string $column
- * @property string $row
- * @property string $description
- * @property string $note
- * @property string|null $attach
+ * @property string|null $shelf_location
+ * @property string|null $shelf_column
+ * @property string|null $shelf_row
+ * @property string|null $description
+ * @property string|null $note
+ * @property string|null $cover_image_path
  * @property string $status
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
- * @property-read BookCategory $category
+ * @property-read BookCategory $bookCategory
+ * @property-read User|null $creator
+ * @property-read User|null $editor
  * @property-read Collection|IssueReturn[] $issues
+ *
+ * @method static Builder withTrashed(bool $withTrashed = true)
+ * @method static Builder onlyTrashed()
+ * @method static Builder withoutTrashed()
  */
-class Book extends Model
+class Book extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -59,21 +73,23 @@ class Book extends Model
         'category_id',
         'title',
         'isbn',
-        'code',
+        'accession_number',
         'author',
         'publisher',
         'edition',
-        'publish_year',
+        'publication_year',
         'language',
         'price',
         'quantity',
-        'section',
-        'column',
-        'row',
+        'shelf_location',
+        'shelf_column',
+        'shelf_row',
         'description',
         'note',
-        'image',
+        'cover_image_path',
         'status',
+        'created_by',
+        'updated_by',
     ];
 
     /**
@@ -84,7 +100,7 @@ class Book extends Model
     protected function casts(): array
     {
         return [
-            'publish_year' => 'integer',
+            'publication_year' => 'integer',
             'price' => 'float',
             'quantity' => 'integer',
             'status' => BookStatus::class,
@@ -92,11 +108,11 @@ class Book extends Model
     }
 
     /**
-     * Get the category that owns the book.
+     * Get the book category that owns the book.
      *
      * @return BelongsTo
      */
-    public function category(): BelongsTo
+    public function bookCategory(): BelongsTo
     {
         return $this->belongsTo(BookCategory::class);
     }
@@ -124,15 +140,15 @@ class Book extends Model
     }
 
     /**
-     * Scope to filter books by category.
+     * Scope to filter books by book category.
      *
      * @param Builder $query
-     * @param int $categoryId
+     * @param int $bookCategoryId
      * @return Builder
      */
-    public function scopeFilterByCategory(Builder $query, int $categoryId): Builder
+    public function scopeFilterByBookCategory(Builder $query, int $bookCategoryId): Builder
     {
-        return $query->where('category_id', $categoryId);
+        return $query->where('book_category_id', $bookCategoryId);
     }
 
     /**
@@ -148,7 +164,7 @@ class Book extends Model
     }
 
     /**
-     * Scope to search books by title, author, or ISBN.
+     * Scope to search books by title, author, ISBN, or Accession Number.
      *
      * @param Builder $query
      * @param string $search
@@ -160,7 +176,7 @@ class Book extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('author', $search)
                 ->orWhereLike('isbn', $search)
-                ->orWhereLike('code', $search);
+                ->orWhereLike('accession_number', $search);
         });
     }
 }

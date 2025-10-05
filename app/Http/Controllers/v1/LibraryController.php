@@ -18,8 +18,6 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use OpenApi\Attributes\QueryParameter;
-use OpenApi\Attributes\RequestBody;
 
 /**
  * LibraryController - Version 1
@@ -67,13 +65,13 @@ class LibraryController extends Controller
     {
         try {
             $perPage = $request->query('per_page', config('app.pagination.per_page', 15));
-            $categoryId = $request->query('category_id');
+            $bookCategoryId = $request->query('book_category_id');
             $status = $request->query('status');
             $author = $request->query('author');
             $search = $request->query('search');
             $available = $request->query('available');
 
-            $result = $this->libraryService->getBooks($perPage, $categoryId, $status, $author, $search, $available);
+            $result = $this->libraryService->getBooks($perPage, $bookCategoryId, $status, $author, $search, $available);
 
             return response()->paginated(
                 BookResource::collection($result),
@@ -123,12 +121,12 @@ class LibraryController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            
+
             // Handle file upload
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $request->file('image');
+            if ($request->hasFile('cover_image_path')) {
+                $validatedData['cover_image_path'] = $request->file('cover_image_path');
             }
-            
+
             $book = $this->libraryService->createBook($validatedData);
 
             return response()->success(
@@ -155,12 +153,11 @@ class LibraryController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            
-            // Handle file upload
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $request->file('image');
+
+            if ($request->hasFile('cover_image_path')) {
+                $validatedData['cover_image_path'] = $request->file('cover_image_path');
             }
-            
+
             $book = $this->libraryService->updateBook($id, $validatedData);
 
             return response()->success(
@@ -177,7 +174,7 @@ class LibraryController extends Controller
     }
 
     /**
-     * Delete a book.
+     * Delete a book (Soft Delete).
      *
      * @param int $id
      * @return JsonResponse
@@ -190,13 +187,13 @@ class LibraryController extends Controller
 
             return response()->success(
                 null,
-                'Book deleted successfully'
+                'Book soft-deleted successfully'
             );
         } catch (ModelNotFoundException $e) {
             return response()->notFound('Book not found');
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to delete book: ' . $e->getMessage()
+                'Failed to soft-delete book: ' . $e->getMessage()
             );
         }
     }
@@ -233,7 +230,7 @@ class LibraryController extends Controller
     }
 
     /**
-     * Bulk delete books.
+     * Bulk delete books (Soft Delete).
      *
      * @param Request $request
      * @return JsonResponse
@@ -252,11 +249,11 @@ class LibraryController extends Controller
 
             return response()->success(
                 ['deleted_count' => $deletedCount],
-                "Successfully deleted {$deletedCount} books"
+                "Successfully soft-deleted {$deletedCount} books"
             );
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to bulk delete books: ' . $e->getMessage()
+                'Failed to bulk soft-delete books: ' . $e->getMessage()
             );
         }
     }
@@ -273,13 +270,13 @@ class LibraryController extends Controller
         try {
             $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
-                'category_id' => 'required|integer|exists:book_categories,id'
+                'book_category_id' => 'required|integer|exists:book_categories,id'
             ]);
 
             $file = $request->file('file');
-            $categoryId = $request->input('category_id');
+            $bookCategoryId = $request->input('book_category_id');
 
-            $result = $this->libraryService->importBooks($file, $categoryId);
+            $result = $this->libraryService->importBooks($file, $bookCategoryId);
 
             if ($result['success']) {
                 return response()->success(
@@ -390,12 +387,12 @@ class LibraryController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            
+
             // Handle file upload
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $request->file('image');
+            if ($request->hasFile('cover_image_path')) {
+                $validatedData['cover_image_path'] = $request->file('cover_image_path');
             }
-            
+
             $bookRequest = $this->libraryService->createBookRequest($validatedData);
 
             return response()->success(
@@ -422,12 +419,12 @@ class LibraryController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            
+
             // Handle file upload
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $request->file('image');
+            if ($request->hasFile('cover_image_path')) {
+                $validatedData['cover_image_path'] = $request->file('cover_image_path');
             }
-            
+
             $bookRequest = $this->libraryService->updateBookRequest($id, $validatedData);
 
             return response()->success(
@@ -545,10 +542,10 @@ class LibraryController extends Controller
     {
         try {
             $perPage = $request->query('per_page', config('app.pagination.per_page', 15));
-            $status = $request->query('status');
             $search = $request->query('search');
+            $status = $request->query('status');
 
-            $result = $this->libraryService->getBookCategories($perPage, $status, $search);
+            $result = $this->libraryService->getBookCategories($perPage, $search, $status);
 
             return response()->paginated(
                 BookCategoryResource::collection($result),
@@ -636,7 +633,7 @@ class LibraryController extends Controller
     }
 
     /**
-     * Delete a book category.
+     * Delete a book category (Soft Delete).
      *
      * @param int $id
      * @return JsonResponse
@@ -649,13 +646,13 @@ class LibraryController extends Controller
 
             return response()->success(
                 null,
-                'Book category deleted successfully'
+                'Book category soft-deleted successfully'
             );
         } catch (ModelNotFoundException $e) {
             return response()->notFound('Book category not found');
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to delete book category: ' . $e->getMessage()
+                'Failed to soft-delete book category: ' . $e->getMessage()
             );
         }
     }
@@ -692,7 +689,7 @@ class LibraryController extends Controller
     }
 
     /**
-     * Bulk delete book categories.
+     * Bulk delete book categories (Soft Delete).
      *
      * @param Request $request
      * @return JsonResponse
@@ -711,11 +708,11 @@ class LibraryController extends Controller
 
             return response()->success(
                 ['deleted_count' => $deletedCount],
-                "Successfully deleted {$deletedCount} book categories"
+                "Successfully soft-deleted {$deletedCount} book categories"
             );
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to bulk delete book categories: ' . $e->getMessage()
+                'Failed to bulk soft-delete book categories: ' . $e->getMessage()
             );
         }
     }

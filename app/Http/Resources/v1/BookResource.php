@@ -36,13 +36,6 @@ class BookResource extends JsonResource
             'id' => $this->id,
 
             /**
-             * The ID of the category this book belongs to.
-             * @var int $category_id
-             * @example 1
-             */
-            'category_id' => $this->category_id,
-
-            /**
              * The title of the book.
              * @var string $title
              * @example "Introduction to Programming"
@@ -57,11 +50,11 @@ class BookResource extends JsonResource
             'isbn' => $this->isbn,
 
             /**
-             * The unique code of the book.
-             * @var string|null $code
-             * @example "BK001"
+             * The unique internal accession number for the book.
+             * @var string|null $accession_number
+             * @example "LMS-90021"
              */
-            'code' => $this->code,
+            'accession_number' => $this->accession_number,
 
             /**
              * The author of the book.
@@ -86,10 +79,10 @@ class BookResource extends JsonResource
 
             /**
              * The publication year of the book.
-             * @var int|null $publish_year
+             * @var int|null $publication_year
              * @example 2023
              */
-            'publish_year' => $this->publish_year,
+            'publication_year' => $this->publication_year,
 
             /**
              * The language of the book.
@@ -113,25 +106,25 @@ class BookResource extends JsonResource
             'quantity' => $this->quantity,
 
             /**
-             * The section where the book is located.
-             * @var string|null $section
-             * @example "A"
+             * The shelf location (main section) where the book is stored.
+             * @var string|null $shelf_location
+             * @example "Science-A"
              */
-            'section' => $this->section,
+            'shelf_location' => $this->shelf_location,
 
             /**
-             * The column where the book is located.
-             * @var string|null $column
-             * @example "1"
+             * The shelf column where the book is stored.
+             * @var string|null $shelf_column
+             * @example "C-2"
              */
-            'column' => $this->column,
+            'shelf_column' => $this->shelf_column,
 
             /**
-             * The row where the book is located.
-             * @var string|null $row
-             * @example "1"
+             * The shelf row where the book is stored.
+             * @var string|null $shelf_row
+             * @example "R-5"
              */
-            'row' => $this->row,
+            'shelf_row' => $this->shelf_row,
 
             /**
              * The description of the book.
@@ -148,18 +141,25 @@ class BookResource extends JsonResource
             'note' => $this->note,
 
             /**
-             * The book image path.
-             * @var string|null $image
+             * The path to the book's cover image.
+             * @var string|null $cover_image_path
              * @example "books/book_cover.jpg"
              */
-            'image' => $this->image,
+            'cover_image_path' => $this->cover_image_path,
 
             /**
              * The book image URL.
              * @var string|null $image_url
              * @example "http://localhost/storage/books/book_cover.jpg"
              */
-            'image_url' => StorageHelper::getConfigurableStorageUrl($this->image, 'filesystems.default'),
+            'cover_image_url' => StorageHelper::getConfigurableStorageUrl($this->cover_image, 'filesystems.default'),
+
+            /**
+             * Whether the book has a cover image path.
+             * @var bool $has_image
+             * @example true
+             */
+            'has_cover_image' => !empty($this->cover_image_path),
 
             /**
              * The status of the book (0=Inactive, 1=Active).
@@ -182,26 +182,31 @@ class BookResource extends JsonResource
              */
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
 
-            // Relationships
             /**
-             * The category information (loaded when relationship is included).
+             * Timestamp when the record was soft deleted. Null if not deleted.
+             * @var string|null $deleted_at
+             * @example "2024-05-15T10:00:00.000000Z"
+             */
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * The book category information (loaded when relationship is included).
              * @var BookCategoryResource|null $category
              */
-            'category' => new BookCategoryResource($this->whenLoaded('category')),
+            'book_category' => new BookCategoryResource($this->whenLoaded('bookCategory')),
 
             /**
              * The book issues/returns (loaded when relationship is included).
              * @var IssueReturnResource[]|null $issues
              */
-            'issues' => \App\Http\Resources\v1\IssueReturnResource::collection($this->whenLoaded('issues')),
+            'issues' => IssueReturnResource::collection($this->whenLoaded('issues')),
 
-            // Computed fields
             /**
-             * Whether the book is currently available for issue.
+             * Whether the book is currently available (quantity > 0 and not soft deleted).
              * @var bool $is_available
              * @example true
              */
-            'is_available' => $this->quantity > 0,
+            'is_available' => $this->quantity > 0 && is_null($this->deleted_at),
 
             /**
              * The number of currently issued copies (computed when issues are loaded).
@@ -222,24 +227,6 @@ class BookResource extends JsonResource
                     ->where('due_date', '<', now())
                     ->count();
             }),
-
-            /**
-             * Whether the book has an image.
-             * @var bool $has_image
-             * @example true
-             */
-            'has_image' => !empty($this->image),
-
-            /**
-             * The book image information.
-             * @var array $image_info
-             * @example {"has_image": true, "url": "http://localhost/storage/books/book_cover.jpg"}
-             */
-            'image_info' => [
-                'has_image' => !empty($this->image),
-                'url' => StorageHelper::getConfigurableStorageUrl($this->image, 'filesystems.default'),
-                'path' => $this->image,
-            ],
         ];
     }
 }

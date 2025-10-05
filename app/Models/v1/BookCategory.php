@@ -8,31 +8,43 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use App\Enums\v1\BookCategoryStatus;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
- * BookCategory Model - Version 1
+ * BookCategory Model - Version 2.0.0
  *
  * Represents a book category in the College Management System.
- * This model handles book category information and relationships with books.
+ * This model implements soft deletes and handles category information.
  *
  * @package App\Models\v1
- * @version 1.0.0
+ * @version 2.0.0
  * @author Softmax Technologies
  *
  * @property int $id
  * @property string $title
  * @property string $slug
- * @property string $description
+ * @property string|null $code
+ * @property string|null $description
  * @property string $status
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @property-read Collection|Book[] $books
+ *
+ * @method static Builder withTrashed(bool $withTrashed = true)
+ * @method static Builder onlyTrashed()
+ * @method static Builder withoutTrashed()
  */
-class BookCategory extends Model
+class BookCategory extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -41,12 +53,16 @@ class BookCategory extends Model
      */
     protected $fillable = [
         'title',
+        'slug',
+        'code',
         'description',
         'status',
+        'created_by',
+        'updated_by',
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -54,7 +70,28 @@ class BookCategory extends Model
     {
         return [
             'status' => BookCategoryStatus::class,
+            'deleted_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Boot the model.
+     * Generates slug before creation/update.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($category) {
+            $category->slug = Str::slug($category->title);
+        });
+
+        static::updating(function ($category) {
+            // Only update slug if title has changed
+            if ($category->isDirty('title')) {
+                $category->slug = Str::slug($category->title);
+            }
+        });
     }
 
     /**
@@ -64,7 +101,7 @@ class BookCategory extends Model
      */
     public function books(): HasMany
     {
-        return $this->hasMany(Book::class, 'category_id');
+        return $this->hasMany(Book::class);
     }
 
     /**
@@ -80,7 +117,7 @@ class BookCategory extends Model
     }
 
     /**
-     * Scope to search book categories by title.
+     * Scope to search book categories by title or code.
      *
      * @param Builder $query
      * @param string $search
@@ -90,7 +127,7 @@ class BookCategory extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->whereLike('title', $search)
-                ->orWhereLike('slug', $search);
+                ->orWhereLike('code', $search); // Searching by new 'code' field
         });
     }
 }

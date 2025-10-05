@@ -35,13 +35,6 @@ class BookRequestResource extends JsonResource
             'id' => $this->id,
 
             /**
-             * The ID of the category this book request belongs to.
-             * @var int $category_id
-             * @example 1
-             */
-            'category_id' => $this->category_id,
-
-            /**
              * The title of the book being requested.
              * @var string $title
              * @example "Introduction to Programming"
@@ -56,15 +49,15 @@ class BookRequestResource extends JsonResource
             'isbn' => $this->isbn,
 
             /**
-             * The unique code of the book.
-             * @var string|null $code
-             * @example "BK001"
+             * The accession number of the book.
+             * @var string|null $accession_number
+             * @example "A00123"
              */
-            'code' => $this->code,
+            'accession_number' => $this->accession_number,
 
             /**
              * The author of the book.
-             * @var string $author
+             * @var string|null $author
              * @example "John Doe"
              */
             'author' => $this->author,
@@ -72,23 +65,23 @@ class BookRequestResource extends JsonResource
             /**
              * The publisher of the book.
              * @var string|null $publisher
-             * @example "Tech Publications"
+             * @example "Prentice Hall"
              */
             'publisher' => $this->publisher,
 
             /**
              * The edition of the book.
              * @var string|null $edition
-             * @example "2nd Edition"
+             * @example "3rd Edition"
              */
             'edition' => $this->edition,
 
             /**
              * The publication year of the book.
-             * @var int|null $publish_year
+             * @var int|null $publication_year
              * @example 2023
              */
-            'publish_year' => $this->publish_year,
+            'publication_year' => (int) $this->publication_year,
 
             /**
              * The language of the book.
@@ -98,67 +91,65 @@ class BookRequestResource extends JsonResource
             'language' => $this->language,
 
             /**
-             * The price of the book.
+             * The estimated price of the book.
              * @var float|null $price
-             * @example 29.99
+             * @example 50.99
              */
-            'price' => $this->price,
+            'price' => (float) $this->price,
 
             /**
-             * The requested quantity of the book.
+             * The quantity of copies requested.
              * @var int $quantity
-             * @example 5
+             * @example 1
              */
-            'quantity' => $this->quantity,
+            'quantity' => (int) $this->quantity,
 
             /**
-             * The name of the person requesting the book.
-             * @var string $request_by
-             * @example "John Smith"
+             * The name of the person/department requesting the book.
+             * @var string $requester_name
+             * @example "Faculty of Science"
              */
-            'request_by' => $this->request_by,
+            'requester_name' => $this->requester_name,
 
             /**
              * The phone number of the requester.
-             * @var string|null $phone
-             * @example "+1234567890"
+             * @var string|null $requester_phone
+             * @example "0123456789"
              */
-            'phone' => $this->phone,
+            'requester_phone' => $this->requester_phone,
 
             /**
              * The email address of the requester.
-             * @var string|null $email
-             * @example "john@example.com"
+             * @var string|null $requester_email
+             * @example "request@college.edu"
              */
-            'email' => $this->email,
+            'requester_email' => $this->requester_email,
 
             /**
-             * The description of the book request.
+             * Detailed description/justification for the request.
              * @var string|null $description
-             * @example "A comprehensive guide to programming fundamentals"
              */
             'description' => $this->description,
 
             /**
-             * Additional notes about the book request.
+             * Internal notes about the request.
              * @var string|null $note
-             * @example "Urgent request for next semester"
              */
             'note' => $this->note,
 
             /**
-             * The book image path.
-             * @var string|null $image
+             * The book cover image path.
+             * @var string|null $cover_image_path
              * @example "book-requests/book_cover.jpg"
              */
-            'image' => $this->image,
+            'cover_image_path' => $this->cover_image_path,
 
             /**
-             * The book image URL.
-             * @var string|null $image_url
+             * The book cover image URL.
+             * @var string|null $cover_image_url
              * @example "http://localhost/storage/book-requests/book_cover.jpg"
              */
-            'image_url' => StorageHelper::getConfigurableStorageUrl($this->image, 'filesystems.default'),
+            'cover_image_url' => StorageHelper::getConfigurableStorageUrl($this->cover_image_path, 'filesystems.default'),
 
             /**
              * The status of the book request.
@@ -181,12 +172,18 @@ class BookRequestResource extends JsonResource
              */
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
 
-            // Relationships
+            /**
+             * The soft delete timestamp.
+             * @var string|null $deleted_at
+             * @example "2024-01-10 10:00:00"
+             */
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
+
             /**
              * The category information (loaded when relationship is included).
-             * @var BookCategoryResource|null $category
+             * @var BookCategoryResource|null $book_category
              */
-            'category' => new BookCategoryResource($this->whenLoaded('category')),
+            'book_category' => BookCategoryResource::make($this->whenLoaded('bookCategory')),
         ];
     }
 }
