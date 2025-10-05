@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Program Resource - Version 1
+ * ProgramResource - Version 1
  *
- * This resource transforms Program model data for API responses
- * in the College Management System.
+ * Resource for transforming Program model data into API responses.
+ * This resource handles program data formatting for API endpoints.
  *
  * @package App\Http\Resources\v1
  * @version 1.0.0
@@ -26,48 +26,145 @@ class ProgramResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            /**
+             * The unique identifier of the program.
+             * @var int $id
+             * @example 1
+             */
             'id' => $this->id,
-            'title' => $this->title,
-            'shortcode' => $this->shortcode,
+
+            /**
+             * The faculty ID that the program belongs to.
+             * @var int $faculty_id
+             * @example 1
+             */
+            'faculty_id' => $this->faculty_id,
+
+            /**
+             * The name of the program.
+             * @var string $name
+             * @example "Bachelor of Computer Science"
+             */
+            'name' => $this->name,
+
+            /**
+             * The slug of the program.
+             * @var string $slug
+             * @example "bachelor-of-computer-science"
+             */
             'slug' => $this->slug,
+
+            /**
+             * The unique code of the program.
+             * @var string $code
+             * @example "BCS"
+             */
+            'code' => $this->code,
+
+            /**
+             * The description of the program.
+             * @var string|null $description
+             * @example "Comprehensive computer science program"
+             */
             'description' => $this->description,
-            'duration' => $this->duration,
-            'duration_type' => $this->duration_type,
-            'duration_text' => $this->getDurationText(),
+
+            /**
+             * The duration of the program in years.
+             * @var int $duration_years
+             * @example 4
+             */
+            'duration_years' => $this->duration_years,
+
+            /**
+             * The total credits required for the program.
+             * @var int $total_credits
+             * @example 120
+             */
             'total_credits' => $this->total_credits,
-            'total_semesters' => $this->total_semesters,
-            'fee_structure' => $this->fee_structure,
+
+            /**
+             * The fee amount for the program.
+             * @var float|null $fee_amount
+             * @example 5000.00
+             */
+            'fee_amount' => $this->fee_amount,
+
+            /**
+             * The degree type of the program.
+             * @var string $degree_type
+             * @example "bachelor"
+             */
+            'degree_type' => $this->degree_type,
+
+            /**
+             * The admission requirements for the program.
+             * @var string|null $admission_requirements
+             * @example "High school diploma or equivalent"
+             */
             'admission_requirements' => $this->admission_requirements,
-            'curriculum' => $this->curriculum,
-            'career_prospects' => $this->career_prospects,
-            'image' => $this->image,
-            'brochure' => $this->brochure,
+
+            /**
+             * Whether registration is open for the program.
+             * @var bool $is_registration_open
+             * @example true
+             */
+            'is_registration_open' => $this->is_registration_open,
+
+            /**
+             * The status of the program.
+             * @var string $status
+             * @example "active"
+             */
             'status' => $this->status,
-            'status_text' => $this->getStatusText(),
-            'is_featured' => $this->is_featured,
+
+            /**
+             * The sort order for display.
+             * @var int $sort_order
+             * @example 1
+             */
             'sort_order' => $this->sort_order,
 
-            // Faculty Information
-            'faculty_info' => [
-                'faculty_id' => $this->faculty_id,
-                'faculty' => new FacultyResource($this->whenLoaded('faculty')),
-            ],
+            /**
+             * The creation timestamp.
+             * @var string|null $created_at
+             * @example "2023-12-01 10:30:00"
+             */
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
 
-            // Timestamps
-            'timestamps' => [
-                'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            ],
+            /**
+             * The last update timestamp.
+             * @var string|null $updated_at
+             * @example "2023-12-01 15:45:00"
+             */
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
 
-            // Relationships
-            'relationships' => [
-                'batches' => BatchResource::collection($this->whenLoaded('batches')),
-                'subjects' => SubjectResource::collection($this->whenLoaded('subjects')),
-                'sessions' => SessionResource::collection($this->whenLoaded('sessions')),
-                'semesters' => SemesterResource::collection($this->whenLoaded('semesters')),
-                'students' => StudentResource::collection($this->whenLoaded('students')),
-                'applications' => ApplicationResource::collection($this->whenLoaded('applications')),
-            ],
+            /**
+             * Timestamp when the record was soft deleted. Null if not deleted.
+             * @var string|null $deleted_at
+             * @example "2024-05-15T10:00:00.000000Z"
+             */
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * The faculty information (loaded when relationship is included).
+             * @var FacultyResource|null $faculty
+             */
+            'faculty' => new FacultyResource($this->whenLoaded('faculty')),
+
+            /**
+             * The batches associated with this program (loaded when relationship is included).
+             * @var BatchResource[]|null $batches
+             */
+            'batches' => BatchResource::collection($this->whenLoaded('batches')),
+
+            /**
+             * The number of batches in this program (computed when batches are loaded).
+             * @var int|null $batches_count
+             * @example 3
+             */
+            'batches_count' => $this->whenLoaded('batches', function () {
+                return $this->batches->count();
+            }),
         ];
     }
 }

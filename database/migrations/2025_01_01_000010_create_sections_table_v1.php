@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\v1\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -8,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
  * Create Sections Table Migration - Version 1
  * 
  * This migration creates the sections table for the College Management System.
- * It handles section information storage with proper indexing and constraints.
+ * It handles section information storage with proper indexing, constraints, and soft deletes.
  * 
  * @package Database\Migrations
  * @version 1.0.0
@@ -25,12 +26,20 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->integer('seat')->nullable();
-            $table->string('status')->default('active');
+            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->integer('max_students')->nullable();
+            $table->text('description')->nullable();
+            $table->string('status')->default(Status::ACTIVE->value);
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
+            $table->softDeletes();
             
-            $table->index(['status']);
+            // Indexes for better performance
+            $table->index(['batch_id', 'status']);
+            $table->index(['code']);
+            $table->index(['deleted_at']);
         });
     }
 

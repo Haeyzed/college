@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\v1\Status;
+use App\Enums\v1\RoomType;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * ClassRoom Model - Version 1
@@ -21,23 +25,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @author Softmax Technologies
  *
  * @property int $id
- * @property string $title
- * @property string $slug
- * @property int $floor
+ * @property string $name
+ * @property string $code
+ * @property string|null $floor
  * @property int $capacity
- * @property string $type
- * @property string $description
+ * @property string $room_type
+ * @property string|null $description
+ * @property array|null $facilities
+ * @property bool $is_available
  * @property string $status
+ * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @property-read Collection|Program[] $programs
  * @property-read Collection|ClassRoutine[] $classes
  * @property-read Collection|ExamRoutine[] $examRoutines
+ *
+ * @method static Builder withTrashed(bool $withTrashed = true)
+ * @method static Builder onlyTrashed()
+ * @method static Builder withoutTrashed()
  */
-class ClassRoom extends Model
+class ClassRoom extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -45,13 +58,16 @@ class ClassRoom extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
-        'slug',
+        'name',
+        'code',
         'floor',
         'capacity',
-        'type',
+        'room_type',
         'description',
+        'facilities',
+        'is_available',
         'status',
+        'sort_order',
     ];
 
     /**
@@ -62,8 +78,11 @@ class ClassRoom extends Model
     protected function casts(): array
     {
         return [
-            'floor' => 'integer',
-            'capacity' => 'integer',
+            'facilities' => 'array',
+            'is_available' => 'boolean',
+            'room_type' => RoomType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -110,31 +129,54 @@ class ClassRoom extends Model
     }
 
     /**
-     * Scope to filter classrooms by type.
+     * Scope to filter classrooms by room type.
      *
      * @param Builder $query
-     * @param string $type
+     * @param string $roomType
      * @return Builder
      */
-    public function scopeFilterByType(Builder $query, string $type): Builder
+    public function scopeFilterByRoomType(Builder $query, string $roomType): Builder
     {
-        return $query->where('type', $type);
+        return $query->where('room_type', $roomType);
     }
 
     /**
      * Scope to filter classrooms by floor.
      *
      * @param Builder $query
-     * @param int $floor
+     * @param string $floor
      * @return Builder
      */
-    public function scopeFilterByFloor(Builder $query, int $floor): Builder
+    public function scopeFilterByFloor(Builder $query, string $floor): Builder
     {
         return $query->where('floor', $floor);
     }
 
     /**
-     * Scope to search classrooms by title.
+     * Scope to filter available classrooms.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->where('is_available', true);
+    }
+
+    /**
+     * Scope to filter classrooms by capacity.
+     *
+     * @param Builder $query
+     * @param int $minCapacity
+     * @return Builder
+     */
+    public function scopeFilterByCapacity(Builder $query, int $minCapacity): Builder
+    {
+        return $query->where('capacity', '>=', $minCapacity);
+    }
+
+    /**
+     * Scope to search classrooms by name, code, or description.
      *
      * @param Builder $query
      * @param string $search
@@ -143,8 +185,20 @@ class ClassRoom extends Model
     public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
-            $q->whereLike('title', $search)
-                ->orWhereLike('slug', $search);
+            $q->whereLike('name', $search)
+                ->orWhereLike('code', $search)
+                ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Scope to order classrooms by sort order.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

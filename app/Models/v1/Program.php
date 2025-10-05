@@ -11,6 +11,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
+use App\Enums\v1\Status;
+use App\Enums\v1\DegreeType;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * Program Model - Version 1
@@ -25,13 +30,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * @property int $id
  * @property int $faculty_id
- * @property string $title
+ * @property string $name
  * @property string $slug
- * @property string $shortcode
- * @property string $registration
+ * @property string $code
+ * @property string|null $description
+ * @property int $duration_years
+ * @property int $total_credits
+ * @property float|null $fee_amount
+     * @property DegreeType $degree_type
+ * @property string|null $admission_requirements
+ * @property bool $is_registration_open
  * @property string $status
+ * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @property-read Faculty $faculty
  * @property-read Collection|Batch[] $batches
@@ -45,10 +58,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read Collection|ClassRoutine[] $classes
  * @property-read Collection|User[] $users
  * @property-read Collection|Content[] $contents
+ *
+ * @method static Builder withTrashed(bool $withTrashed = true)
+ * @method static Builder onlyTrashed()
+ * @method static Builder withoutTrashed()
  */
-class Program extends Model
+class Program extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -57,12 +75,55 @@ class Program extends Model
      */
     protected $fillable = [
         'faculty_id',
-        'title',
+        'name',
         'slug',
-        'shortcode',
-        'registration',
+        'code',
+        'description',
+        'duration_years',
+        'total_credits',
+        'fee_amount',
+        'degree_type',
+        'admission_requirements',
+        'is_registration_open',
         'status',
+        'sort_order',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'fee_amount' => 'decimal:2',
+            'is_registration_open' => 'boolean',
+            'degree_type' => DegreeType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Boot the model.
+     * Generates slug before creation/update.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($program) {
+            $program->slug = Str::slug($program->name);
+        });
+
+        static::updating(function ($program) {
+            // Only update slug if name has changed
+            if ($program->isDirty('name')) {
+                $program->slug = Str::slug($program->name);
+            }
+        });
+    }
 
     /**
      * Get the faculty that owns the program.
@@ -191,7 +252,7 @@ class Program extends Model
      * @param string $status
      * @return Builder
      */
-    public function scopeFilterByStatus($query, $status)
+    public function scopeFilterByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
@@ -203,24 +264,59 @@ class Program extends Model
      * @param int $facultyId
      * @return Builder
      */
-    public function scopeFilterByFaculty($query, $facultyId)
+    public function scopeFilterByFaculty(Builder $query, int $facultyId): Builder
     {
         return $query->where('faculty_id', $facultyId);
     }
 
     /**
-     * Scope to search programs by title or shortcode.
+     * Scope to filter programs by degree type.
+     *
+     * @param Builder $query
+     * @param string $degreeType
+     * @return Builder
+     */
+    public function scopeFilterByDegreeType(Builder $query, string $degreeType): Builder
+    {
+        return $query->where('degree_type', $degreeType);
+    }
+
+    /**
+     * Scope to filter programs by registration status.
+     *
+     * @param Builder $query
+     * @param bool $isOpen
+     * @return Builder
+     */
+    public function scopeFilterByRegistrationStatus(Builder $query, bool $isOpen): Builder
+    {
+        return $query->where('is_registration_open', $isOpen);
+    }
+
+    /**
+     * Scope to search programs by name, code, or description.
      *
      * @param Builder $query
      * @param string $search
      * @return Builder
      */
-    public function scopeSearch($query, $search)
+    public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
-            $q->whereLike('title', $search)
-                ->orWhereLike('shortcode', $search)
-                ->orWhereLike('slug', $search);
+            $q->whereLike('name', $search)
+                ->orWhereLike('code', $search)
+                ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Scope to order programs by sort order.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

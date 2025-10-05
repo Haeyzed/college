@@ -283,14 +283,14 @@ Route::prefix('v1')->group(function () {
             // Book Issues/Returns Management
             Route::prefix('issues')->group(function () {
                 // Issue/Return Operations
-                Route::post('/issue', [LibraryController::class, 'issueBook']);
-                Route::post('/return', [LibraryController::class, 'returnBook']);
+            Route::post('/issue', [LibraryController::class, 'issueBook']);
+            Route::post('/return', [LibraryController::class, 'returnBook']);
                 Route::get('/', [LibraryController::class, 'getBookIssues']);
             });
 
             // Library Settings
             Route::prefix('settings')->group(function () {
-                // ID Card Settings
+            // ID Card Settings
                 Route::get('/id-card', [LibraryController::class, 'getIdCardSetting']);
                 Route::post('/id-card', [LibraryController::class, 'updateIdCardSetting']);
             });

@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\v1\Status;
+use App\Enums\v1\SubjectType;
+use App\Enums\v1\ClassType;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * Subject Model - Version 1
@@ -22,17 +27,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @author Softmax Technologies
  *
  * @property int $id
- * @property string $title
+ * @property string $name
  * @property string $code
- * @property int $credit_hour
+ * @property int $credit_hours
  * @property string $subject_type
  * @property string $class_type
- * @property int $total_marks
- * @property int $passing_marks
+ * @property float|null $total_marks
+ * @property float|null $passing_marks
  * @property string|null $description
+ * @property string|null $learning_outcomes
+ * @property string|null $prerequisites
  * @property string $status
+ * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @property-read Collection|Program[] $programs
  * @property-read Collection|EnrollSubject[] $subjectEnrolls
@@ -42,10 +51,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection|ExamRoutine[] $examRoutines
  * @property-read Collection|Exam[] $exams
  * @property-read Collection|SubjectMarking[] $subjectMarks
+ *
+ * @method static Builder withTrashed(bool $withTrashed = true)
+ * @method static Builder onlyTrashed()
+ * @method static Builder withoutTrashed()
  */
-class Subject extends Model
+class Subject extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -53,15 +67,18 @@ class Subject extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
+        'name',
         'code',
-        'credit_hour',
+        'credit_hours',
         'subject_type',
         'class_type',
         'total_marks',
         'passing_marks',
         'description',
+        'learning_outcomes',
+        'prerequisites',
         'status',
+        'sort_order',
     ];
 
     /**
@@ -72,9 +89,13 @@ class Subject extends Model
     protected function casts(): array
     {
         return [
-            'credit_hour' => 'integer',
-            'total_marks' => 'integer',
-            'passing_marks' => 'integer',
+            'credit_hours' => 'integer',
+            'total_marks' => 'decimal:2',
+            'passing_marks' => 'decimal:2',
+            'subject_type' => SubjectType::class,
+            'class_type' => ClassType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -165,21 +186,21 @@ class Subject extends Model
      * @param string $status
      * @return Builder
      */
-    public function scopeFilterByStatus($query, $status)
+    public function scopeFilterByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
 
     /**
-     * Scope to filter subjects by type.
+     * Scope to filter subjects by subject type.
      *
      * @param Builder $query
-     * @param string $type
+     * @param string $subjectType
      * @return Builder
      */
-    public function scopeFilterByType($query, $type)
+    public function scopeFilterBySubjectType(Builder $query, string $subjectType): Builder
     {
-        return $query->where('subject_type', $type);
+        return $query->where('subject_type', $subjectType);
     }
 
     /**
@@ -189,23 +210,47 @@ class Subject extends Model
      * @param string $classType
      * @return Builder
      */
-    public function scopeFilterByClassType($query, $classType)
+    public function scopeFilterByClassType(Builder $query, string $classType): Builder
     {
         return $query->where('class_type', $classType);
     }
 
     /**
-     * Scope to search subjects by title or code.
+     * Scope to filter subjects by credit hours.
+     *
+     * @param Builder $query
+     * @param int $creditHours
+     * @return Builder
+     */
+    public function scopeFilterByCreditHours(Builder $query, int $creditHours): Builder
+    {
+        return $query->where('credit_hours', $creditHours);
+    }
+
+    /**
+     * Scope to search subjects by name, code, or description.
      *
      * @param Builder $query
      * @param string $search
      * @return Builder
      */
-    public function scopeSearch($query, $search)
+    public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
-            $q->whereLike('title', $search)
-                ->orWhereLike('code', $search);
+            $q->whereLike('name', $search)
+                ->orWhereLike('code', $search)
+                ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Scope to order subjects by sort order.
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

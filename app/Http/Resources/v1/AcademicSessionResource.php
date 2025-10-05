@@ -6,16 +6,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * SemesterResource - Version 1
+ * AcademicSessionResource - Version 1
  *
- * Resource for transforming Semester model data into API responses.
- * This resource handles semester data formatting for API endpoints.
+ * Resource for transforming AcademicSession model data into API responses.
+ * This resource handles academic session data formatting for API endpoints.
  *
  * @package App\Http\Resources\v1
  * @version 1.0.0
  * @author Softmax Technologies
  */
-class SemesterResource extends JsonResource
+class AcademicSessionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -27,63 +27,56 @@ class SemesterResource extends JsonResource
     {
         return [
             /**
-             * The unique identifier of the semester.
+             * The unique identifier of the academic session.
              * @var int $id
              * @example 1
              */
             'id' => $this->id,
 
             /**
-             * The name of the semester.
+             * The name of the academic session.
              * @var string $name
-             * @example "Fall 2024"
+             * @example "Academic Year 2024-2025"
              */
             'name' => $this->name,
 
             /**
-             * The unique code of the semester.
+             * The unique code of the academic session.
              * @var string $code
-             * @example "F2024"
+             * @example "AY2024"
              */
             'code' => $this->code,
 
             /**
-             * The academic year of the semester.
-             * @var int $academic_year
-             * @example 2024
-             */
-            'academic_year' => $this->academic_year,
-
-            /**
-             * The start date of the semester.
+             * The start date of the academic session.
              * @var string $start_date
              * @example "2024-09-01"
              */
             'start_date' => $this->start_date?->format('Y-m-d'),
 
             /**
-             * The end date of the semester.
+             * The end date of the academic session.
              * @var string $end_date
-             * @example "2024-12-31"
+             * @example "2025-08-31"
              */
             'end_date' => $this->end_date?->format('Y-m-d'),
 
             /**
-             * Whether this is the current semester.
+             * Whether this is the current academic session.
              * @var bool $is_current
              * @example true
              */
             'is_current' => $this->is_current,
 
             /**
-             * The description of the semester.
+             * The description of the academic session.
              * @var string|null $description
-             * @example "Fall semester for academic year 2024"
+             * @example "Academic year 2024-2025 session"
              */
             'description' => $this->description,
 
             /**
-             * The status of the semester.
+             * The status of the academic session.
              * @var string $status
              * @example "active"
              */
@@ -118,24 +111,18 @@ class SemesterResource extends JsonResource
             'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
 
             /**
-             * The academic session information (loaded when relationship is included).
-             * @var AcademicSessionResource|null $academic_session
+             * The semesters in this academic session (loaded when relationship is included).
+             * @var SemesterResource[]|null $semesters
              */
-            'academic_session' => new AcademicSessionResource($this->whenLoaded('academicSession')),
+            'semesters' => SemesterResource::collection($this->whenLoaded('semesters')),
 
             /**
-             * The subjects in this semester (loaded when relationship is included).
-             * @var SubjectResource[]|null $subjects
+             * The number of semesters in this academic session (computed when semesters are loaded).
+             * @var int|null $semesters_count
+             * @example 2
              */
-            'subjects' => SubjectResource::collection($this->whenLoaded('subjects')),
-
-            /**
-             * The number of subjects in this semester (computed when subjects are loaded).
-             * @var int|null $subjects_count
-             * @example 5
-             */
-            'subjects_count' => $this->whenLoaded('subjects', function () {
-                return $this->subjects->count();
+            'semesters_count' => $this->whenLoaded('semesters', function () {
+                return $this->semesters->count();
             }),
         ];
     }
