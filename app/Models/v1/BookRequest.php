@@ -164,4 +164,33 @@ class BookRequest extends Model implements Auditable
             ;
         });
     }
+
+    /**
+     * Scope to filter book requests by requester.
+     *
+     * @param Builder $query
+     * @param string $requesterName
+     * @return Builder
+     */
+    public function scopeFilterByRequester(Builder $query, string $requesterName): Builder
+    {
+        return $query->where('requester_name', 'like', "%{$requesterName}%");
+    }
+
+    /**
+     * Boot the model.
+     * Handle image deletion on force delete.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Handle image deletion on force delete
+        static::deleting(function ($bookRequest) {
+            if ($bookRequest->isForceDeleting() && $bookRequest->cover_image_path) {
+                // Delete the image file when force deleting
+                \Storage::disk('public')->delete($bookRequest->cover_image_path);
+            }
+        });
+    }
 }

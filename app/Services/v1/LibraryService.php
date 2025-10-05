@@ -50,7 +50,7 @@ class LibraryService
             ->when($status, fn ($q) => $q->filterByStatus($status))
             ->when($author, fn ($q) => $q->filterByAuthor($author))
             ->when($search, fn ($q) => $q->search($search))
-            ->when($available, fn ($q) => $q->where('quantity', '>', 0));
+            ->when($available !== null, fn ($q) => $q->filterByAvailability($available));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
@@ -118,7 +118,7 @@ class LibraryService
     }
 
     /**
-     * Delete a book.
+     * Delete a book (Soft Delete).
      */
     public function deleteBook(int $id): bool
     {
@@ -133,7 +133,29 @@ class LibraryService
                 throw new Exception('Cannot delete book with active issues');
             }
 
-            $book->delete();
+            $book->delete(); // Soft delete - image is preserved
+
+            return true;
+        });
+    }
+
+    /**
+     * Force delete a book (Permanent Delete).
+     */
+    public function forceDeleteBook(int $id): bool
+    {
+        return DB::transaction(function () use ($id) {
+            $book = Book::query()->findOrFail($id);
+
+            $activeIssues = IssueReturn::query()->where('book_id', $id)
+                ->where('status', IssueStatus::ISSUED->value)
+                ->count();
+
+            if ($activeIssues > 0) {
+                throw new Exception('Cannot force delete book with active issues');
+            }
+
+            $book->forceDelete(); // Force delete - image will be deleted in model boot
 
             return true;
         });
@@ -150,7 +172,7 @@ class LibraryService
     }
 
     /**
-     * Bulk delete books.
+     * Bulk delete books (Soft Delete).
      */
     public function bulkDeleteBooks(array $ids): int
     {
@@ -167,7 +189,33 @@ class LibraryService
                     continue;
                 }
 
-                $book->delete();
+                $book->delete(); // Soft delete - images preserved
+                $deletedCount++;
+            }
+
+            return $deletedCount;
+        });
+    }
+
+    /**
+     * Bulk force delete books (Permanent Delete).
+     */
+    public function bulkForceDeleteBooks(array $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $books = Book::query()->whereIn('id', $ids)->get();
+            $deletedCount = 0;
+
+            foreach ($books as $book) {
+                $activeIssues = IssueReturn::query()->where('book_id', $book->id)
+                    ->where('status', IssueStatus::ISSUED->value)
+                    ->count();
+
+                if ($activeIssues > 0) {
+                    continue;
+                }
+
+                $book->forceDelete(); // Force delete - images will be deleted
                 $deletedCount++;
             }
 
@@ -253,12 +301,13 @@ class LibraryService
     /**
      * Get a paginated list of book requests.
      */
-    public function getBookRequests(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null): LengthAwarePaginator
+    public function getBookRequests(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?string $requester = null): LengthAwarePaginator
     {
         $query = BookRequest::with(['bookCategory'])
             ->when($bookCategoryId, fn ($q) => $q->filterByBookCategory($bookCategoryId))
             ->when($status, fn ($q) => $q->filterByStatus($status))
             ->when($author, fn ($q) => $q->filterByAuthor($author))
+            ->when($requester, fn ($q) => $q->filterByRequester($requester))
             ->when($search, fn ($q) => $q->search($search));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
@@ -327,14 +376,28 @@ class LibraryService
     }
 
     /**
-     * Delete a book request.
+     * Delete a book request (Soft Delete).
      */
     public function deleteBookRequest(int $id): bool
     {
         return DB::transaction(function () use ($id) {
             $bookRequest = BookRequest::query()->findOrFail($id);
 
-            $bookRequest->delete();
+            $bookRequest->delete(); // Soft delete - image preserved
+
+            return true;
+        });
+    }
+
+    /**
+     * Force delete a book request (Permanent Delete).
+     */
+    public function forceDeleteBookRequest(int $id): bool
+    {
+        return DB::transaction(function () use ($id) {
+            $bookRequest = BookRequest::query()->findOrFail($id);
+
+            $bookRequest->forceDelete(); // Force delete - image will be deleted
 
             return true;
         });
@@ -351,7 +414,7 @@ class LibraryService
     }
 
     /**
-     * Bulk delete book requests.
+     * Bulk delete book requests (Soft Delete).
      */
     public function bulkDeleteBookRequests(array $ids): int
     {
@@ -360,7 +423,25 @@ class LibraryService
             $deletedCount = 0;
 
             foreach ($bookRequests as $bookRequest) {
-                $bookRequest->delete();
+                $bookRequest->delete(); // Soft delete - images preserved
+                $deletedCount++;
+            }
+
+            return $deletedCount;
+        });
+    }
+
+    /**
+     * Bulk force delete book requests (Permanent Delete).
+     */
+    public function bulkForceDeleteBookRequests(array $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $bookRequests = BookRequest::query()->whereIn('id', $ids)->get();
+            $deletedCount = 0;
+
+            foreach ($bookRequests as $bookRequest) {
+                $bookRequest->forceDelete(); // Force delete - images will be deleted
                 $deletedCount++;
             }
 

@@ -70,7 +70,7 @@ class Book extends Model implements Auditable
      * @var array<int, string>
      */
     protected $fillable = [
-        'category_id',
+        'book_category_id',
         'title',
         'isbn',
         'accession_number',
@@ -177,6 +177,48 @@ class Book extends Model implements Auditable
                 ->orWhereLike('author', $search)
                 ->orWhereLike('isbn', $search)
                 ->orWhereLike('accession_number', $search);
+        });
+    }
+
+    /**
+     * Scope to filter books by availability (quantity > 0).
+     *
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query->where('quantity', '>', 0);
+    }
+
+    /**
+     * Scope to filter books by availability status.
+     *
+     * @param Builder $query
+     * @param bool $available
+     * @return Builder
+     */
+    public function scopeFilterByAvailability(Builder $query, bool $available): Builder
+    {
+        return $available 
+            ? $query->where('quantity', '>', 0)
+            : $query->where('quantity', '<=', 0);
+    }
+
+    /**
+     * Boot the model.
+     * Handle image deletion on force delete.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Handle image deletion on force delete
+        static::deleting(function ($book) {
+            if ($book->isForceDeleting() && $book->cover_image_path) {
+                // Delete the image file when force deleting
+                \Storage::disk('public')->delete($book->cover_image_path);
+            }
         });
     }
 }

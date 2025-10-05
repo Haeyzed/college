@@ -40,7 +40,7 @@ class ReturnBookRequest extends BaseRequest
              * @var int $member_id
              * @example 1
              */
-            'member_id' => 'required|integer|exists:students,id',
+            'member_id' => 'required|integer|exists:users,id',
 
             /**
              * The type of member returning the book (student or staff).

@@ -122,7 +122,6 @@ class LibraryController extends Controller
         try {
             $validatedData = $request->validated();
 
-            // Handle file upload
             if ($request->hasFile('cover_image_path')) {
                 $validatedData['cover_image_path'] = $request->file('cover_image_path');
             }
@@ -199,6 +198,31 @@ class LibraryController extends Controller
     }
 
     /**
+     * Force delete a book (Permanent Delete).
+     *
+     * @param int $id
+     * @return JsonResponse
+     * @response array{success: bool, message: string}
+     */
+    public function forceDeleteBook(int $id): JsonResponse
+    {
+        try {
+            $this->libraryService->forceDeleteBook($id);
+
+            return response()->success(
+                null,
+                'Book permanently deleted successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Book not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to permanently delete book: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Bulk update book status.
      *
      * @param Request $request
@@ -254,6 +278,35 @@ class LibraryController extends Controller
         } catch (Exception $e) {
             return response()->internalServerError(
                 'Failed to bulk soft-delete books: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Bulk force delete books (Permanent Delete).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: array}
+     */
+    public function bulkForceDeleteBooks(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|exists:books,id',
+            ]);
+
+            $ids = $request->input('ids');
+            $deletedCount = $this->libraryService->bulkForceDeleteBooks($ids);
+
+            return response()->success(
+                ['deleted_count' => $deletedCount],
+                "Successfully permanently deleted {$deletedCount} books"
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to bulk permanently delete books: ' . $e->getMessage()
             );
         }
     }
@@ -324,11 +377,11 @@ class LibraryController extends Controller
     */
 
     /**
-     * Get a paginated list of book requests.
+     * Get all book requests with filtering, searching, and pagination.
      *
      * @param Request $request
      * @return JsonResponse
-     * @response array{success: bool, message: string, data: array}
+     * @response array{success: bool, message: string, data: BookRequestResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getBookRequests(Request $request): JsonResponse
     {
@@ -441,7 +494,7 @@ class LibraryController extends Controller
     }
 
     /**
-     * Delete a book request.
+     * Delete a book request (Soft Delete).
      *
      * @param int $id
      * @return JsonResponse
@@ -454,13 +507,38 @@ class LibraryController extends Controller
 
             return response()->success(
                 null,
-                'Book request deleted successfully'
+                'Book request soft-deleted successfully'
             );
         } catch (ModelNotFoundException $e) {
             return response()->notFound('Book request not found');
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to delete book request: ' . $e->getMessage()
+                'Failed to soft-delete book request: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Force delete a book request (Permanent Delete).
+     *
+     * @param int $id
+     * @return JsonResponse
+     * @response array{success: bool, message: string}
+     */
+    public function forceDeleteBookRequest(int $id): JsonResponse
+    {
+        try {
+            $this->libraryService->forceDeleteBookRequest($id);
+
+            return response()->success(
+                null,
+                'Book request permanently deleted successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Book request not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to permanently delete book request: ' . $e->getMessage()
             );
         }
     }
@@ -470,7 +548,7 @@ class LibraryController extends Controller
      *
      * @param Request $request
      * @return JsonResponse
-     * @response array{success: bool, message: string, data: array}
+     * @response array{success: bool, message: string, data: array{updated_count: int}}
      */
     public function bulkUpdateBookRequestStatus(Request $request): JsonResponse
     {
@@ -497,11 +575,11 @@ class LibraryController extends Controller
     }
 
     /**
-     * Bulk delete book requests.
+     * Bulk delete book requests (Soft Delete).
      *
      * @param Request $request
      * @return JsonResponse
-     * @response array{success: bool, message: string, data: array}
+     * @response array{success: bool, message: string, data: array{deleted_count: int}}
      */
     public function bulkDeleteBookRequests(Request $request): JsonResponse
     {
@@ -516,11 +594,40 @@ class LibraryController extends Controller
 
             return response()->success(
                 ['deleted_count' => $deletedCount],
-                "Successfully deleted {$deletedCount} book requests"
+                "Successfully soft-deleted {$deletedCount} book requests"
             );
         } catch (Exception $e) {
             return response()->internalServerError(
-                'Failed to bulk delete book requests: ' . $e->getMessage()
+                'Failed to bulk soft-delete book requests: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Bulk force delete book requests (Permanent Delete).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: array{deleted_count: int}}
+     */
+    public function bulkForceDeleteBookRequests(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|exists:book_requests,id',
+            ]);
+
+            $ids = $request->input('ids');
+            $deletedCount = $this->libraryService->bulkForceDeleteBookRequests($ids);
+
+            return response()->success(
+                ['deleted_count' => $deletedCount],
+                "Successfully permanently deleted {$deletedCount} book requests"
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to bulk permanently delete book requests: ' . $e->getMessage()
             );
         }
     }
