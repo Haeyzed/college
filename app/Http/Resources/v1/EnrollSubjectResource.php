@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Enroll Subject Resource - Version 1
+ * EnrollSubjectResource - Version 1
  *
- * This resource transforms EnrollSubject model data for API responses
- * in the College Management System.
+ * Resource for transforming EnrollSubject model data into API responses.
+ * This resource handles enroll subject data formatting for API endpoints.
  *
  * @package App\Http\Resources\v1
  * @version 1.0.0
@@ -26,57 +26,73 @@ class EnrollSubjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            /**
+             * The unique identifier of the enroll subject.
+             * @var int $id
+             * @example 1
+             */
             'id' => $this->id,
-            'enrollment_date' => $this->enrollment_date?->format('Y-m-d'),
+
+            /**
+             * The program information (loaded when relationship is included).
+             * @var ProgramResource|null $program
+             */
+            'program' => new ProgramResource($this->whenLoaded('program')),
+
+            /**
+             * The semester information (loaded when relationship is included).
+             * @var SemesterResource|null $semester
+             */
+            'semester' => new SemesterResource($this->whenLoaded('semester')),
+
+            /**
+             * The section information (loaded when relationship is included).
+             * @var SectionResource|null $section
+             */
+            'section' => new SectionResource($this->whenLoaded('section')),
+
+            /**
+             * The subjects enrolled for this combination (loaded when relationship is included).
+             * @var SubjectResource[]|null $subjects
+             */
+            'subjects' => SubjectResource::collection($this->whenLoaded('subjects')),
+
+            /**
+             * The status of the enroll subject.
+             * @var string $status
+             * @example "active"
+             */
             'status' => $this->status,
-            'status_text' => $this->getStatusText(),
-            'is_active' => $this->is_active,
-            'is_completed' => $this->is_completed,
-            'completion_date' => $this->completion_date?->format('Y-m-d'),
-            'grade' => $this->grade,
-            'marks_obtained' => $this->marks_obtained,
-            'total_marks' => $this->total_marks,
-            'credits_earned' => $this->credits_earned,
-            'attendance_percentage' => $this->attendance_percentage,
-            'is_eligible_for_exam' => $this->is_eligible_for_exam,
-            'notes' => $this->notes,
-            'sort_order' => $this->sort_order,
 
-            // Student Information
-            'student_info' => [
-                'student_id' => $this->student_id,
-                'student' => new StudentResource($this->whenLoaded('student')),
-            ],
+            /**
+             * The creation timestamp.
+             * @var string|null $created_at
+             * @example "2023-12-01 10:30:00"
+             */
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
 
-            // Subject Information
-            'subject_info' => [
-                'subject_id' => $this->subject_id,
-                'subject' => new SubjectResource($this->whenLoaded('subject')),
-            ],
+            /**
+             * The last update timestamp.
+             * @var string|null $updated_at
+             * @example "2023-12-01 15:45:00"
+             */
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
 
-            // Program Information
-            'program_info' => [
-                'program_id' => $this->program_id,
-                'program' => new ProgramResource($this->whenLoaded('program')),
-            ],
+            /**
+             * Timestamp when the record was soft deleted. Null if not deleted.
+             * @var string|null $deleted_at
+             * @example "2024-05-15T10:00:00.000000Z"
+             */
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
 
-            // Semester Information
-            'semester_info' => [
-                'semester_id' => $this->semester_id,
-                'semester' => new SemesterResource($this->whenLoaded('semester')),
-            ],
-
-            // Session Information
-            'session_info' => [
-                'session_id' => $this->session_id,
-                'session' => new SessionResource($this->whenLoaded('session')),
-            ],
-
-            // Timestamps
-            'timestamps' => [
-                'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            ],
+            /**
+             * The number of subjects enrolled (computed when subjects are loaded).
+             * @var int|null $subjects_count
+             * @example 5
+             */
+            'subjects_count' => $this->whenLoaded('subjects', function () {
+                return $this->subjects->count();
+            }),
         ];
     }
 }

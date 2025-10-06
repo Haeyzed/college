@@ -2,20 +2,19 @@
 
 namespace App\Models\v1;
 
-use App\Enums\v1\Status;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\v1\Status;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * EnrollSubject Model - Version 1
  *
- * Represents an enrolled subject in the College Management System.
- * This model handles enrolled subject information and relationships.
+ * Represents subject enrollment for specific program, semester, and section combinations.
+ * This model handles the enrollment of subjects for academic sections.
  *
  * @package App\Models\v1
  * @version 1.0.0
@@ -26,17 +25,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $semester_id
  * @property int $section_id
  * @property string $status
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
  *
  * @property-read Program $program
  * @property-read Semester $semester
  * @property-read Section $section
- * @property-read Collection|Subject[] $subjects
+ * @property-read \Illuminate\Database\Eloquent\Collection|Subject[] $subjects
  */
-class EnrollSubject extends Model
+class EnrollSubject extends Model implements Auditable
 {
-    use HasFactory;
+    use \OwenIt\Auditing\Auditable;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -58,15 +59,13 @@ class EnrollSubject extends Model
     protected function casts(): array
     {
         return [
-            'program_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
             'status' => Status::class,
+            'deleted_at' => 'datetime',
         ];
     }
 
     /**
-     * Get the program for the enrolled subject.
+     * Get the program for the enroll subject.
      *
      * @return BelongsTo
      */
@@ -76,7 +75,7 @@ class EnrollSubject extends Model
     }
 
     /**
-     * Get the semester for the enrolled subject.
+     * Get the semester for the enroll subject.
      *
      * @return BelongsTo
      */
@@ -86,7 +85,7 @@ class EnrollSubject extends Model
     }
 
     /**
-     * Get the section for the enrolled subject.
+     * Get the section for the enroll subject.
      *
      * @return BelongsTo
      */
@@ -96,24 +95,60 @@ class EnrollSubject extends Model
     }
 
     /**
-     * Get the subjects for the enrolled subject.
+     * Get the subjects enrolled for this combination.
      *
      * @return BelongsToMany
      */
     public function subjects(): BelongsToMany
     {
-        return $this->belongsToMany(Subject::class, 'enroll_subject_subject', 'enroll_subject_id', 'subject_id');
+        return $this->belongsToMany(Subject::class, 'enroll_subject_subjects', 'enroll_subject_id', 'subject_id');
     }
 
     /**
-     * Scope to filter enrolled subjects by status.
+     * Scope to filter enroll subjects by status.
      *
-     * @param Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @param string $status
-     * @return Builder
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeFilterByStatus($query, $status)
+    public function scopeFilterByStatus($query, string $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Scope to filter enroll subjects by program.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $programId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFilterByProgram($query, int $programId)
+    {
+        return $query->where('program_id', $programId);
+    }
+
+    /**
+     * Scope to filter enroll subjects by semester.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $semesterId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFilterBySemester($query, int $semesterId)
+    {
+        return $query->where('semester_id', $semesterId);
+    }
+
+    /**
+     * Scope to filter enroll subjects by section.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int $sectionId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeFilterBySection($query, int $sectionId)
+    {
+        return $query->where('section_id', $sectionId);
     }
 }

@@ -24,10 +24,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('enroll_subject_subject', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('enroll_subject_id')->constrained('enroll_subjects')->cascadeOnDelete();
-            $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('subject_id')->constrained('subjects')->cascadeOnDelete();
+            $table->timestamps();
 
-//            $table->primary(['enroll_subject_id', 'subject_id']);
+            // Unique constraint to prevent duplicates
+            $table->unique(['enroll_subject_id', 'subject_id'], 'enroll_subject_subject_unique');
+            
+            // Indexes for better performance
+            $table->index('enroll_subject_id');
+            $table->index('subject_id');
         });
     }
 

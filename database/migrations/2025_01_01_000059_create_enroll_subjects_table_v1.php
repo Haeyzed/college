@@ -33,7 +33,8 @@ return new class extends Migration
             $table->timestamps();
             
             $table->index(['program_id', 'semester_id', 'section_id']);
-            $table->index(['status']);
+            $table->index('status');
+            $table->index('deleted_at');
         });
     }
 

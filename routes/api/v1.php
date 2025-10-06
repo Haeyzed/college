@@ -302,6 +302,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('/classrooms/{id}', [AcademicController::class, 'deleteClassRoom']);
             Route::post('/classrooms/bulk-status', [AcademicController::class, 'bulkUpdateClassRoomStatus']);
             Route::delete('/classrooms/bulk-delete', [AcademicController::class, 'bulkDeleteClassRooms']);
+
+            // Enroll Subject Routes
+            Route::get('/enroll-subjects', [AcademicController::class, 'getEnrollSubjects']);
+            Route::get('/enroll-subjects/{id}', [AcademicController::class, 'getEnrollSubject']);
+            Route::post('/enroll-subjects', [AcademicController::class, 'createEnrollSubject']);
+            Route::put('/enroll-subjects/{id}', [AcademicController::class, 'updateEnrollSubject']);
+            Route::delete('/enroll-subjects/{id}', [AcademicController::class, 'deleteEnrollSubject']);
+            Route::post('/enroll-subjects/bulk-status', [AcademicController::class, 'bulkUpdateEnrollSubjectStatus']);
+            Route::delete('/enroll-subjects/bulk-delete', [AcademicController::class, 'bulkDeleteEnrollSubjects']);
         });
 
         // Library Management Routes

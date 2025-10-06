@@ -4,6 +4,7 @@ namespace App\Services\v1;
 
 use App\Models\v1\Batch;
 use App\Models\v1\ClassRoom;
+use App\Models\v1\EnrollSubject;
 use App\Models\v1\Faculty;
 use App\Models\v1\Program;
 use App\Models\v1\ProgramSemesterSection;
@@ -943,5 +944,130 @@ class AcademicService
                 );
             }
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enroll Subject Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle all enroll subject-related operations including CRUD operations
+    | for enroll subjects and enroll subject filtering.
+    |
+    */
+
+    /**
+     * Get a paginated list of enroll subjects.
+     */
+    public function getEnrollSubjects(int $perPage, ?int $programId = null, ?int $semesterId = null, ?int $sectionId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
+    {
+        $query = EnrollSubject::with(['program', 'semester', 'section', 'subjects'])
+            ->when($programId, fn ($q) => $q->filterByProgram($programId))
+            ->when($semesterId, fn ($q) => $q->filterBySemester($semesterId))
+            ->when($sectionId, fn ($q) => $q->filterBySection($sectionId))
+            ->when($status, fn ($q) => $q->filterByStatus($status));
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+    }
+
+    /**
+     * Get a specific enroll subject by ID.
+     */
+    public function getEnrollSubjectById(int $id): EnrollSubject
+    {
+        return EnrollSubject::with(['program', 'semester', 'section', 'subjects'])->findOrFail($id);
+    }
+
+    /**
+     * Create a new enroll subject.
+     */
+    public function createEnrollSubject(array $data): EnrollSubject
+    {
+        return DB::transaction(function () use ($data) {
+            // Extract subjects from data
+            $subjects = $data['subjects'] ?? [];
+            unset($data['subjects']);
+
+            // Use firstOrCreate like UniversitySystem pattern
+            $enrollSubject = EnrollSubject::firstOrCreate(
+                [
+                    'program_id' => $data['program_id'],
+                    'semester_id' => $data['semester_id'],
+                    'section_id' => $data['section_id'],
+                ],
+                $data
+            );
+
+            // Sync subjects using many-to-many relationship
+            $enrollSubject->subjects()->sync($subjects);
+
+            return $enrollSubject->load(['program', 'semester', 'section', 'subjects']);
+        });
+    }
+
+    /**
+     * Update an enroll subject.
+     */
+    public function updateEnrollSubject(int $id, array $data): EnrollSubject
+    {
+        return DB::transaction(function () use ($data, $id) {
+            $enrollSubject = EnrollSubject::query()->findOrFail($id);
+
+            // Extract subjects from data
+            $subjects = $data['subjects'] ?? null;
+            unset($data['subjects']);
+
+            // Update main fields
+            $enrollSubject->update($data);
+
+            // Sync subjects if provided
+            if ($subjects !== null) {
+                $enrollSubject->subjects()->sync($subjects);
+            }
+
+            return $enrollSubject->load(['program', 'semester', 'section', 'subjects']);
+        });
+    }
+
+    /**
+     * Delete an enroll subject (Soft Delete).
+     */
+    public function deleteEnrollSubject(int $id): bool
+    {
+        return DB::transaction(function () use ($id) {
+            $enrollSubject = EnrollSubject::query()->findOrFail($id);
+            $enrollSubject->subjects()->detach();
+            $enrollSubject->delete();
+            return true;
+        });
+    }
+
+    /**
+     * Bulk update enroll subject status.
+     */
+    public function bulkUpdateEnrollSubjectStatus(array $ids, string $status): int
+    {
+        return DB::transaction(function () use ($ids, $status) {
+            return EnrollSubject::query()->whereIn('id', $ids)->update(['status' => $status]);
+        });
+    }
+
+    /**
+     * Bulk delete enroll subjects (Soft Delete).
+     */
+    public function bulkDeleteEnrollSubjects(array $ids): int
+    {
+        return DB::transaction(function () use ($ids) {
+            $enrollSubjects = EnrollSubject::query()->whereIn('id', $ids)->get();
+            $deletedCount = 0;
+
+            foreach ($enrollSubjects as $enrollSubject) {
+                $enrollSubject->subjects()->detach();
+                $enrollSubject->delete();
+                $deletedCount++;
+            }
+
+            return $deletedCount;
+        });
     }
 }

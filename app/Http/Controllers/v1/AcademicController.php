@@ -11,6 +11,7 @@ use App\Http\Requests\v1\SemesterRequest;
 use App\Http\Requests\v1\SubjectRequest;
 use App\Http\Requests\v1\AcademicSessionRequest;
 use App\Http\Requests\v1\ClassRoomRequest;
+use App\Http\Requests\v1\EnrollSubjectRequest;
 use App\Http\Resources\v1\FacultyResource;
 use App\Http\Resources\v1\ProgramResource;
 use App\Http\Resources\v1\BatchResource;
@@ -19,6 +20,7 @@ use App\Http\Resources\v1\SemesterResource;
 use App\Http\Resources\v1\SubjectResource;
 use App\Http\Resources\v1\AcademicSessionResource;
 use App\Http\Resources\v1\ClassRoomResource;
+use App\Http\Resources\v1\EnrollSubjectResource;
 use App\Services\v1\AcademicService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -1632,6 +1634,201 @@ class AcademicController extends Controller
         } catch (Exception $e) {
             return response()->internalServerError(
                 'Failed to bulk soft-delete classrooms: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enroll Subject Methods
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Get all enroll subjects with filtering, searching, and pagination.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: EnrollSubjectResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
+     */
+    public function getEnrollSubjects(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->query('per_page', config('app.pagination.per_page', 15));
+            $programId = $request->query('program_id');
+            $semesterId = $request->query('semester_id');
+            $sectionId = $request->query('section_id');
+            $status = $request->query('status');
+            $search = $request->query('search');
+
+            $result = $this->academicService->getEnrollSubjects($perPage, $programId, $semesterId, $sectionId, $status, $search);
+
+            return response()->paginated(
+                EnrollSubjectResource::collection($result),
+                'Enroll subjects retrieved successfully'
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to retrieve enroll subjects: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Get a specific enroll subject by ID.
+     *
+     * @param int $id
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: EnrollSubjectResource}
+     */
+    public function getEnrollSubject(int $id): JsonResponse
+    {
+        try {
+            $enrollSubject = $this->academicService->getEnrollSubjectById($id);
+
+            return response()->success(
+                new EnrollSubjectResource($enrollSubject),
+                'Enroll subject retrieved successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Enroll subject not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to retrieve enroll subject: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Create a new enroll subject.
+     *
+     * @param EnrollSubjectRequest $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: EnrollSubjectResource}
+     */
+    public function createEnrollSubject(EnrollSubjectRequest $request): JsonResponse
+    {
+        try {
+            $enrollSubject = $this->academicService->createEnrollSubject($request->validated());
+
+            return response()->success(
+                new EnrollSubjectResource($enrollSubject),
+                'Enroll subject created successfully'
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to create enroll subject: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Update an existing enroll subject.
+     *
+     * @param EnrollSubjectRequest $request
+     * @param int $id
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: EnrollSubjectResource}
+     */
+    public function updateEnrollSubject(EnrollSubjectRequest $request, int $id): JsonResponse
+    {
+        try {
+            $enrollSubject = $this->academicService->updateEnrollSubject($id, $request->validated());
+
+            return response()->success(
+                new EnrollSubjectResource($enrollSubject),
+                'Enroll subject updated successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Enroll subject not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to update enroll subject: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Delete an enroll subject (Soft Delete).
+     *
+     * @param int $id
+     * @return JsonResponse
+     * @response array{success: bool, message: string}
+     */
+    public function deleteEnrollSubject(int $id): JsonResponse
+    {
+        try {
+            $this->academicService->deleteEnrollSubject($id);
+
+            return response()->success(
+                null,
+                'Enroll subject soft-deleted successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Enroll subject not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to soft-delete enroll subject: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Bulk update enroll subject status.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: array}
+     */
+    public function bulkUpdateEnrollSubjectStatus(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|exists:enroll_subjects,id',
+                'status' => 'required|string|in:active,inactive'
+            ]);
+
+            $ids = $request->input('ids');
+            $status = $request->input('status');
+            $updatedCount = $this->academicService->bulkUpdateEnrollSubjectStatus($ids, $status);
+
+            return response()->success(
+                ['updated_count' => $updatedCount],
+                "Successfully updated {$updatedCount} enroll subjects"
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to bulk update enroll subject status: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Bulk delete enroll subjects (Soft Delete).
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @response array{success: bool, message: string, data: array}
+     */
+    public function bulkDeleteEnrollSubjects(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|exists:enroll_subjects,id',
+            ]);
+
+            $ids = $request->input('ids');
+            $deletedCount = $this->academicService->bulkDeleteEnrollSubjects($ids);
+
+            return response()->success(
+                ['deleted_count' => $deletedCount],
+                "Successfully soft-deleted {$deletedCount} enroll subjects"
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to bulk soft-delete enroll subjects: ' . $e->getMessage()
             );
         }
     }
