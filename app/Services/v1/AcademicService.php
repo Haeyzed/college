@@ -6,6 +6,7 @@ use App\Models\v1\Batch;
 use App\Models\v1\ClassRoom;
 use App\Models\v1\Faculty;
 use App\Models\v1\Program;
+use App\Models\v1\ProgramSemesterSection;
 use App\Models\v1\Section;
 use App\Models\v1\Semester;
 use App\Models\v1\Session;
@@ -346,7 +347,7 @@ class AcademicService
      */
     public function getSections(int $perPage, ?int $batchId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
-        $query = Section::with(['batch'])
+        $query = Section::with(['programSemesters'])
             ->when($batchId, fn($q) => $q->filterByBatch($batchId))
             ->when($status, fn($q) => $q->filterByStatus($status))
             ->when($search, fn($q) => $q->search($search));
@@ -359,7 +360,7 @@ class AcademicService
      */
     public function getSectionById(int $id): Section
     {
-        return Section::with(['batch', 'students'])->findOrFail($id);
+        return Section::with(['programSemesters'])->findOrFail($id);
     }
 
     /**
@@ -370,7 +371,7 @@ class AcademicService
         return DB::transaction(function () use ($data) {
             $section = Section::query()->create($data);
             $this->syncSectionRelationships($section, $data);
-            return $section->load(['batch', 'programSemesters']);
+            return $section->load(['programSemesters']);
         });
     }
 
@@ -383,7 +384,7 @@ class AcademicService
             $section = Section::query()->findOrFail($id);
             $section->update($data);
             $this->syncSectionRelationships($section, $data);
-            return $section->load(['batch', 'programSemesters']);
+            return $section->load(['programSemesters']);
         });
     }
 
@@ -892,7 +893,7 @@ class AcademicService
 
         foreach ($items as $index => $item) {
             if (isset($programs[$index]) && isset($semesters[$index])) {
-                \App\Models\v1\ProgramSemesterSection::create([
+                ProgramSemesterSection::query()->create([
                     'program_id' => $programs[$index],
                     'semester_id' => $semesters[$index],
                     'section_id' => $section->id,

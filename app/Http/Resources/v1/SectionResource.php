@@ -59,7 +59,7 @@ class SectionResource extends JsonResource
              * @var string $status
              * @example "active"
              */
-            'status' => (string) $this->status,
+            'status' => $this->status,
 
             /**
              * The creation timestamp.
