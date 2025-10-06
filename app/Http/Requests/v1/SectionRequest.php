@@ -119,7 +119,7 @@ class SectionRequest extends BaseRequest
             'items.*' => [
                 'required',
                 'integer',
-                Rule::exists('items', 'id')->whereNull('deleted_at'),
+                Rule::exists('subjects', 'id')->whereNull('deleted_at'),
             ],
 
             /**
@@ -133,6 +133,27 @@ class SectionRequest extends BaseRequest
                 Rule::enum(Status::class)
             ],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     * @return void
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->has('programs') && $this->has('semesters') && $this->has('items')) {
+                $programs = $this->input('programs', []);
+                $semesters = $this->input('semesters', []);
+                $items = $this->input('items', []);
+
+                if (count($programs) !== count($semesters) || count($programs) !== count($items)) {
+                    $validator->errors()->add('relationships', 'Programs, semesters, and items arrays must have the same length.');
+                }
+            }
+        });
     }
 
     /**

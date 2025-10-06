@@ -369,7 +369,8 @@ class AcademicService
     {
         return DB::transaction(function () use ($data) {
             $section = Section::query()->create($data);
-            return $section->load(['batch']);
+            $this->syncSectionRelationships($section, $data);
+            return $section->load(['batch', 'programSemesters']);
         });
     }
 
@@ -381,7 +382,8 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $section = Section::query()->findOrFail($id);
             $section->update($data);
-            return $section->load(['batch']);
+            $this->syncSectionRelationships($section, $data);
+            return $section->load(['batch', 'programSemesters']);
         });
     }
 
@@ -855,5 +857,47 @@ class AcademicService
 
             return $deletedCount;
         });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Section Relationship Helper Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle the complex many-to-many relationships for sections
+    | with programs, semesters, and items.
+    |
+    */
+
+    /**
+     * Sync section relationships with programs, semesters, and subjects.
+     *
+     * @param Section $section
+     * @param array $data
+     * @return void
+     */
+    private function syncSectionRelationships(Section $section, array $data): void
+    {
+        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
+            return;
+        }
+
+        // Delete existing relationships
+        $section->programSemesters()->delete();
+
+        // Create new relationships
+        $programs = $data['programs'];
+        $semesters = $data['semesters'];
+        $items = $data['items'];
+
+        foreach ($items as $index => $item) {
+            if (isset($programs[$index]) && isset($semesters[$index])) {
+                \App\Models\v1\ProgramSemesterSection::create([
+                    'program_id' => $programs[$index],
+                    'semester_id' => $semesters[$index],
+                    'section_id' => $section->id,
+                ]);
+            }
+        }
     }
 }
