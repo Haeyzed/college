@@ -347,7 +347,7 @@ class AcademicService
      */
     public function getSections(int $perPage, ?int $batchId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
-        $query = Section::with(['programSemesters'])
+        $query = Section::with(['programSemesters.program', 'programSemesters.semester'])
             ->when($batchId, fn($q) => $q->filterByBatch($batchId))
             ->when($status, fn($q) => $q->filterByStatus($status))
             ->when($search, fn($q) => $q->search($search));
@@ -360,7 +360,7 @@ class AcademicService
      */
     public function getSectionById(int $id): Section
     {
-        return Section::with(['programSemesters'])->findOrFail($id);
+        return Section::with(['programSemesters.program', 'programSemesters.semester'])->findOrFail($id);
     }
 
     /**
@@ -370,8 +370,8 @@ class AcademicService
     {
         return DB::transaction(function () use ($data) {
             $section = Section::query()->create($data);
-            $this->syncSectionRelationships($section, $data);
-            return $section->load(['programSemesters']);
+            $this->createSectionRelationships($section, $data);
+            return $section->load(['programSemesters.program', 'programSemesters.semester']);
         });
     }
 
@@ -383,8 +383,8 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $section = Section::query()->findOrFail($id);
             $section->update($data);
-            $this->syncSectionRelationships($section, $data);
-            return $section->load(['programSemesters']);
+            $this->updateSectionRelationships($section, $data);
+            return $section->load(['programSemesters.program', 'programSemesters.semester']);
         });
     }
 
@@ -871,33 +871,76 @@ class AcademicService
     */
 
     /**
-     * Sync section relationships with programs, semesters, and subjects.
+     * Create section relationships (for new sections).
      *
      * @param Section $section
      * @param array $data
      * @return void
      */
-    private function syncSectionRelationships(Section $section, array $data): void
+    private function createSectionRelationships(Section $section, array $data): void
     {
         if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
             return;
         }
 
-        // Delete existing relationships
-        $section->programSemesters()->delete();
-
-        // Create new relationships
         $programs = $data['programs'];
         $semesters = $data['semesters'];
         $items = $data['items'];
 
+        // Create new relationships using updateOrCreate
         foreach ($items as $index => $item) {
             if (isset($programs[$index]) && isset($semesters[$index])) {
-                ProgramSemesterSection::query()->create([
-                    'program_id' => $programs[$index],
-                    'semester_id' => $semesters[$index],
-                    'section_id' => $section->id,
-                ]);
+                ProgramSemesterSection::query()->updateOrCreate(
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ],
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * Update section relationships (for existing sections).
+     *
+     * @param Section $section
+     * @param array $data
+     * @return void
+     */
+    private function updateSectionRelationships(Section $section, array $data): void
+    {
+        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
+            return;
+        }
+
+        // Delete existing relationships first
+        $section->programSemesters()->delete();
+
+        $programs = $data['programs'];
+        $semesters = $data['semesters'];
+        $items = $data['items'];
+
+        // Create new relationships using updateOrCreate
+        foreach ($items as $index => $item) {
+            if (isset($programs[$index]) && isset($semesters[$index])) {
+                ProgramSemesterSection::query()->updateOrCreate(
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ],
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ]
+                );
             }
         }
     }
