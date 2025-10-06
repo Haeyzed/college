@@ -34,25 +34,11 @@ class BatchResource extends JsonResource
             'id' => $this->id,
 
             /**
-             * The program ID that the batch belongs to.
-             * @var int $program_id
-             * @example 1
-             */
-            'program_id' => $this->program_id,
-
-            /**
              * The name of the batch.
              * @var string $name
              * @example "Batch 2024"
              */
             'name' => $this->name,
-
-            /**
-             * The unique code of the batch.
-             * @var string $code
-             * @example "B2024"
-             */
-            'code' => $this->code,
 
             /**
              * The academic year of the batch.
@@ -97,13 +83,6 @@ class BatchResource extends JsonResource
             'status' => $this->status,
 
             /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
-
-            /**
              * The creation timestamp.
              * @var string|null $created_at
              * @example "2023-12-01 10:30:00"
@@ -125,10 +104,10 @@ class BatchResource extends JsonResource
             'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
 
             /**
-             * The program information (loaded when relationship is included).
-             * @var ProgramResource|null $program
+             * The programs associated with this batch (loaded when relationship is included).
+             * @var ProgramResource[]|null $programs
              */
-            'program' => new ProgramResource($this->whenLoaded('program')),
+            'programs' => ProgramResource::collection($this->whenLoaded('programs')),
 
             /**
              * The sections associated with this batch (loaded when relationship is included).

@@ -90,13 +90,6 @@ class FacultyResource extends JsonResource
             'status' => $this->status,
 
             /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
-
-            /**
              * The creation timestamp.
              * @var string|null $created_at
              * @example "2023-12-01 10:30:00"

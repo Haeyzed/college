@@ -2,15 +2,16 @@
 
 namespace App\Services\v1;
 
+use App\Models\v1\Batch;
+use App\Models\v1\ClassRoom;
 use App\Models\v1\Faculty;
 use App\Models\v1\Program;
-use App\Models\v1\Batch;
 use App\Models\v1\Section;
 use App\Models\v1\Semester;
+use App\Models\v1\Session;
 use App\Models\v1\Subject;
-use App\Models\v1\AcademicSession;
-use App\Models\v1\ClassRoom;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -43,10 +44,10 @@ class AcademicService
     public function getFaculties(int $perPage, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
         $query = Faculty::query()
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -144,12 +145,12 @@ class AcademicService
     public function getPrograms(int $perPage, ?int $facultyId = null, ?string $status = null, ?string $search = null, ?string $degreeType = null): LengthAwarePaginator
     {
         $query = Program::with(['faculty'])
-            ->when($facultyId, fn ($q) => $q->filterByFaculty($facultyId))
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($degreeType, fn ($q) => $q->filterByDegreeType($degreeType))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($facultyId, fn($q) => $q->filterByFaculty($facultyId))
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($degreeType, fn($q) => $q->filterByDegreeType($degreeType))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -245,15 +246,14 @@ class AcademicService
     /**
      * Get a paginated list of batches.
      */
-    public function getBatches(int $perPage, ?int $programId = null, ?string $status = null, ?string $search = null, ?int $academicYear = null): LengthAwarePaginator
+    public function getBatches(int $perPage, ?string $status = null, ?string $search = null, ?int $academicYear = null): LengthAwarePaginator
     {
-        $query = Batch::with(['program'])
-            ->when($programId, fn ($q) => $q->filterByProgram($programId))
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($academicYear, fn ($q) => $q->filterByAcademicYear($academicYear))
-            ->when($search, fn ($q) => $q->search($search));
+        $query = Batch::query()->with(['programs'])
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($academicYear, fn($q) => $q->filterByAcademicYear($academicYear))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -261,7 +261,7 @@ class AcademicService
      */
     public function getBatchById(int $id): Batch
     {
-        return Batch::with(['program', 'sections'])->findOrFail($id);
+        return Batch::with(['programs', 'sections'])->findOrFail($id);
     }
 
     /**
@@ -271,7 +271,8 @@ class AcademicService
     {
         return DB::transaction(function () use ($data) {
             $batch = Batch::query()->create($data);
-            return $batch->load(['program']);
+            $batch->programs()->attach($data['programs']);
+            return $batch->load(['programs']);
         });
     }
 
@@ -283,7 +284,8 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $batch = Batch::query()->findOrFail($id);
             $batch->update($data);
-            return $batch->load(['program']);
+            $batch->programs()->sync($data['programs']);
+            return $batch->load(['programs']);
         });
     }
 
@@ -294,11 +296,7 @@ class AcademicService
     {
         return DB::transaction(function () use ($id) {
             $batch = Batch::query()->findOrFail($id);
-
-            if ($batch->sections()->exists()) {
-                throw new Exception('Cannot delete batch that contains sections. Please delete all sections first.');
-            }
-
+            $batch->programs()->detach();
             $batch->delete();
             return true;
         });
@@ -324,10 +322,7 @@ class AcademicService
             $deletedCount = 0;
 
             foreach ($batches as $batch) {
-                if ($batch->sections()->exists()) {
-                    continue;
-                }
-
+                $batch->programs()->detach();
                 $batch->delete();
                 $deletedCount++;
             }
@@ -352,11 +347,11 @@ class AcademicService
     public function getSections(int $perPage, ?int $batchId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
         $query = Section::with(['batch'])
-            ->when($batchId, fn ($q) => $q->filterByBatch($batchId))
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($batchId, fn($q) => $q->filterByBatch($batchId))
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -454,13 +449,13 @@ class AcademicService
      */
     public function getSemesters(int $perPage, ?string $status = null, ?string $search = null, ?int $academicYear = null, ?bool $isCurrent = null): LengthAwarePaginator
     {
-        $query = Semester::query()
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($academicYear, fn ($q) => $q->filterByAcademicYear($academicYear))
-            ->when($isCurrent !== null, fn ($q) => $q->current($isCurrent))
-            ->when($search, fn ($q) => $q->search($search));
+        $query = Semester::query()->with(['programs'])
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($academicYear, fn($q) => $q->filterByAcademicYear($academicYear))
+            ->when($isCurrent !== null, fn($q) => $q->current($isCurrent))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -477,7 +472,9 @@ class AcademicService
     public function createSemester(array $data): Semester
     {
         return DB::transaction(function () use ($data) {
-            return Semester::query()->create($data);
+            $semester = Semester::query()->create($data);
+            $semester->programs()->attach($data['programs']);
+            return $semester->load(['programs']);
         });
     }
 
@@ -489,7 +486,8 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $semester = Semester::query()->findOrFail($id);
             $semester->update($data);
-            return $semester;
+            $semester->programs()->sync($data['programs']);
+            return $semester->load(['programs']);
         });
     }
 
@@ -500,6 +498,7 @@ class AcademicService
     {
         return DB::transaction(function () use ($id) {
             $semester = Semester::query()->findOrFail($id);
+            $semester->programs()->detach();
             $semester->delete();
             return true;
         });
@@ -549,12 +548,12 @@ class AcademicService
     public function getSubjects(int $perPage, ?string $status = null, ?string $search = null, ?string $subjectType = null, ?string $classType = null): LengthAwarePaginator
     {
         $query = Subject::query()
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($subjectType, fn ($q) => $q->filterBySubjectType($subjectType))
-            ->when($classType, fn ($q) => $q->filterByClassType($classType))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($subjectType, fn($q) => $q->filterBySubjectType($subjectType))
+            ->when($classType, fn($q) => $q->filterByClassType($classType))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -642,41 +641,53 @@ class AcademicService
      */
     public function getAcademicSessions(int $perPage, ?string $status = null, ?string $search = null, ?bool $isCurrent = null): LengthAwarePaginator
     {
-        $query = AcademicSession::query()
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($isCurrent !== null, fn ($q) => $q->current($isCurrent))
-            ->when($search, fn ($q) => $q->search($search));
+        $query = Session::query()->with(['programs'])
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($isCurrent !== null, fn($q) => $q->current($isCurrent))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
      * Get a specific academic session by ID.
      */
-    public function getAcademicSessionById(int $id): AcademicSession
+    public function getAcademicSessionById(int $id): Session
     {
-        return AcademicSession::with(['semesters'])->findOrFail($id);
+        return Session::with(['programs'])->findOrFail($id);
     }
 
     /**
      * Create a new academic session.
      */
-    public function createAcademicSession(array $data): AcademicSession
+    public function createAcademicSession(array $data): Session
     {
         return DB::transaction(function () use ($data) {
-            return AcademicSession::query()->create($data);
+            if (isset($data['is_current']) && $data['is_current']) {
+                Session::query()->where('is_current', true)->update(['is_current' => false]);
+            }
+            $session = Session::query()->create($data);
+            $session->programs()->attach($data['programs']);
+            return $session->load(['programs']);
         });
     }
 
     /**
      * Update an academic session.
      */
-    public function updateAcademicSession(int $id, array $data): AcademicSession
+    public function updateAcademicSession(int $id, array $data): Session
     {
         return DB::transaction(function () use ($data, $id) {
-            $academicSession = AcademicSession::query()->findOrFail($id);
+            $academicSession = Session::query()->findOrFail($id);
+            if (isset($data['is_current']) && $data['is_current']) {
+                Session::query()
+                    ->where('is_current', true)
+                    ->where('id', '!=', $id)
+                    ->update(['is_current' => false]);
+            }
             $academicSession->update($data);
-            return $academicSession;
+            $academicSession->programs()->sync($data['programs']);
+            return $academicSession->load(['programs']);
         });
     }
 
@@ -686,12 +697,8 @@ class AcademicService
     public function deleteAcademicSession(int $id): bool
     {
         return DB::transaction(function () use ($id) {
-            $academicSession = AcademicSession::query()->findOrFail($id);
-
-            if ($academicSession->semesters()->exists()) {
-                throw new Exception('Cannot delete academic session that contains semesters. Please delete all semesters first.');
-            }
-
+            $academicSession = Session::query()->findOrFail($id);
+            $academicSession->programs()->detach();
             $academicSession->delete();
             return true;
         });
@@ -703,7 +710,7 @@ class AcademicService
     public function bulkUpdateAcademicSessionStatus(array $ids, string $status): int
     {
         return DB::transaction(function () use ($ids, $status) {
-            return AcademicSession::query()->whereIn('id', $ids)->update(['status' => $status]);
+            return Session::query()->whereIn('id', $ids)->update(['status' => $status]);
         });
     }
 
@@ -713,19 +720,41 @@ class AcademicService
     public function bulkDeleteAcademicSessions(array $ids): int
     {
         return DB::transaction(function () use ($ids) {
-            $academicSessions = AcademicSession::query()->whereIn('id', $ids)->get();
+            $academicSessions = Session::query()->whereIn('id', $ids)->get();
             $deletedCount = 0;
 
             foreach ($academicSessions as $academicSession) {
-                if ($academicSession->semesters()->exists()) {
-                    continue;
-                }
-
+                $academicSession->programs()->detach();
                 $academicSession->delete();
                 $deletedCount++;
             }
 
             return $deletedCount;
+        });
+    }
+
+    /**
+     * Set a specific academic session as the current session.
+     *
+     * This method ensures that only one session is marked as 'is_current' at a time.
+     *
+     * @param int $id The ID of the session to set as current.
+     * @return Session
+     * @throws ModelNotFoundException
+     */
+    public function setCurrentAcademicSession(int $id): Session
+    {
+        return DB::transaction(function () use ($id) {
+            Session::query()
+                ->where('is_current', true)
+                ->where('id', '!=', $id)
+                ->update(['is_current' => false]);
+
+            $session = Session::query()->findOrFail($id);
+            $session->is_current = true;
+            $session->save();
+
+            return $session;
         });
     }
 
@@ -744,13 +773,13 @@ class AcademicService
      */
     public function getClassRooms(int $perPage, ?string $status = null, ?string $search = null, ?string $roomType = null, ?bool $isAvailable = null): LengthAwarePaginator
     {
-        $query = ClassRoom::query()
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($roomType, fn ($q) => $q->filterByRoomType($roomType))
-            ->when($isAvailable !== null, fn ($q) => $q->available($isAvailable))
-            ->when($search, fn ($q) => $q->search($search));
+        $query = ClassRoom::query()->with(['programs'])
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($roomType, fn($q) => $q->filterByRoomType($roomType))
+            ->when($isAvailable !== null, fn($q) => $q->available($isAvailable))
+            ->when($search, fn($q) => $q->search($search));
 
-        return $query->ordered()->paginate($perPage);
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
@@ -767,7 +796,9 @@ class AcademicService
     public function createClassRoom(array $data): ClassRoom
     {
         return DB::transaction(function () use ($data) {
-            return ClassRoom::query()->create($data);
+            $classRoom = ClassRoom::query()->create($data);
+            $classRoom->programs()->attach($data['programs']);
+            return $classRoom->load(['programs']);
         });
     }
 
@@ -778,6 +809,7 @@ class AcademicService
     {
         return DB::transaction(function () use ($data, $id) {
             $classRoom = ClassRoom::query()->findOrFail($id);
+            $classRoom->programs()->sync($data['programs']);
             $classRoom->update($data);
             return $classRoom;
         });
@@ -790,6 +822,7 @@ class AcademicService
     {
         return DB::transaction(function () use ($id) {
             $classRoom = ClassRoom::query()->findOrFail($id);
+            $classRoom->programs()->detach();
             $classRoom->delete();
             return true;
         });
@@ -815,6 +848,7 @@ class AcademicService
             $deletedCount = 0;
 
             foreach ($classRooms as $classRoom) {
+                $classRoom->programs()->detach();
                 $classRoom->delete();
                 $deletedCount++;
             }

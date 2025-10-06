@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Class Rooms Table Migration - Version 1
- * 
+ *
  * This migration creates the class_rooms table for the College Management System.
  * It handles classroom information storage with proper indexing, constraints, and soft deletes.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
@@ -28,7 +28,6 @@ return new class extends Migration
         Schema::create('class_rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
             $table->string('floor')->nullable();
             $table->integer('capacity');
             $table->string('room_type')->default(RoomType::CLASSROOM->value); // classroom, lab, library, auditorium, conference
@@ -36,16 +35,14 @@ return new class extends Migration
             $table->json('facilities')->nullable(); // ["projector", "whiteboard", "air_conditioning"]
             $table->boolean('is_available')->default(true);
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for better performance
             $table->index(['status', 'is_available']);
             $table->index(['room_type']);
             $table->index(['floor']);
             $table->index(['capacity']);
-            $table->index(['code']);
             $table->index(['deleted_at']);
         });
     }

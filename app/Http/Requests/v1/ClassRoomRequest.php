@@ -53,18 +53,6 @@ class ClassRoomRequest extends BaseRequest
             ],
 
             /**
-             * The unique code of the classroom.
-             * @var string $code
-             * @example "CL-001"
-             */
-            'code' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'max:50',
-                Rule::unique('class_rooms', 'code')->ignore($classRoomId),
-            ],
-
-            /**
              * The floor where the classroom is located (optional).
              * @var string|null $floor
              * @example "Ground Floor"
@@ -96,6 +84,22 @@ class ClassRoomRequest extends BaseRequest
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 Rule::enum(RoomType::class)
+            ],
+
+            /**
+             * The IDs of the programs associated with the classroom (optional).
+             * @var array<int>|null $programs
+             * @example [1, 5]
+             */
+            'programs' => [
+                'nullable', // Allows a classroom to not be associated with any program initially
+                'array',
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                // Validates that each ID exists in the 'programs' table
+                Rule::exists('programs', 'id'),
             ],
 
             /**
@@ -148,17 +152,6 @@ class ClassRoomRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -176,12 +169,6 @@ class ClassRoomRequest extends BaseRequest
             'name.max' => 'The classroom name cannot exceed 255 characters.',
             'name.unique' => 'This classroom name is already registered.',
 
-            // Code
-            'code.required' => 'The classroom code is required.',
-            'code.string' => 'The classroom code must be a string.',
-            'code.max' => 'The classroom code cannot exceed 50 characters.',
-            'code.unique' => 'This classroom code is already registered.',
-
             // Floor
             'floor.string' => 'The floor must be a string.',
             'floor.max' => 'The floor cannot exceed 50 characters.',
@@ -196,6 +183,12 @@ class ClassRoomRequest extends BaseRequest
             'room_type.required' => 'The room type is required.',
             'room_type.string' => 'The room type must be a string.',
             'room_type.enum' => 'The room type must be a valid room type.',
+
+            // Programs
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
 
             // Description
             'description.string' => 'The description must be a string.',
@@ -213,10 +206,6 @@ class ClassRoomRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid classroom status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -229,15 +218,15 @@ class ClassRoomRequest extends BaseRequest
     {
         return [
             'name' => 'classroom name',
-            'code' => 'classroom code',
             'floor' => 'floor',
             'capacity' => 'capacity',
             'room_type' => 'room type',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
             'description' => 'classroom description',
             'facilities' => 'facilities',
             'is_available' => 'availability status',
             'status' => 'classroom status',
-            'sort_order' => 'sort order',
         ];
     }
 }

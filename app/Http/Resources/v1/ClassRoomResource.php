@@ -41,13 +41,6 @@ class ClassRoomResource extends JsonResource
             'name' => $this->name,
 
             /**
-             * The unique code of the classroom.
-             * @var string $code
-             * @example "CL-001"
-             */
-            'code' => $this->code,
-
-            /**
              * The floor where the classroom is located.
              * @var string|null $floor
              * @example "Ground Floor"
@@ -95,13 +88,6 @@ class ClassRoomResource extends JsonResource
              * @example "active"
              */
             'status' => $this->status,
-
-            /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
 
             /**
              * The creation timestamp.

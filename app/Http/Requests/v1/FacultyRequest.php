@@ -117,17 +117,6 @@ class FacultyRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -171,10 +160,6 @@ class FacultyRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid faculty status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -193,7 +178,6 @@ class FacultyRequest extends BaseRequest
             'dean_email' => 'dean email',
             'dean_phone' => 'dean phone',
             'status' => 'faculty status',
-            'sort_order' => 'sort order',
         ];
     }
 }

@@ -83,13 +83,6 @@ class ProgramResource extends JsonResource
             'total_credits' => $this->total_credits,
 
             /**
-             * The fee amount for the program.
-             * @var float|null $fee_amount
-             * @example 5000.00
-             */
-            'fee_amount' => $this->fee_amount,
-
-            /**
              * The degree type of the program.
              * @var string $degree_type
              * @example "bachelor"
@@ -116,13 +109,6 @@ class ProgramResource extends JsonResource
              * @example "active"
              */
             'status' => $this->status,
-
-            /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
 
             /**
              * The creation timestamp.

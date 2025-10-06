@@ -26,7 +26,6 @@ use OwenIt\Auditing\Contracts\Auditable;
  *
  * @property int $id
  * @property string $name
- * @property string $code
  * @property string|null $floor
  * @property int $capacity
  * @property string $room_type
@@ -34,7 +33,6 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property array|null $facilities
  * @property bool $is_available
  * @property string $status
- * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -59,7 +57,6 @@ class ClassRoom extends Model implements Auditable
      */
     protected $fillable = [
         'name',
-        'code',
         'floor',
         'capacity',
         'room_type',
@@ -67,7 +64,6 @@ class ClassRoom extends Model implements Auditable
         'facilities',
         'is_available',
         'status',
-        'sort_order',
     ];
 
     /**

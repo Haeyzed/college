@@ -111,18 +111,6 @@ class ProgramRequest extends BaseRequest
             ],
 
             /**
-             * The fee amount for the program (optional).
-             * @var float|null $fee_amount
-             * @example 5000.00
-             */
-            'fee_amount' => [
-                'nullable',
-                'numeric',
-                'min:0',
-                'max:999999.99'
-            ],
-
-            /**
              * The degree type of the program.
              * @var string $degree_type
              * @example "bachelor"
@@ -163,17 +151,6 @@ class ProgramRequest extends BaseRequest
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 Rule::enum(Status::class)
-            ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
             ],
         ];
     }
@@ -219,11 +196,6 @@ class ProgramRequest extends BaseRequest
             'total_credits.min' => 'The total credits must be at least 1.',
             'total_credits.max' => 'The total credits cannot exceed 200.',
 
-            // Fee Amount
-            'fee_amount.numeric' => 'The fee amount must be a valid number.',
-            'fee_amount.min' => 'The fee amount cannot be negative.',
-            'fee_amount.max' => 'The fee amount cannot exceed 999,999.99.',
-
             // Degree Type
             'degree_type.required' => 'The degree type is required.',
             'degree_type.string' => 'The degree type must be a string.',
@@ -240,10 +212,6 @@ class ProgramRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid program status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -261,12 +229,10 @@ class ProgramRequest extends BaseRequest
             'description' => 'program description',
             'duration_years' => 'duration in years',
             'total_credits' => 'total credits',
-            'fee_amount' => 'fee amount',
             'degree_type' => 'degree type',
             'admission_requirements' => 'admission requirements',
             'is_registration_open' => 'registration status',
             'status' => 'program status',
-            'sort_order' => 'sort order',
         ];
     }
 }

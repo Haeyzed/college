@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Faculties Table Migration - Version 1
- * 
+ *
  * This migration creates the faculties table for the College Management System.
  * It handles faculty information storage with proper indexing, constraints, and soft deletes.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
@@ -34,12 +34,11 @@ return new class extends Migration
             $table->string('dean_email')->nullable();
             $table->string('dean_phone')->nullable();
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for better performance
-            $table->index(['status', 'sort_order']);
+            $table->index(['status']);
             $table->index(['slug']);
             $table->index(['code']);
             $table->index(['deleted_at']);

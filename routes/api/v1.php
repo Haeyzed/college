@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\v1\AcademicController;
 use App\Http\Controllers\v1\ApplicationController;
 use App\Http\Controllers\v1\StudentController;
 use App\Http\Controllers\v1\ProgramController;
@@ -53,21 +54,21 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
 
     // Authentication Routes
-    Route::prefix('auth')->group(function () {
-        // Public authentication routes
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-
-        // Protected authentication routes
-        Route::middleware(['auth:sanctum'])->group(function () {
-            Route::post('/logout', [AuthController::class, 'logout']);
-            Route::get('/user', [AuthController::class, 'user']);
-            Route::post('/change-password', [AuthController::class, 'changePassword']);
-            Route::post('/refresh', [AuthController::class, 'refresh']);
-        });
-    });
+//    Route::prefix('auth')->group(function () {
+//        // Public authentication routes
+//        Route::post('/login', [AuthController::class, 'login']);
+//        Route::post('/register', [AuthController::class, 'register']);
+//        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+//        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+//
+//        // Protected authentication routes
+//        Route::middleware(['auth:sanctum'])->group(function () {
+//            Route::post('/logout', [AuthController::class, 'logout']);
+//            Route::get('/user', [AuthController::class, 'user']);
+//            Route::post('/change-password', [AuthController::class, 'changePassword']);
+//            Route::post('/refresh', [AuthController::class, 'refresh']);
+//        });
+//    });
 
     // Public Routes (No Authentication Required)
     // Route::prefix('public')->group(function () {
@@ -227,9 +228,85 @@ Route::prefix('v1')->group(function () {
         //     Route::post('/{id}/grade/{studentId}', [AssignmentController::class, 'gradeAssignment']);
         // });
 
+        // Academic Routes
+        Route::prefix('academic')->group(function () {
+            // Faculty Routes
+            Route::get('/faculties', [AcademicController::class, 'getFaculties']);
+            Route::get('/faculties/{id}', [AcademicController::class, 'getFaculty']);
+            Route::post('/faculties', [AcademicController::class, 'createFaculty']);
+            Route::put('/faculties/{id}', [AcademicController::class, 'updateFaculty']);
+            Route::delete('/faculties/{id}', [AcademicController::class, 'deleteFaculty']);
+            Route::post('/faculties/bulk-status', [AcademicController::class, 'bulkUpdateFacultyStatus']);
+            Route::delete('/faculties/bulk-delete', [AcademicController::class, 'bulkDeleteFaculties']);
+
+            // Program Routes
+            Route::get('/programs', [AcademicController::class, 'getPrograms']);
+            Route::get('/programs/{id}', [AcademicController::class, 'getProgram']);
+            Route::post('/programs', [AcademicController::class, 'createProgram']);
+            Route::put('/programs/{id}', [AcademicController::class, 'updateProgram']);
+            Route::delete('/programs/{id}', [AcademicController::class, 'deleteProgram']);
+            Route::post('/programs/bulk-status', [AcademicController::class, 'bulkUpdateProgramStatus']);
+            Route::delete('/programs/bulk-delete', [AcademicController::class, 'bulkDeletePrograms']);
+
+            // Batch Routes
+            Route::get('/batches', [AcademicController::class, 'getBatches']);
+            Route::get('/batches/{id}', [AcademicController::class, 'getBatch']);
+            Route::post('/batches', [AcademicController::class, 'createBatch']);
+            Route::put('/batches/{id}', [AcademicController::class, 'updateBatch']);
+            Route::delete('/batches/{id}', [AcademicController::class, 'deleteBatch']);
+            Route::post('/batches/bulk-status', [AcademicController::class, 'bulkUpdateBatchStatus']);
+            Route::delete('/batches/bulk-delete', [AcademicController::class, 'bulkDeleteBatches']);
+
+            // Section Routes
+            Route::get('/sections', [AcademicController::class, 'getSections']);
+            Route::get('/sections/{id}', [AcademicController::class, 'getSection']);
+            Route::post('/sections', [AcademicController::class, 'createSection']);
+            Route::put('/sections/{id}', [AcademicController::class, 'updateSection']);
+            Route::delete('/sections/{id}', [AcademicController::class, 'deleteSection']);
+            Route::post('/sections/bulk-status', [AcademicController::class, 'bulkUpdateSectionStatus']);
+            Route::delete('/sections/bulk-delete', [AcademicController::class, 'bulkDeleteSections']);
+
+            // Semester Routes
+            Route::get('/semesters', [AcademicController::class, 'getSemesters']);
+            Route::get('/semesters/{id}', [AcademicController::class, 'getSemester']);
+            Route::post('/semesters', [AcademicController::class, 'createSemester']);
+            Route::put('/semesters/{id}', [AcademicController::class, 'updateSemester']);
+            Route::delete('/semesters/{id}', [AcademicController::class, 'deleteSemester']);
+            Route::post('/semesters/bulk-status', [AcademicController::class, 'bulkUpdateSemesterStatus']);
+            Route::delete('/semesters/bulk-delete', [AcademicController::class, 'bulkDeleteSemesters']);
+
+            // Subject Routes
+            Route::get('/subjects', [AcademicController::class, 'getSubjects']);
+            Route::get('/subjects/{id}', [AcademicController::class, 'getSubject']);
+            Route::post('/subjects', [AcademicController::class, 'createSubject']);
+            Route::put('/subjects/{id}', [AcademicController::class, 'updateSubject']);
+            Route::delete('/subjects/{id}', [AcademicController::class, 'deleteSubject']);
+            Route::post('/subjects/bulk-status', [AcademicController::class, 'bulkUpdateSubjectStatus']);
+            Route::delete('/subjects/bulk-delete', [AcademicController::class, 'bulkDeleteSubjects']);
+
+            // Academic Session Routes
+            Route::get('/academic-sessions', [AcademicController::class, 'getAcademicSessions']);
+            Route::get('/academic-sessions/{id}', [AcademicController::class, 'getAcademicSession']);
+            Route::post('/academic-sessions', [AcademicController::class, 'createAcademicSession']);
+            Route::put('/academic-sessions/{id}', [AcademicController::class, 'updateAcademicSession']);
+            Route::delete('/academic-sessions/{id}', [AcademicController::class, 'deleteAcademicSession']);
+            Route::post('/academic-sessions/bulk-status', [AcademicController::class, 'bulkUpdateAcademicSessionStatus']);
+            Route::delete('/academic-sessions/bulk-delete', [AcademicController::class, 'bulkDeleteAcademicSessions']);
+            Route::post('/academic-sessions/{id}/set-current', [AcademicController::class, 'setCurrentAcademicSession']);
+
+            // Classroom Routes
+            Route::get('/classrooms', [AcademicController::class, 'getClassRooms']);
+            Route::get('/classrooms/{id}', [AcademicController::class, 'getClassRoom']);
+            Route::post('/classrooms', [AcademicController::class, 'createClassRoom']);
+            Route::put('/classrooms/{id}', [AcademicController::class, 'updateClassRoom']);
+            Route::delete('/classrooms/{id}', [AcademicController::class, 'deleteClassRoom']);
+            Route::post('/classrooms/bulk-status', [AcademicController::class, 'bulkUpdateClassRoomStatus']);
+            Route::delete('/classrooms/bulk-delete', [AcademicController::class, 'bulkDeleteClassRooms']);
+        });
+
         // Library Management Routes
         Route::prefix('library')->group(function () {
-            
+
             // Books Management
             Route::prefix('books')->group(function () {
                 // Individual Book Operations
@@ -239,12 +316,12 @@ Route::prefix('v1')->group(function () {
                 Route::put('/{id}', [LibraryController::class, 'updateBook']);
                 Route::delete('/{id}', [LibraryController::class, 'deleteBook']);
                 Route::delete('/{id}/force', [LibraryController::class, 'forceDeleteBook']);
-                
+
                 // Bulk Book Operations
                 Route::post('/bulk/status', [LibraryController::class, 'bulkUpdateBookStatus']);
                 Route::post('/bulk/delete', [LibraryController::class, 'bulkDeleteBooks']);
                 Route::post('/bulk/force-delete', [LibraryController::class, 'bulkForceDeleteBooks']);
-                
+
                 // Book Import/Export
                 Route::post('/import', [LibraryController::class, 'importBooks']);
                 Route::get('/import/template', [LibraryController::class, 'getBookImportTemplate']);
@@ -258,7 +335,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [LibraryController::class, 'getBookCategory']);
                 Route::put('/{id}', [LibraryController::class, 'updateBookCategory']);
                 Route::delete('/{id}', [LibraryController::class, 'deleteBookCategory']);
-                
+
                 // Bulk Category Operations
                 Route::post('/bulk/status', [LibraryController::class, 'bulkUpdateBookCategoryStatus']);
                 Route::post('/bulk/delete', [LibraryController::class, 'bulkDeleteBookCategories']);
@@ -273,7 +350,7 @@ Route::prefix('v1')->group(function () {
                 Route::put('/{id}', [LibraryController::class, 'updateBookRequest']);
                 Route::delete('/{id}', [LibraryController::class, 'deleteBookRequest']);
                 Route::delete('/{id}/force', [LibraryController::class, 'forceDeleteBookRequest']);
-                
+
                 // Bulk Request Operations
                 Route::post('/bulk/status', [LibraryController::class, 'bulkUpdateBookRequestStatus']);
                 Route::post('/bulk/delete', [LibraryController::class, 'bulkDeleteBookRequests']);

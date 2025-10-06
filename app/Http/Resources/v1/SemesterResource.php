@@ -41,13 +41,6 @@ class SemesterResource extends JsonResource
             'name' => $this->name,
 
             /**
-             * The unique code of the semester.
-             * @var string $code
-             * @example "F2024"
-             */
-            'code' => $this->code,
-
-            /**
              * The academic year of the semester.
              * @var int $academic_year
              * @example 2024
@@ -90,13 +83,6 @@ class SemesterResource extends JsonResource
             'status' => $this->status,
 
             /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
-
-            /**
              * The creation timestamp.
              * @var string|null $created_at
              * @example "2023-12-01 10:30:00"
@@ -116,6 +102,12 @@ class SemesterResource extends JsonResource
              * @example "2024-05-15T10:00:00.000000Z"
              */
             'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * The programs associated with this semester (loaded when relationship is included).
+             * @var ProgramResource[]|null $programs
+             */
+            'programs' => ProgramResource::collection($this->whenLoaded('programs')),
 
             /**
              * The academic session information (loaded when relationship is included).

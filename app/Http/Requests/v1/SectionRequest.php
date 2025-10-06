@@ -40,17 +40,6 @@ class SectionRequest extends BaseRequest
 
         return [
             /**
-             * The batch ID that the section belongs to.
-             * @var int $batch_id
-             * @example 1
-             */
-            'batch_id' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'integer',
-                'exists:batches,id'
-            ],
-
-            /**
              * The name of the section.
              * @var string $name
              * @example "Section A"
@@ -63,23 +52,11 @@ class SectionRequest extends BaseRequest
             ],
 
             /**
-             * The unique code of the section.
-             * @var string $code
-             * @example "SEC-A"
-             */
-            'code' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'max:50',
-                Rule::unique('sections', 'code')->ignore($sectionId),
-            ],
-
-            /**
-             * The maximum number of students in the section (optional).
-             * @var int|null $max_students
+             * The maximum number of seats in the section (optional).
+             * @var int|null $seat
              * @example 30
              */
-            'max_students' => [
+            'seat' => [
                 'nullable',
                 'integer',
                 'min:1',
@@ -107,17 +84,6 @@ class SectionRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -129,11 +95,6 @@ class SectionRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            // Batch ID
-            'batch_id.required' => 'The batch is required.',
-            'batch_id.integer' => 'The batch must be a valid integer.',
-            'batch_id.exists' => 'The selected batch does not exist.',
-
             // Name
             'name.required' => 'The section name is required.',
             'name.string' => 'The section name must be a string.',
@@ -147,9 +108,9 @@ class SectionRequest extends BaseRequest
             'code.unique' => 'This section code is already registered.',
 
             // Max Students
-            'max_students.integer' => 'The maximum students must be a valid integer.',
-            'max_students.min' => 'The maximum students must be at least 1.',
-            'max_students.max' => 'The maximum students cannot exceed 100.',
+            'seat.integer' => 'The maximum students must be a valid integer.',
+            'seat.min' => 'The maximum students must be at least 1.',
+            'seat.max' => 'The maximum students cannot exceed 100.',
 
             // Description
             'description.string' => 'The description must be a string.',
@@ -177,7 +138,7 @@ class SectionRequest extends BaseRequest
             'batch_id' => 'batch',
             'name' => 'section name',
             'code' => 'section code',
-            'max_students' => 'maximum students',
+            'seat' => 'maximum seats',
             'description' => 'section description',
             'status' => 'section status',
             'sort_order' => 'sort order',

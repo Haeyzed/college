@@ -37,7 +37,7 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property int $duration_years
  * @property int $total_credits
  * @property float|null $fee_amount
-     * @property DegreeType $degree_type
+ * @property DegreeType $degree_type
  * @property string|null $admission_requirements
  * @property bool $is_registration_open
  * @property string $status
@@ -81,12 +81,10 @@ class Program extends Model implements Auditable
         'description',
         'duration_years',
         'total_credits',
-        'fee_amount',
         'degree_type',
         'admission_requirements',
         'is_registration_open',
         'status',
-        'sort_order',
     ];
 
     /**
@@ -307,16 +305,5 @@ class Program extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
-    }
-
-    /**
-     * Scope to order programs by sort order.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeOrdered(Builder $query): Builder
-    {
-        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

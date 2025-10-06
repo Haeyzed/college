@@ -52,18 +52,6 @@ class AcademicSessionRequest extends BaseRequest
             ],
 
             /**
-             * The unique code of the academic session.
-             * @var string $code
-             * @example "AY2024"
-             */
-            'code' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'max:50',
-                Rule::unique('academic_sessions', 'code')->ignore($sessionId),
-            ],
-
-            /**
              * The start date of the academic session.
              * @var string $start_date
              * @example "2024-09-01"
@@ -76,7 +64,7 @@ class AcademicSessionRequest extends BaseRequest
             /**
              * The end date of the academic session.
              * @var string $end_date
-             * @example "2025-08-31"
+             * @example "2025-05-31"
              */
             'end_date' => [
                 $isUpdate ? 'sometimes' : 'required',
@@ -95,9 +83,25 @@ class AcademicSessionRequest extends BaseRequest
             ],
 
             /**
+             * The IDs of the programs associated with the session.
+             * @var array<int> $programs
+             * @example [1, 5, 8]
+             */
+            'programs' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1',
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                Rule::exists('programs', 'id'),
+            ],
+
+            /**
              * The description of the academic session (optional).
              * @var string|null $description
-             * @example "Academic year 2024-2025 session"
+             * @example "Full academic session for the year."
              */
             'description' => [
                 'nullable',
@@ -114,17 +118,6 @@ class AcademicSessionRequest extends BaseRequest
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 Rule::enum(Status::class)
-            ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
             ],
         ];
     }
@@ -143,12 +136,6 @@ class AcademicSessionRequest extends BaseRequest
             'name.max' => 'The session name cannot exceed 255 characters.',
             'name.unique' => 'This session name is already registered.',
 
-            // Code
-            'code.required' => 'The session code is required.',
-            'code.string' => 'The session code must be a string.',
-            'code.max' => 'The session code cannot exceed 50 characters.',
-            'code.unique' => 'This session code is already registered.',
-
             // Start Date
             'start_date.required' => 'The start date is required.',
             'start_date.date' => 'The start date must be a valid date.',
@@ -161,6 +148,14 @@ class AcademicSessionRequest extends BaseRequest
             // Is Current
             'is_current.boolean' => 'The current session flag must be true or false.',
 
+            // Programs
+            'programs.required' => 'At least one program ID is required for the session.',
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.min' => 'At least one program must be selected.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
+
             // Description
             'description.string' => 'The description must be a string.',
             'description.max' => 'The description cannot exceed 1000 characters.',
@@ -169,10 +164,6 @@ class AcademicSessionRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid session status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -185,13 +176,13 @@ class AcademicSessionRequest extends BaseRequest
     {
         return [
             'name' => 'session name',
-            'code' => 'session code',
             'start_date' => 'start date',
             'end_date' => 'end date',
             'is_current' => 'current session',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
             'description' => 'session description',
             'status' => 'session status',
-            'sort_order' => 'sort order',
         ];
     }
 }

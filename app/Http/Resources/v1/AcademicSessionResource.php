@@ -41,13 +41,6 @@ class AcademicSessionResource extends JsonResource
             'name' => $this->name,
 
             /**
-             * The unique code of the academic session.
-             * @var string $code
-             * @example "AY2024"
-             */
-            'code' => $this->code,
-
-            /**
              * The start date of the academic session.
              * @var string $start_date
              * @example "2024-09-01"
@@ -57,7 +50,7 @@ class AcademicSessionResource extends JsonResource
             /**
              * The end date of the academic session.
              * @var string $end_date
-             * @example "2025-08-31"
+             * @example "2025-05-31"
              */
             'end_date' => $this->end_date?->format('Y-m-d'),
 
@@ -66,12 +59,12 @@ class AcademicSessionResource extends JsonResource
              * @var bool $is_current
              * @example true
              */
-            'is_current' => $this->is_current,
+            'is_current' => (bool) $this->is_current,
 
             /**
              * The description of the academic session.
              * @var string|null $description
-             * @example "Academic year 2024-2025 session"
+             * @example "Full academic session for the year."
              */
             'description' => $this->description,
 
@@ -81,13 +74,6 @@ class AcademicSessionResource extends JsonResource
              * @example "active"
              */
             'status' => $this->status,
-
-            /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
 
             /**
              * The creation timestamp.
@@ -109,6 +95,12 @@ class AcademicSessionResource extends JsonResource
              * @example "2024-05-15T10:00:00.000000Z"
              */
             'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
+
+            /**
+             * The programs associated with this academic session (loaded when relationship is included).
+             * @var ProgramResource[]|null $programs
+             */
+            'programs' => ProgramResource::collection($this->whenLoaded('programs')),
 
             /**
              * The semesters in this academic session (loaded when relationship is included).

@@ -40,17 +40,6 @@ class BatchRequest extends BaseRequest
 
         return [
             /**
-             * The program ID that the batch belongs to.
-             * @var int $program_id
-             * @example 1
-             */
-            'program_id' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'integer',
-                'exists:programs,id'
-            ],
-
-            /**
              * The name of the batch.
              * @var string $name
              * @example "Batch 2024"
@@ -60,18 +49,6 @@ class BatchRequest extends BaseRequest
                 'string',
                 'max:255',
                 Rule::unique('batches', 'name')->ignore($batchId),
-            ],
-
-            /**
-             * The unique code of the batch.
-             * @var string $code
-             * @example "B2024"
-             */
-            'code' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'max:50',
-                Rule::unique('batches', 'code')->ignore($batchId),
             ],
 
             /**
@@ -109,6 +86,23 @@ class BatchRequest extends BaseRequest
             ],
 
             /**
+             * The IDs of the programs associated with the batch.
+             * @var array<int> $programs
+             * @example [1, 5, 8]
+             */
+            'programs' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1', // Ensures the array is not empty
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                // Validates that each ID exists in the 'programs' table
+                Rule::exists('programs', 'id'),
+            ],
+
+            /**
              * The maximum number of students in the batch (optional).
              * @var int|null $max_students
              * @example 50
@@ -141,17 +135,6 @@ class BatchRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -163,22 +146,11 @@ class BatchRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            // Program ID
-            'program_id.required' => 'The program is required.',
-            'program_id.integer' => 'The program must be a valid integer.',
-            'program_id.exists' => 'The selected program does not exist.',
-
             // Name
             'name.required' => 'The batch name is required.',
             'name.string' => 'The batch name must be a string.',
             'name.max' => 'The batch name cannot exceed 255 characters.',
             'name.unique' => 'This batch name is already registered.',
-
-            // Code
-            'code.required' => 'The batch code is required.',
-            'code.string' => 'The batch code must be a string.',
-            'code.max' => 'The batch code cannot exceed 50 characters.',
-            'code.unique' => 'This batch code is already registered.',
 
             // Academic Year
             'academic_year.required' => 'The academic year is required.',
@@ -205,14 +177,18 @@ class BatchRequest extends BaseRequest
             'description.string' => 'The description must be a string.',
             'description.max' => 'The description cannot exceed 1000 characters.',
 
+            // Programs
+            'programs.required' => 'At least one program ID is required for the batch.',
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.min' => 'At least one program must be selected.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
+
             // Status
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid batch status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -224,16 +200,15 @@ class BatchRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'program_id' => 'program',
             'name' => 'batch name',
-            'code' => 'batch code',
             'academic_year' => 'academic year',
             'start_date' => 'start date',
             'end_date' => 'end date',
             'max_students' => 'maximum students',
             'description' => 'batch description',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
             'status' => 'batch status',
-            'sort_order' => 'sort order',
         ];
     }
 }

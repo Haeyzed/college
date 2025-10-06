@@ -32,7 +32,6 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property string|null $dean_email
  * @property string|null $dean_phone
  * @property string $status
- * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -62,7 +61,6 @@ class Faculty extends Model implements Auditable
         'dean_email',
         'dean_phone',
         'status',
-        'sort_order',
     ];
 
     /**
@@ -134,16 +132,5 @@ class Faculty extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('dean_name', $search);
         });
-    }
-
-    /**
-     * Scope to order faculties by sort order.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeOrdered(Builder $query): Builder
-    {
-        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

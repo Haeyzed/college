@@ -2,6 +2,12 @@
 
 namespace App\Models\v1;
 
+use App\Models\v1\ClassRoutine;
+use App\Models\v1\Content;
+use App\Models\v1\Program;
+use App\Models\v1\ProgramSemesterSection;
+use App\Models\v1\StudentEnroll;
+use App\Models\v1\Session; // Added missing use statement for Session
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,14 +32,12 @@ use OwenIt\Auditing\Contracts\Auditable;
  *
  * @property int $id
  * @property string $name
- * @property string $code
  * @property int $academic_year
  * @property Carbon $start_date
  * @property Carbon $end_date
  * @property bool $is_current
  * @property string|null $description
  * @property string $status
- * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -41,6 +45,9 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property-read Collection|Program[] $programs
  * @property-read Collection|Session[] $sessions
  * @property-read Collection|StudentEnroll[] $studentEnrolls
+ * @property-read Collection|ProgramSemesterSection[] $programSections
+ * @property-read Collection|ClassRoutine[] $classes
+ * @property-read Collection|Content[] $contents
  *
  * @method static Builder withTrashed(bool $withTrashed = true)
  * @method static Builder onlyTrashed()
@@ -58,14 +65,12 @@ class Semester extends Model implements Auditable
      */
     protected $fillable = [
         'name',
-        'code',
         'academic_year',
         'start_date',
         'end_date',
         'is_current',
         'description',
         'status',
-        'sort_order',
     ];
 
     /**
@@ -85,6 +90,36 @@ class Semester extends Model implements Auditable
     }
 
     /**
+     * Get the program semester sections associated with the semester.
+     *
+     * @return HasMany
+     */
+    public function programSections(): HasMany
+    {
+        return $this->hasMany(ProgramSemesterSection::class, 'semester_id', 'id');
+    }
+
+    /**
+     * Get the class routines associated with the semester.
+     *
+     * @return HasMany
+     */
+    public function classes(): HasMany
+    {
+        return $this->hasMany(ClassRoutine::class, 'semester_id', 'id');
+    }
+
+    /**
+     * Get the academic contents uploaded for this semester.
+     *
+     * @return HasMany
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(Content::class, 'semester_id', 'id');
+    }
+
+    /**
      * Get the programs for the semester.
      *
      * @return BelongsToMany
@@ -92,16 +127,6 @@ class Semester extends Model implements Auditable
     public function programs(): BelongsToMany
     {
         return $this->belongsToMany(Program::class, 'program_semester', 'semester_id', 'program_id');
-    }
-
-    /**
-     * Get the sessions for the semester.
-     *
-     * @return BelongsToMany
-     */
-    public function sessions(): BelongsToMany
-    {
-        return $this->belongsToMany(Session::class, 'session_semester', 'semester_id', 'session_id');
     }
 
     /**
@@ -163,16 +188,5 @@ class Semester extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
-    }
-
-    /**
-     * Scope to order semesters by sort order.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeOrdered(Builder $query): Builder
-    {
-        return $query->orderBy('sort_order')->orderBy('academic_year', 'desc')->orderBy('start_date');
     }
 }

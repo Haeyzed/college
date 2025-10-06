@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Sections Table Migration - Version 1
- * 
+ *
  * This migration creates the sections table for the College Management System.
  * It handles section information storage with proper indexing, constraints, and soft deletes.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
@@ -26,19 +26,15 @@ return new class extends Migration
     {
         Schema::create('sections', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('batch_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('code')->unique();
-            $table->integer('max_students')->nullable();
+            $table->string('name')->unique();
+            $table->integer('seat')->nullable();
             $table->text('description')->nullable();
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for better performance
             $table->index(['batch_id', 'status']);
-            $table->index(['code']);
             $table->index(['deleted_at']);
         });
     }

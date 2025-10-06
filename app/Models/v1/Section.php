@@ -2,6 +2,10 @@
 
 namespace App\Models\v1;
 
+use App\Models\v1\ClassRoutine;
+use App\Models\v1\Content;
+use App\Models\v1\ProgramSemesterSection;
+use App\Models\v1\StudentEnroll;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -24,20 +28,19 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @author Softmax Technologies
  *
  * @property int $id
- * @property int $batch_id
  * @property string $name
- * @property string $code
- * @property int|null $max_students
+ * @property int|null $seat
  * @property string|null $description
  * @property string $status
- * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
  *
- * @property-read Batch $batch
- * @property-read Collection|Assignment[] $assignments
- * @property-read Collection|Student[] $students
+ * @property-read Collection|ProgramSemesterSection[] $semesterPrograms
+ * @property-read Collection|ProgramSemesterSection[] $programSemesters
+ * @property-read Collection|StudentEnroll[] $studentEnrolls
+ * @property-read Collection|ClassRoutine[] $classes
+ * @property-read Collection|Content[] $contents
  *
  * @method static Builder withTrashed(bool $withTrashed = true)
  * @method static Builder onlyTrashed()
@@ -54,13 +57,10 @@ class Section extends Model implements Auditable
      * @var array<int, string>
      */
     protected $fillable = [
-        'batch_id',
         'name',
-        'code',
-        'max_students',
+        'seat',
         'description',
         'status',
-        'sort_order',
     ];
 
     /**
@@ -77,33 +77,53 @@ class Section extends Model implements Auditable
     }
 
     /**
-     * Get the batch that owns the section.
-     *
-     * @return BelongsTo
-     */
-    public function batch(): BelongsTo
-    {
-        return $this->belongsTo(Batch::class);
-    }
-
-    /**
-     * Get the assignments for the section.
+     * Get the program semester sections associated with the section.
      *
      * @return HasMany
      */
-    public function assignments(): HasMany
+    public function semesterPrograms(): HasMany
     {
-        return $this->hasMany(Assignment::class);
+        return $this->hasMany(ProgramSemesterSection::class, 'section_id', 'id');
     }
 
     /**
-     * Get the students for the section.
+     * Get the program semester sections associated with the section (alias).
      *
      * @return HasMany
      */
-    public function students(): HasMany
+    public function programSemesters(): HasMany
     {
-        return $this->hasMany(Student::class);
+        return $this->hasMany(ProgramSemesterSection::class, 'section_id', 'id');
+    }
+
+    /**
+     * Get the student enrollment records associated with the section.
+     *
+     * @return HasMany
+     */
+    public function studentEnrolls(): HasMany
+    {
+        return $this->hasMany(StudentEnroll::class, 'section_id');
+    }
+
+    /**
+     * Get the class routines associated with the section.
+     *
+     * @return HasMany
+     */
+    public function classes(): HasMany
+    {
+        return $this->hasMany(ClassRoutine::class, 'section_id', 'id');
+    }
+
+    /**
+     * Get the academic contents uploaded for this section.
+     *
+     * @return HasMany
+     */
+    public function contents(): HasMany
+    {
+        return $this->hasMany(Content::class, 'section_id', 'id');
     }
 
     /**

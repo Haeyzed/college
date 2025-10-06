@@ -52,18 +52,6 @@ class SemesterRequest extends BaseRequest
             ],
 
             /**
-             * The unique code of the semester.
-             * @var string $code
-             * @example "F2024"
-             */
-            'code' => [
-                $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'max:50',
-                Rule::unique('semesters', 'code')->ignore($semesterId),
-            ],
-
-            /**
              * The academic year of the semester.
              * @var int $academic_year
              * @example 2024
@@ -107,6 +95,23 @@ class SemesterRequest extends BaseRequest
             ],
 
             /**
+             * The IDs of the programs associated with the semester.
+             * @var array<int> $programs
+             * @example [1, 5, 8]
+             */
+            'programs' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1', // Ensures the array is not empty
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                // Validates that each ID exists in the 'programs' table
+                Rule::exists('programs', 'id'),
+            ],
+
+            /**
              * The description of the semester (optional).
              * @var string|null $description
              * @example "Fall semester for academic year 2024"
@@ -127,17 +132,6 @@ class SemesterRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -154,12 +148,6 @@ class SemesterRequest extends BaseRequest
             'name.string' => 'The semester name must be a string.',
             'name.max' => 'The semester name cannot exceed 255 characters.',
             'name.unique' => 'This semester name is already registered.',
-
-            // Code
-            'code.required' => 'The semester code is required.',
-            'code.string' => 'The semester code must be a string.',
-            'code.max' => 'The semester code cannot exceed 50 characters.',
-            'code.unique' => 'This semester code is already registered.',
 
             // Academic Year
             'academic_year.required' => 'The academic year is required.',
@@ -179,6 +167,14 @@ class SemesterRequest extends BaseRequest
             // Is Current
             'is_current.boolean' => 'The current semester flag must be true or false.',
 
+            // Programs
+            'programs.required' => 'At least one program ID is required for the semester.',
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.min' => 'At least one program must be selected.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
+
             // Description
             'description.string' => 'The description must be a string.',
             'description.max' => 'The description cannot exceed 1000 characters.',
@@ -187,10 +183,6 @@ class SemesterRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid semester status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -203,14 +195,14 @@ class SemesterRequest extends BaseRequest
     {
         return [
             'name' => 'semester name',
-            'code' => 'semester code',
             'academic_year' => 'academic year',
             'start_date' => 'start date',
             'end_date' => 'end date',
             'is_current' => 'current semester',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
             'description' => 'semester description',
             'status' => 'semester status',
-            'sort_order' => 'sort order',
         ];
     }
 }

@@ -34,13 +34,6 @@ class SectionResource extends JsonResource
             'id' => $this->id,
 
             /**
-             * The batch ID that the section belongs to.
-             * @var int $batch_id
-             * @example 1
-             */
-            'batch_id' => $this->batch_id,
-
-            /**
              * The name of the section.
              * @var string $name
              * @example "Section A"
@@ -48,18 +41,11 @@ class SectionResource extends JsonResource
             'name' => $this->name,
 
             /**
-             * The unique code of the section.
-             * @var string $code
-             * @example "SEC-A"
-             */
-            'code' => $this->code,
-
-            /**
-             * The maximum number of students in the section.
-             * @var int|null $max_students
+             * The maximum number of students/seats in the section.
+             * @var int|null $seat
              * @example 30
              */
-            'max_students' => $this->max_students,
+            'seat' => $this->seat,
 
             /**
              * The description of the section.
@@ -73,14 +59,7 @@ class SectionResource extends JsonResource
              * @var string $status
              * @example "active"
              */
-            'status' => $this->status,
-
-            /**
-             * The sort order for display.
-             * @var int $sort_order
-             * @example 1
-             */
-            'sort_order' => $this->sort_order,
+            'status' => (string) $this->status,
 
             /**
              * The creation timestamp.
@@ -108,6 +87,42 @@ class SectionResource extends JsonResource
              * @var BatchResource|null $batch
              */
             'batch' => new BatchResource($this->whenLoaded('batch')),
+
+            /**
+             * The assignments for this section (loaded when relationship is included).
+             * @var AssignmentResource[]|null $assignments
+             */
+            'assignments' => AssignmentResource::collection($this->whenLoaded('assignments')),
+
+            /**
+             * The program semester sections associated with the section (loaded when relationship is included).
+             * @var ProgramSemesterSectionResource[]|null $semester_programs
+             */
+            'semester_programs' => ProgramSemesterSectionResource::collection($this->whenLoaded('semesterPrograms')),
+
+            /**
+             * The program semester sections associated with the section (alias) (loaded when relationship is included).
+             * @var ProgramSemesterSectionResource[]|null $program_semesters
+             */
+            'program_semesters' => ProgramSemesterSectionResource::collection($this->whenLoaded('programSemesters')),
+
+            /**
+             * The student enrollment records associated with the section (loaded when relationship is included).
+             * @var StudentEnrollResource[]|null $student_enrolls
+             */
+            'student_enrolls' => StudentEnrollResource::collection($this->whenLoaded('studentEnrolls')),
+
+            /**
+             * The class routines associated with the section (loaded when relationship is included).
+             * @var ClassRoutineResource[]|null $classes
+             */
+            'classes' => ClassRoutineResource::collection($this->whenLoaded('classes')),
+
+            /**
+             * The academic contents uploaded for this section (loaded when relationship is included).
+             * @var ContentResource[]|null $contents
+             */
+            'contents' => ContentResource::collection($this->whenLoaded('contents')),
 
             /**
              * The students in this section (loaded when relationship is included).
