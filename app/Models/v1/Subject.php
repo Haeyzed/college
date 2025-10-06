@@ -38,7 +38,6 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property string|null $learning_outcomes
  * @property string|null $prerequisites
  * @property string $status
- * @property int $sort_order
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
@@ -78,7 +77,6 @@ class Subject extends Model implements Auditable
         'learning_outcomes',
         'prerequisites',
         'status',
-        'sort_order',
     ];
 
     /**
@@ -228,6 +226,34 @@ class Subject extends Model implements Auditable
     }
 
     /**
+     * Scope to filter subjects by program.
+     *
+     * @param Builder $query
+     * @param int $programId
+     * @return Builder
+     */
+    public function scopeFilterByProgram(Builder $query, int $programId): Builder
+    {
+        return $query->whereHas('programs', function ($q) use ($programId) {
+            $q->where('id', $programId);
+        });
+    }
+
+    /**
+     * Scope to filter subjects by faculty.
+     *
+     * @param Builder $query
+     * @param int $facultyId
+     * @return Builder
+     */
+    public function scopeFilterByFaculty(Builder $query, int $facultyId): Builder
+    {
+        return $query->whereHas('programs.faculty', function ($q) use ($facultyId) {
+            $q->where('id', $facultyId);
+        });
+    }
+
+    /**
      * Scope to search subjects by name, code, or description.
      *
      * @param Builder $query
@@ -241,16 +267,5 @@ class Subject extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
-    }
-
-    /**
-     * Scope to order subjects by sort order.
-     *
-     * @param Builder $query
-     * @return Builder
-     */
-    public function scopeOrdered(Builder $query): Builder
-    {
-        return $query->orderBy('sort_order')->orderBy('name');
     }
 }

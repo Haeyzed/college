@@ -48,7 +48,7 @@ class SectionRequest extends BaseRequest
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:255',
-                Rule::unique('sections', 'name')->where('batch_id', $this->input('batch_id'))->ignore($sectionId),
+                Rule::unique('sections', 'name')->ignore($sectionId),
             ],
 
             /**
@@ -72,6 +72,54 @@ class SectionRequest extends BaseRequest
                 'nullable',
                 'string',
                 'max:1000'
+            ],
+
+            /**
+             * The IDs of the programs associated with the section.
+             * @var array<int> $programs
+             * @example [1, 5]
+             */
+            'programs' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1',
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                Rule::exists('programs', 'id')->whereNull('deleted_at'),
+            ],
+
+            /**
+             * The IDs of the semesters this section is offered in.
+             * @var array<int> $semesters
+             * @example [1, 2]
+             */
+            'semesters' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1',
+            ],
+            'semesters.*' => [
+                'required',
+                'integer',
+                Rule::exists('semesters', 'id')->whereNull('deleted_at'),
+            ],
+
+            /**
+             * The IDs of the academic items (e.g., subjects/courses) associated with the section.
+             * @var array<int> $items
+             * @example [101, 102]
+             */
+            'items' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1',
+            ],
+            'items.*' => [
+                'required',
+                'integer',
+                Rule::exists('items', 'id')->whereNull('deleted_at'),
             ],
 
             /**
@@ -101,12 +149,6 @@ class SectionRequest extends BaseRequest
             'name.max' => 'The section name cannot exceed 255 characters.',
             'name.unique' => 'This section name already exists in this batch.',
 
-            // Code
-            'code.required' => 'The section code is required.',
-            'code.string' => 'The section code must be a string.',
-            'code.max' => 'The section code cannot exceed 50 characters.',
-            'code.unique' => 'This section code is already registered.',
-
             // Max Students
             'seat.integer' => 'The maximum students must be a valid integer.',
             'seat.min' => 'The maximum students must be at least 1.',
@@ -116,14 +158,34 @@ class SectionRequest extends BaseRequest
             'description.string' => 'The description must be a string.',
             'description.max' => 'The description cannot exceed 1000 characters.',
 
+            // Programs
+            'programs.required' => 'At least one program ID is required for the section.',
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.min' => 'At least one program must be selected.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
+
+            // Semesters
+            'semesters.required' => 'At least one semester ID is required for the section.',
+            'semesters.array' => 'The semesters field must be an array of semester IDs.',
+            'semesters.min' => 'At least one semester must be selected.',
+            'semesters.*.required' => 'Each semester ID in the list is required.',
+            'semesters.*.integer' => 'Each semester ID must be a valid integer.',
+            'semesters.*.exists' => 'One or more selected semester IDs are invalid.',
+
+            // Items (New)
+            'items.required' => 'At least one item ID is required for the section.',
+            'items.array' => 'The items field must be an array of item IDs.',
+            'items.min' => 'At least one item must be selected.',
+            'items.*.required' => 'Each item ID in the list is required.',
+            'items.*.integer' => 'Each item ID must be a valid integer.',
+            'items.*.exists' => 'One or more selected item IDs are invalid.',
+
             // Status
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid section status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -135,13 +197,16 @@ class SectionRequest extends BaseRequest
     public function attributes(): array
     {
         return [
-            'batch_id' => 'batch',
             'name' => 'section name',
-            'code' => 'section code',
             'seat' => 'maximum seats',
             'description' => 'section description',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
+            'semesters' => 'semesters',
+            'semesters.*' => 'semester ID',
+            'items' => 'items',
+            'items.*' => 'item ID',
             'status' => 'section status',
-            'sort_order' => 'sort order',
         ];
     }
 }

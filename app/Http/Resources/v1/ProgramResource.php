@@ -34,13 +34,6 @@ class ProgramResource extends JsonResource
             'id' => $this->id,
 
             /**
-             * The faculty ID that the program belongs to.
-             * @var int $faculty_id
-             * @example 1
-             */
-            'faculty_id' => $this->faculty_id,
-
-            /**
              * The name of the program.
              * @var string $name
              * @example "Bachelor of Computer Science"

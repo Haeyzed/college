@@ -392,11 +392,6 @@ class AcademicService
     {
         return DB::transaction(function () use ($id) {
             $section = Section::query()->findOrFail($id);
-
-            if ($section->students()->exists()) {
-                throw new Exception('Cannot delete section that contains students. Please reassign students first.');
-            }
-
             $section->delete();
             return true;
         });
@@ -422,10 +417,6 @@ class AcademicService
             $deletedCount = 0;
 
             foreach ($sections as $section) {
-                if ($section->students()->exists()) {
-                    continue;
-                }
-
                 $section->delete();
                 $deletedCount++;
             }
@@ -524,6 +515,7 @@ class AcademicService
             $deletedCount = 0;
 
             foreach ($semesters as $semester) {
+                $semester->programs()->detach();
                 $semester->delete();
                 $deletedCount++;
             }
@@ -545,15 +537,18 @@ class AcademicService
     /**
      * Get a paginated list of subjects.
      */
-    public function getSubjects(int $perPage, ?string $status = null, ?string $search = null, ?string $subjectType = null, ?string $classType = null): LengthAwarePaginator
+    public function getSubjects(int $perPage, ?int $facultyId, ?int $programId, ?string $status = null, ?string $search = null, ?string $subjectType = null, ?string $classType = null, ?int $creditHours = null): LengthAwarePaginator
     {
-        $query = Subject::query()
+        $query = Subject::query()->with(['programs', 'programs.faculty'])
             ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($facultyId, fn($q) => $q->filterByFaculty($facultyId))
+            ->when($programId, fn($q) => $q->filterByProgram($programId))
             ->when($subjectType, fn($q) => $q->filterBySubjectType($subjectType))
             ->when($classType, fn($q) => $q->filterByClassType($classType))
+            ->when($creditHours, fn($q) => $q->filterByCreditHours($creditHours))
             ->when($search, fn($q) => $q->search($search));
 
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $query->orderBy('name', 'asc')->paginate($perPage);
     }
 
     /**
@@ -561,7 +556,7 @@ class AcademicService
      */
     public function getSubjectById(int $id): Subject
     {
-        return Subject::with(['programs'])->findOrFail($id);
+        return Subject::with(['programs', 'programs.faculty'])->findOrFail($id);
     }
 
     /**
@@ -570,7 +565,9 @@ class AcademicService
     public function createSubject(array $data): Subject
     {
         return DB::transaction(function () use ($data) {
-            return Subject::query()->create($data);
+            $subject = Subject::query()->create($data);
+            $subject->programs()->attach($data['programs']);
+            return $subject->load(['programs', 'programs.faculty']);
         });
     }
 
@@ -582,7 +579,8 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $subject = Subject::query()->findOrFail($id);
             $subject->update($data);
-            return $subject;
+            $subject->programs()->sync($data['programs']);
+            return $subject->load(['programs', 'programs.faculty']);
         });
     }
 
@@ -593,6 +591,7 @@ class AcademicService
     {
         return DB::transaction(function () use ($id) {
             $subject = Subject::query()->findOrFail($id);
+            $subject->programs()->detach();
             $subject->delete();
             return true;
         });
@@ -618,6 +617,7 @@ class AcademicService
             $deletedCount = 0;
 
             foreach ($subjects as $subject) {
+                $subject->programs()->detach();
                 $subject->delete();
                 $deletedCount++;
             }

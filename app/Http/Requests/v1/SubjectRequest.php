@@ -100,6 +100,22 @@ class SubjectRequest extends BaseRequest
             ],
 
             /**
+             * The IDs of the programs associated with the subject.
+             * @var array<int> $programs
+             * @example [1, 5]
+             */
+            'programs' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'array',
+                'min:1',
+            ],
+            'programs.*' => [
+                'required',
+                'integer',
+                Rule::exists('programs', 'id'),
+            ],
+
+            /**
              * The total marks for the subject (optional).
              * @var float|null $total_marks
              * @example 100.00
@@ -166,17 +182,6 @@ class SubjectRequest extends BaseRequest
                 'string',
                 Rule::enum(Status::class)
             ],
-
-            /**
-             * The sort order for display (optional).
-             * @var int|null $sort_order
-             * @example 1
-             */
-            'sort_order' => [
-                'nullable',
-                'integer',
-                'min:0'
-            ],
         ];
     }
 
@@ -216,6 +221,14 @@ class SubjectRequest extends BaseRequest
             'class_type.string' => 'The class type must be a string.',
             'class_type.enum' => 'The class type must be a valid class type.',
 
+            // Programs
+            'programs.required' => 'At least one program ID is required for the subject.',
+            'programs.array' => 'The programs field must be an array of program IDs.',
+            'programs.min' => 'At least one program must be selected.',
+            'programs.*.required' => 'Each program ID in the list is required.',
+            'programs.*.integer' => 'Each program ID must be a valid integer.',
+            'programs.*.exists' => 'One or more selected program IDs are invalid.',
+
             // Total Marks
             'total_marks.numeric' => 'The total marks must be a valid number.',
             'total_marks.min' => 'The total marks cannot be negative.',
@@ -242,10 +255,6 @@ class SubjectRequest extends BaseRequest
             'status.required' => 'The status is required.',
             'status.string' => 'The status must be a string.',
             'status.enum' => 'The status must be a valid subject status.',
-
-            // Sort Order
-            'sort_order.integer' => 'The sort order must be a valid integer.',
-            'sort_order.min' => 'The sort order must be at least 0.',
         ];
     }
 
@@ -262,13 +271,14 @@ class SubjectRequest extends BaseRequest
             'credit_hours' => 'credit hours',
             'subject_type' => 'subject type',
             'class_type' => 'class type',
+            'programs' => 'programs',
+            'programs.*' => 'program ID',
             'total_marks' => 'total marks',
             'passing_marks' => 'passing marks',
             'description' => 'subject description',
             'learning_outcomes' => 'learning outcomes',
             'prerequisites' => 'prerequisites',
             'status' => 'subject status',
-            'sort_order' => 'sort order',
         ];
     }
 }

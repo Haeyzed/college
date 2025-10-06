@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Subjects Table Migration - Version 1
- * 
+ *
  * This migration creates the subjects table for the College Management System.
  * It handles subject information storage with proper indexing, constraints, and soft deletes.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
@@ -39,10 +39,9 @@ return new class extends Migration
             $table->text('learning_outcomes')->nullable();
             $table->string('prerequisites')->nullable();
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for better performance
             $table->index(['status', 'subject_type']);
             $table->index(['subject_type', 'class_type']);

@@ -1042,10 +1042,13 @@ class AcademicController extends Controller
             $perPage = $request->query('per_page', config('app.pagination.per_page', 15));
             $status = $request->query('status');
             $search = $request->query('search');
+            $programId = $request->query('program_id');
+            $facultyId = $request->query('faculty_id');
             $subjectType = $request->query('subject_type');
             $classType = $request->query('class_type');
+            $creditHours = $request->query('credit_hours');
 
-            $result = $this->academicService->getSubjects($perPage, $status, $search, $subjectType, $classType);
+            $result = $this->academicService->getSubjects($perPage, $facultyId, $programId, $status, $search, $subjectType, $classType, $creditHours);
 
             return response()->paginated(
                 SubjectResource::collection($result),
