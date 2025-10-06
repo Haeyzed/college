@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -60,7 +61,7 @@ class EnrollSubject extends Model
             'program_id' => 'integer',
             'semester_id' => 'integer',
             'section_id' => 'integer',
-            'status' => 'boolean',
+            'status' => Status::class,
         ];
     }
 
