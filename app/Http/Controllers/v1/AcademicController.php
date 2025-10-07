@@ -61,13 +61,19 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Faculty Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all faculty-related HTTP endpoints including CRUD operations
+    | for faculties and faculty filtering. Faculty management endpoints include creating,
+    | updating, deleting, and retrieving faculty information with support for
+    | pagination, searching, status filtering, and bulk operations.
+    |
     */
 
     /**
      * Get all faculties with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated faculty data
      * @response array{success: bool, message: string, data: FacultyResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getFaculties(Request $request): JsonResponse
@@ -93,8 +99,8 @@ class AcademicController extends Controller
     /**
      * Get a specific faculty by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Faculty ID
+     * @return JsonResponse JSON response with faculty data
      * @response array{success: bool, message: string, data: FacultyResource}
      */
     public function getFaculty(int $id): JsonResponse
@@ -118,8 +124,8 @@ class AcademicController extends Controller
     /**
      * Create a new faculty.
      *
-     * @param FacultyRequest $request
-     * @return JsonResponse
+     * @param FacultyRequest $request Validated faculty creation request
+     * @return JsonResponse JSON response with created faculty data
      * @response array{success: bool, message: string, data: FacultyResource}
      */
     public function createFaculty(FacultyRequest $request): JsonResponse
@@ -141,9 +147,9 @@ class AcademicController extends Controller
     /**
      * Update an existing faculty.
      *
-     * @param FacultyRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param FacultyRequest $request Validated faculty update request
+     * @param int $id Faculty ID to update
+     * @return JsonResponse JSON response with updated faculty data
      * @response array{success: bool, message: string, data: FacultyResource}
      */
     public function updateFaculty(FacultyRequest $request, int $id): JsonResponse
@@ -167,8 +173,8 @@ class AcademicController extends Controller
     /**
      * Delete a faculty (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Faculty ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteFaculty(int $id): JsonResponse
@@ -192,8 +198,8 @@ class AcademicController extends Controller
     /**
      * Bulk update faculty status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing faculty IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateFacultyStatus(Request $request): JsonResponse
@@ -223,8 +229,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete faculties (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing faculty IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteFaculties(Request $request): JsonResponse
@@ -253,13 +259,19 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Program Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all program-related HTTP endpoints including CRUD operations
+    | for programs and program filtering. Program management endpoints include creating,
+    | updating, deleting, and retrieving program information with support for
+    | faculty association, degree type filtering, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all programs with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated program data
      * @response array{success: bool, message: string, data: ProgramResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getPrograms(Request $request): JsonResponse
@@ -287,8 +299,8 @@ class AcademicController extends Controller
     /**
      * Get a specific program by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Program ID
+     * @return JsonResponse JSON response with program data
      * @response array{success: bool, message: string, data: ProgramResource}
      */
     public function getProgram(int $id): JsonResponse
@@ -312,8 +324,8 @@ class AcademicController extends Controller
     /**
      * Create a new program.
      *
-     * @param ProgramRequest $request
-     * @return JsonResponse
+     * @param ProgramRequest $request Validated program creation request
+     * @return JsonResponse JSON response with created program data
      * @response array{success: bool, message: string, data: ProgramResource}
      */
     public function createProgram(ProgramRequest $request): JsonResponse
@@ -335,9 +347,9 @@ class AcademicController extends Controller
     /**
      * Update an existing program.
      *
-     * @param ProgramRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param ProgramRequest $request Validated program update request
+     * @param int $id Program ID to update
+     * @return JsonResponse JSON response with updated program data
      * @response array{success: bool, message: string, data: ProgramResource}
      */
     public function updateProgram(ProgramRequest $request, int $id): JsonResponse
@@ -361,8 +373,8 @@ class AcademicController extends Controller
     /**
      * Delete a program (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Program ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteProgram(int $id): JsonResponse
@@ -386,8 +398,8 @@ class AcademicController extends Controller
     /**
      * Bulk update program status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing program IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateProgramStatus(Request $request): JsonResponse
@@ -417,8 +429,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete programs (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing program IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeletePrograms(Request $request): JsonResponse
@@ -447,13 +459,19 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Batch Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all batch-related HTTP endpoints including CRUD operations
+    | for batches and batch filtering. Batch management endpoints include creating,
+    | updating, deleting, and retrieving batch information with support for
+    | program associations, academic year filtering, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all batches with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated batch data
      * @response array{success: bool, message: string, data: BatchResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getBatches(Request $request): JsonResponse
@@ -480,8 +498,8 @@ class AcademicController extends Controller
     /**
      * Get a specific batch by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Batch ID
+     * @return JsonResponse JSON response with batch data
      * @response array{success: bool, message: string, data: BatchResource}
      */
     public function getBatch(int $id): JsonResponse
@@ -505,8 +523,8 @@ class AcademicController extends Controller
     /**
      * Create a new batch.
      *
-     * @param BatchRequest $request
-     * @return JsonResponse
+     * @param BatchRequest $request Validated batch creation request
+     * @return JsonResponse JSON response with created batch data
      * @response array{success: bool, message: string, data: BatchResource}
      */
     public function createBatch(BatchRequest $request): JsonResponse
@@ -528,9 +546,9 @@ class AcademicController extends Controller
     /**
      * Update an existing batch.
      *
-     * @param BatchRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param BatchRequest $request Validated batch update request
+     * @param int $id Batch ID to update
+     * @return JsonResponse JSON response with updated batch data
      * @response array{success: bool, message: string, data: BatchResource}
      */
     public function updateBatch(BatchRequest $request, int $id): JsonResponse
@@ -554,8 +572,8 @@ class AcademicController extends Controller
     /**
      * Delete a batch (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Batch ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteBatch(int $id): JsonResponse
@@ -579,8 +597,8 @@ class AcademicController extends Controller
     /**
      * Bulk update batch status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing batch IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateBatchStatus(Request $request): JsonResponse
@@ -610,8 +628,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete batches (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing batch IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteBatches(Request $request): JsonResponse
@@ -640,13 +658,19 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Section Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all section-related HTTP endpoints including CRUD operations
+    | for sections and section filtering. Section management endpoints include creating,
+    | updating, deleting, and retrieving section information with support for
+    | complex many-to-many relationships, batch filtering, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all sections with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated section data
      * @response array{success: bool, message: string, data: SectionResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getSections(Request $request): JsonResponse
@@ -673,8 +697,8 @@ class AcademicController extends Controller
     /**
      * Get a specific section by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Section ID
+     * @return JsonResponse JSON response with section data
      * @response array{success: bool, message: string, data: SectionResource}
      */
     public function getSection(int $id): JsonResponse
@@ -698,8 +722,8 @@ class AcademicController extends Controller
     /**
      * Create a new section.
      *
-     * @param SectionRequest $request
-     * @return JsonResponse
+     * @param SectionRequest $request Validated section creation request
+     * @return JsonResponse JSON response with created section data
      * @response array{success: bool, message: string, data: SectionResource}
      */
     public function createSection(SectionRequest $request): JsonResponse
@@ -721,9 +745,9 @@ class AcademicController extends Controller
     /**
      * Update an existing section.
      *
-     * @param SectionRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param SectionRequest $request Validated section update request
+     * @param int $id Section ID to update
+     * @return JsonResponse JSON response with updated section data
      * @response array{success: bool, message: string, data: SectionResource}
      */
     public function updateSection(SectionRequest $request, int $id): JsonResponse
@@ -747,8 +771,8 @@ class AcademicController extends Controller
     /**
      * Delete a section (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Section ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteSection(int $id): JsonResponse
@@ -772,8 +796,8 @@ class AcademicController extends Controller
     /**
      * Bulk update section status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing section IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateSectionStatus(Request $request): JsonResponse
@@ -803,8 +827,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete sections (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing section IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteSections(Request $request): JsonResponse
@@ -833,13 +857,20 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Semester Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all semester-related HTTP endpoints including CRUD operations
+    | for semesters and semester filtering. Semester management endpoints include creating,
+    | updating, deleting, and retrieving semester information with support for
+    | program associations, academic year filtering, current semester tracking,
+    | pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all semesters with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated semester data
      * @response array{success: bool, message: string, data: SemesterResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getSemesters(Request $request): JsonResponse
@@ -869,8 +900,8 @@ class AcademicController extends Controller
     /**
      * Get a specific semester by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Semester ID
+     * @return JsonResponse JSON response with semester data
      * @response array{success: bool, message: string, data: SemesterResource}
      */
     public function getSemester(int $id): JsonResponse
@@ -894,8 +925,8 @@ class AcademicController extends Controller
     /**
      * Create a new semester.
      *
-     * @param SemesterRequest $request
-     * @return JsonResponse
+     * @param SemesterRequest $request Validated semester creation request
+     * @return JsonResponse JSON response with created semester data
      * @response array{success: bool, message: string, data: SemesterResource}
      */
     public function createSemester(SemesterRequest $request): JsonResponse
@@ -917,9 +948,9 @@ class AcademicController extends Controller
     /**
      * Update an existing semester.
      *
-     * @param SemesterRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param SemesterRequest $request Validated semester update request
+     * @param int $id Semester ID to update
+     * @return JsonResponse JSON response with updated semester data
      * @response array{success: bool, message: string, data: SemesterResource}
      */
     public function updateSemester(SemesterRequest $request, int $id): JsonResponse
@@ -943,8 +974,8 @@ class AcademicController extends Controller
     /**
      * Delete a semester (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Semester ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteSemester(int $id): JsonResponse
@@ -968,8 +999,8 @@ class AcademicController extends Controller
     /**
      * Bulk update semester status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing semester IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateSemesterStatus(Request $request): JsonResponse
@@ -999,8 +1030,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete semesters (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing semester IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteSemesters(Request $request): JsonResponse
@@ -1029,13 +1060,20 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Subject Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all subject-related HTTP endpoints including CRUD operations
+    | for subjects and subject filtering. Subject management endpoints include creating,
+    | updating, deleting, and retrieving subject information with support for
+    | program associations, faculty filtering, subject type classification,
+    | credit hours management, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all subjects with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated subject data
      * @response array{success: bool, message: string, data: SubjectResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getSubjects(Request $request): JsonResponse
@@ -1066,8 +1104,8 @@ class AcademicController extends Controller
     /**
      * Get a specific subject by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Subject ID
+     * @return JsonResponse JSON response with subject data
      * @response array{success: bool, message: string, data: SubjectResource}
      */
     public function getSubject(int $id): JsonResponse
@@ -1091,8 +1129,8 @@ class AcademicController extends Controller
     /**
      * Create a new subject.
      *
-     * @param SubjectRequest $request
-     * @return JsonResponse
+     * @param SubjectRequest $request Validated subject creation request
+     * @return JsonResponse JSON response with created subject data
      * @response array{success: bool, message: string, data: SubjectResource}
      */
     public function createSubject(SubjectRequest $request): JsonResponse
@@ -1114,9 +1152,9 @@ class AcademicController extends Controller
     /**
      * Update an existing subject.
      *
-     * @param SubjectRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param SubjectRequest $request Validated subject update request
+     * @param int $id Subject ID to update
+     * @return JsonResponse JSON response with updated subject data
      * @response array{success: bool, message: string, data: SubjectResource}
      */
     public function updateSubject(SubjectRequest $request, int $id): JsonResponse
@@ -1140,8 +1178,8 @@ class AcademicController extends Controller
     /**
      * Delete a subject (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Subject ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteSubject(int $id): JsonResponse
@@ -1165,8 +1203,8 @@ class AcademicController extends Controller
     /**
      * Bulk update subject status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing subject IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateSubjectStatus(Request $request): JsonResponse
@@ -1196,8 +1234,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete subjects (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing subject IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteSubjects(Request $request): JsonResponse
@@ -1226,13 +1264,20 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Academic Session Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all academic session-related HTTP endpoints including CRUD operations
+    | for academic sessions and academic session filtering. Academic session management
+    | endpoints include creating, updating, deleting, and retrieving session information
+    | with support for program associations, current session tracking, pagination,
+    | and bulk operations.
+    |
     */
 
     /**
      * Get all academic sessions with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated academic session data
      * @response array{success: bool, message: string, data: AcademicSessionResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getAcademicSessions(Request $request): JsonResponse
@@ -1261,8 +1306,8 @@ class AcademicController extends Controller
     /**
      * Get a specific academic session by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Academic session ID
+     * @return JsonResponse JSON response with academic session data
      * @response array{success: bool, message: string, data: AcademicSessionResource}
      */
     public function getAcademicSession(int $id): JsonResponse
@@ -1286,8 +1331,8 @@ class AcademicController extends Controller
     /**
      * Create a new academic session.
      *
-     * @param AcademicSessionRequest $request
-     * @return JsonResponse
+     * @param AcademicSessionRequest $request Validated academic session creation request
+     * @return JsonResponse JSON response with created academic session data
      * @response array{success: bool, message: string, data: AcademicSessionResource}
      */
     public function createAcademicSession(AcademicSessionRequest $request): JsonResponse
@@ -1309,9 +1354,9 @@ class AcademicController extends Controller
     /**
      * Update an existing academic session.
      *
-     * @param AcademicSessionRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param AcademicSessionRequest $request Validated academic session update request
+     * @param int $id Academic session ID to update
+     * @return JsonResponse JSON response with updated academic session data
      * @response array{success: bool, message: string, data: AcademicSessionResource}
      */
     public function updateAcademicSession(AcademicSessionRequest $request, int $id): JsonResponse
@@ -1335,8 +1380,8 @@ class AcademicController extends Controller
     /**
      * Delete an academic session (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Academic session ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteAcademicSession(int $id): JsonResponse
@@ -1360,8 +1405,8 @@ class AcademicController extends Controller
     /**
      * Bulk update academic session status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing academic session IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateAcademicSessionStatus(Request $request): JsonResponse
@@ -1391,8 +1436,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete academic sessions (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing academic session IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteAcademicSessions(Request $request): JsonResponse
@@ -1420,8 +1465,8 @@ class AcademicController extends Controller
     /**
      * Set a specific academic session as the current session.
      *
-     * @param int $id The ID of the session to set as current.
-     * @return JsonResponse
+     * @param int $id The ID of the session to set as current
+     * @return JsonResponse JSON response with updated academic session data
      * @response array{success: bool, message: string, data: AcademicSessionResource}
      */
     public function setCurrentAcademicSession(int $id): JsonResponse
@@ -1446,13 +1491,20 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | ClassRoom Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all classroom-related HTTP endpoints including CRUD operations
+    | for classrooms and classroom filtering. Classroom management endpoints include creating,
+    | updating, deleting, and retrieving classroom information with support for
+    | program associations, room type classification, availability tracking,
+    | capacity management, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all classrooms with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated classroom data
      * @response array{success: bool, message: string, data: ClassRoomResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getClassRooms(Request $request): JsonResponse
@@ -1482,8 +1534,8 @@ class AcademicController extends Controller
     /**
      * Get a specific classroom by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Classroom ID
+     * @return JsonResponse JSON response with classroom data
      * @response array{success: bool, message: string, data: ClassRoomResource}
      */
     public function getClassRoom(int $id): JsonResponse
@@ -1507,8 +1559,8 @@ class AcademicController extends Controller
     /**
      * Create a new classroom.
      *
-     * @param ClassRoomRequest $request
-     * @return JsonResponse
+     * @param ClassRoomRequest $request Validated classroom creation request
+     * @return JsonResponse JSON response with created classroom data
      * @response array{success: bool, message: string, data: ClassRoomResource}
      */
     public function createClassRoom(ClassRoomRequest $request): JsonResponse
@@ -1530,9 +1582,9 @@ class AcademicController extends Controller
     /**
      * Update an existing classroom.
      *
-     * @param ClassRoomRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param ClassRoomRequest $request Validated classroom update request
+     * @param int $id Classroom ID to update
+     * @return JsonResponse JSON response with updated classroom data
      * @response array{success: bool, message: string, data: ClassRoomResource}
      */
     public function updateClassRoom(ClassRoomRequest $request, int $id): JsonResponse
@@ -1556,8 +1608,8 @@ class AcademicController extends Controller
     /**
      * Delete a classroom (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Classroom ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteClassRoom(int $id): JsonResponse
@@ -1581,8 +1633,8 @@ class AcademicController extends Controller
     /**
      * Bulk update classroom status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing classroom IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateClassRoomStatus(Request $request): JsonResponse
@@ -1612,8 +1664,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete classrooms (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing classroom IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteClassRooms(Request $request): JsonResponse
@@ -1642,13 +1694,20 @@ class AcademicController extends Controller
     |--------------------------------------------------------------------------
     | Enroll Subject Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all enroll subject-related HTTP endpoints including CRUD operations
+    | for enroll subjects and enroll subject filtering. Enroll subject management
+    | endpoints include creating, updating, deleting, and retrieving enrollment information
+    | with support for program, semester, and section associations, comprehensive
+    | subject enrollment tracking, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all enroll subjects with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated enroll subject data
      * @response array{success: bool, message: string, data: EnrollSubjectResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getEnrollSubjects(Request $request): JsonResponse
@@ -1677,8 +1736,8 @@ class AcademicController extends Controller
     /**
      * Get a specific enroll subject by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Enroll subject ID
+     * @return JsonResponse JSON response with enroll subject data
      * @response array{success: bool, message: string, data: EnrollSubjectResource}
      */
     public function getEnrollSubject(int $id): JsonResponse
@@ -1702,8 +1761,8 @@ class AcademicController extends Controller
     /**
      * Create a new enroll subject.
      *
-     * @param EnrollSubjectRequest $request
-     * @return JsonResponse
+     * @param EnrollSubjectRequest $request Validated enroll subject creation request
+     * @return JsonResponse JSON response with created enroll subject data
      * @response array{success: bool, message: string, data: EnrollSubjectResource}
      */
     public function createEnrollSubject(EnrollSubjectRequest $request): JsonResponse
@@ -1725,9 +1784,9 @@ class AcademicController extends Controller
     /**
      * Update an existing enroll subject.
      *
-     * @param EnrollSubjectRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param EnrollSubjectRequest $request Validated enroll subject update request
+     * @param int $id Enroll subject ID to update
+     * @return JsonResponse JSON response with updated enroll subject data
      * @response array{success: bool, message: string, data: EnrollSubjectResource}
      */
     public function updateEnrollSubject(EnrollSubjectRequest $request, int $id): JsonResponse
@@ -1751,8 +1810,8 @@ class AcademicController extends Controller
     /**
      * Delete an enroll subject (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Enroll subject ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteEnrollSubject(int $id): JsonResponse
@@ -1776,8 +1835,8 @@ class AcademicController extends Controller
     /**
      * Bulk update enroll subject status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing enroll subject IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateEnrollSubjectStatus(Request $request): JsonResponse
@@ -1807,8 +1866,8 @@ class AcademicController extends Controller
     /**
      * Bulk delete enroll subjects (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing enroll subject IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteEnrollSubjects(Request $request): JsonResponse

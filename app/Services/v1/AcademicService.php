@@ -36,12 +36,19 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all faculty-related operations including CRUD operations
-    | for faculties and faculty filtering.
+    | for faculties and faculty filtering. Faculty management includes creating,
+    | updating, deleting, and retrieving faculty information with support for
+    | pagination, searching, and status filtering.
     |
     */
 
     /**
-     * Get a paginated list of faculties.
+     * Get a paginated list of faculties with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $search Search term for faculty name or description
+     * @param string|null $status Filter by faculty status (active/inactive)
+     * @return LengthAwarePaginator Paginated list of faculties
      */
     public function getFaculties(int $perPage, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
@@ -54,6 +61,10 @@ class AcademicService
 
     /**
      * Get a specific faculty by ID.
+     *
+     * @param int $id Faculty ID
+     * @return Faculty Faculty model instance
+     * @throws ModelNotFoundException When faculty is not found
      */
     public function getFacultyById(int $id): Faculty
     {
@@ -62,6 +73,10 @@ class AcademicService
 
     /**
      * Create a new faculty.
+     *
+     * @param array $data Faculty data including name, description, status, etc.
+     * @return Faculty Created faculty instance
+     * @throws Exception When creation fails
      */
     public function createFaculty(array $data): Faculty
     {
@@ -71,7 +86,13 @@ class AcademicService
     }
 
     /**
-     * Update a faculty.
+     * Update an existing faculty.
+     *
+     * @param int $id Faculty ID to update
+     * @param array $data Updated faculty data
+     * @return Faculty Updated faculty instance
+     * @throws ModelNotFoundException When faculty is not found
+     * @throws Exception When update fails
      */
     public function updateFaculty(int $id, array $data): Faculty
     {
@@ -84,6 +105,11 @@ class AcademicService
 
     /**
      * Delete a faculty (Soft Delete).
+     *
+     * @param int $id Faculty ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When faculty is not found
+     * @throws Exception When faculty has associated programs
      */
     public function deleteFaculty(int $id): bool
     {
@@ -101,6 +127,11 @@ class AcademicService
 
     /**
      * Bulk update faculty status.
+     *
+     * @param array $ids Array of faculty IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of faculties updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateFacultyStatus(array $ids, string $status): int
     {
@@ -111,6 +142,10 @@ class AcademicService
 
     /**
      * Bulk delete faculties (Soft Delete).
+     *
+     * @param array $ids Array of faculty IDs to delete
+     * @return int Number of faculties successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteFaculties(array $ids): int
     {
@@ -137,12 +172,21 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all program-related operations including CRUD operations
-    | for programs and program filtering.
+    | for programs and program filtering. Program management includes creating,
+    | updating, deleting, and retrieving program information with support for
+    | faculty association, degree type filtering, and comprehensive search capabilities.
     |
     */
 
     /**
-     * Get a paginated list of programs.
+     * Get a paginated list of programs with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $facultyId Filter by faculty ID
+     * @param string|null $status Filter by program status (active/inactive)
+     * @param string|null $search Search term for program name or description
+     * @param string|null $degreeType Filter by degree type
+     * @return LengthAwarePaginator Paginated list of programs
      */
     public function getPrograms(int $perPage, ?int $facultyId = null, ?string $status = null, ?string $search = null, ?string $degreeType = null): LengthAwarePaginator
     {
@@ -157,6 +201,10 @@ class AcademicService
 
     /**
      * Get a specific program by ID.
+     *
+     * @param int $id Program ID
+     * @return Program Program model instance with relationships
+     * @throws ModelNotFoundException When program is not found
      */
     public function getProgramById(int $id): Program
     {
@@ -165,6 +213,10 @@ class AcademicService
 
     /**
      * Create a new program.
+     *
+     * @param array $data Program data including name, description, faculty_id, etc.
+     * @return Program Created program instance with faculty relationship
+     * @throws Exception When creation fails
      */
     public function createProgram(array $data): Program
     {
@@ -175,7 +227,13 @@ class AcademicService
     }
 
     /**
-     * Update a program.
+     * Update an existing program.
+     *
+     * @param int $id Program ID to update
+     * @param array $data Updated program data
+     * @return Program Updated program instance with faculty relationship
+     * @throws ModelNotFoundException When program is not found
+     * @throws Exception When update fails
      */
     public function updateProgram(int $id, array $data): Program
     {
@@ -188,6 +246,11 @@ class AcademicService
 
     /**
      * Delete a program (Soft Delete).
+     *
+     * @param int $id Program ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When program is not found
+     * @throws Exception When program has associated batches
      */
     public function deleteProgram(int $id): bool
     {
@@ -205,6 +268,11 @@ class AcademicService
 
     /**
      * Bulk update program status.
+     *
+     * @param array $ids Array of program IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of programs updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateProgramStatus(array $ids, string $status): int
     {
@@ -215,6 +283,10 @@ class AcademicService
 
     /**
      * Bulk delete programs (Soft Delete).
+     *
+     * @param array $ids Array of program IDs to delete
+     * @return int Number of programs successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeletePrograms(array $ids): int
     {
@@ -241,12 +313,20 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all batch-related operations including CRUD operations
-    | for batches and batch filtering.
+    | for batches and batch filtering. Batch management includes creating,
+    | updating, deleting, and retrieving batch information with support for
+    | program associations, academic year filtering, and comprehensive search capabilities.
     |
     */
 
     /**
-     * Get a paginated list of batches.
+     * Get a paginated list of batches with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $status Filter by batch status (active/inactive)
+     * @param string|null $search Search term for batch name or description
+     * @param int|null $academicYear Filter by academic year
+     * @return LengthAwarePaginator Paginated list of batches
      */
     public function getBatches(int $perPage, ?string $status = null, ?string $search = null, ?int $academicYear = null): LengthAwarePaginator
     {
@@ -260,6 +340,10 @@ class AcademicService
 
     /**
      * Get a specific batch by ID.
+     *
+     * @param int $id Batch ID
+     * @return Batch Batch model instance with relationships
+     * @throws ModelNotFoundException When batch is not found
      */
     public function getBatchById(int $id): Batch
     {
@@ -268,6 +352,10 @@ class AcademicService
 
     /**
      * Create a new batch.
+     *
+     * @param array $data Batch data including name, academic_year, programs, etc.
+     * @return Batch Created batch instance with program relationships
+     * @throws Exception When creation fails
      */
     public function createBatch(array $data): Batch
     {
@@ -279,7 +367,13 @@ class AcademicService
     }
 
     /**
-     * Update a batch.
+     * Update an existing batch.
+     *
+     * @param int $id Batch ID to update
+     * @param array $data Updated batch data
+     * @return Batch Updated batch instance with program relationships
+     * @throws ModelNotFoundException When batch is not found
+     * @throws Exception When update fails
      */
     public function updateBatch(int $id, array $data): Batch
     {
@@ -293,6 +387,11 @@ class AcademicService
 
     /**
      * Delete a batch (Soft Delete).
+     *
+     * @param int $id Batch ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When batch is not found
+     * @throws Exception When deletion fails
      */
     public function deleteBatch(int $id): bool
     {
@@ -306,6 +405,11 @@ class AcademicService
 
     /**
      * Bulk update batch status.
+     *
+     * @param array $ids Array of batch IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of batches updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateBatchStatus(array $ids, string $status): int
     {
@@ -316,6 +420,10 @@ class AcademicService
 
     /**
      * Bulk delete batches (Soft Delete).
+     *
+     * @param array $ids Array of batch IDs to delete
+     * @return int Number of batches successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteBatches(array $ids): int
     {
@@ -339,12 +447,20 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all section-related operations including CRUD operations
-    | for sections and section filtering.
+    | for sections and section filtering. Section management includes creating,
+    | updating, deleting, and retrieving section information with support for
+    | complex many-to-many relationships with programs, semesters, and items.
     |
     */
 
     /**
-     * Get a paginated list of sections.
+     * Get a paginated list of sections with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $batchId Filter by batch ID
+     * @param string|null $status Filter by section status (active/inactive)
+     * @param string|null $search Search term for section name or description
+     * @return LengthAwarePaginator Paginated list of sections
      */
     public function getSections(int $perPage, ?int $batchId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
@@ -358,6 +474,10 @@ class AcademicService
 
     /**
      * Get a specific section by ID.
+     *
+     * @param int $id Section ID
+     * @return Section Section model instance with relationships
+     * @throws ModelNotFoundException When section is not found
      */
     public function getSectionById(int $id): Section
     {
@@ -366,6 +486,10 @@ class AcademicService
 
     /**
      * Create a new section.
+     *
+     * @param array $data Section data including name, programs, semesters, items, etc.
+     * @return Section Created section instance with relationships
+     * @throws Exception When creation fails
      */
     public function createSection(array $data): Section
     {
@@ -377,7 +501,13 @@ class AcademicService
     }
 
     /**
-     * Update a section.
+     * Update an existing section.
+     *
+     * @param int $id Section ID to update
+     * @param array $data Updated section data
+     * @return Section Updated section instance with relationships
+     * @throws ModelNotFoundException When section is not found
+     * @throws Exception When update fails
      */
     public function updateSection(int $id, array $data): Section
     {
@@ -391,6 +521,11 @@ class AcademicService
 
     /**
      * Delete a section (Soft Delete).
+     *
+     * @param int $id Section ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When section is not found
+     * @throws Exception When deletion fails
      */
     public function deleteSection(int $id): bool
     {
@@ -403,6 +538,11 @@ class AcademicService
 
     /**
      * Bulk update section status.
+     *
+     * @param array $ids Array of section IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of sections updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateSectionStatus(array $ids, string $status): int
     {
@@ -413,6 +553,10 @@ class AcademicService
 
     /**
      * Bulk delete sections (Soft Delete).
+     *
+     * @param array $ids Array of section IDs to delete
+     * @return int Number of sections successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteSections(array $ids): int
     {
@@ -435,12 +579,21 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all semester-related operations including CRUD operations
-    | for semesters and semester filtering.
+    | for semesters and semester filtering. Semester management includes creating,
+    | updating, deleting, and retrieving semester information with support for
+    | program associations, academic year filtering, and current semester tracking.
     |
     */
 
     /**
-     * Get a paginated list of semesters.
+     * Get a paginated list of semesters with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $status Filter by semester status (active/inactive)
+     * @param string|null $search Search term for semester name or description
+     * @param int|null $academicYear Filter by academic year
+     * @param bool|null $isCurrent Filter by current semester status
+     * @return LengthAwarePaginator Paginated list of semesters
      */
     public function getSemesters(int $perPage, ?string $status = null, ?string $search = null, ?int $academicYear = null, ?bool $isCurrent = null): LengthAwarePaginator
     {
@@ -455,6 +608,10 @@ class AcademicService
 
     /**
      * Get a specific semester by ID.
+     *
+     * @param int $id Semester ID
+     * @return Semester Semester model instance
+     * @throws ModelNotFoundException When semester is not found
      */
     public function getSemesterById(int $id): Semester
     {
@@ -463,6 +620,10 @@ class AcademicService
 
     /**
      * Create a new semester.
+     *
+     * @param array $data Semester data including name, academic_year, programs, etc.
+     * @return Semester Created semester instance with program relationships
+     * @throws Exception When creation fails
      */
     public function createSemester(array $data): Semester
     {
@@ -474,7 +635,13 @@ class AcademicService
     }
 
     /**
-     * Update a semester.
+     * Update an existing semester.
+     *
+     * @param int $id Semester ID to update
+     * @param array $data Updated semester data
+     * @return Semester Updated semester instance with program relationships
+     * @throws ModelNotFoundException When semester is not found
+     * @throws Exception When update fails
      */
     public function updateSemester(int $id, array $data): Semester
     {
@@ -488,6 +655,11 @@ class AcademicService
 
     /**
      * Delete a semester (Soft Delete).
+     *
+     * @param int $id Semester ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When semester is not found
+     * @throws Exception When deletion fails
      */
     public function deleteSemester(int $id): bool
     {
@@ -501,6 +673,11 @@ class AcademicService
 
     /**
      * Bulk update semester status.
+     *
+     * @param array $ids Array of semester IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of semesters updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateSemesterStatus(array $ids, string $status): int
     {
@@ -511,6 +688,10 @@ class AcademicService
 
     /**
      * Bulk delete semesters (Soft Delete).
+     *
+     * @param array $ids Array of semester IDs to delete
+     * @return int Number of semesters successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteSemesters(array $ids): int
     {
@@ -534,12 +715,25 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all subject-related operations including CRUD operations
-    | for subjects and subject filtering.
+    | for subjects and subject filtering. Subject management includes creating,
+    | updating, deleting, and retrieving subject information with support for
+    | program associations, faculty filtering, subject type classification, and
+    | credit hours management.
     |
     */
 
     /**
-     * Get a paginated list of subjects.
+     * Get a paginated list of subjects with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $facultyId Filter by faculty ID
+     * @param int|null $programId Filter by program ID
+     * @param string|null $status Filter by subject status (active/inactive)
+     * @param string|null $search Search term for subject name or description
+     * @param string|null $subjectType Filter by subject type
+     * @param string|null $classType Filter by class type
+     * @param int|null $creditHours Filter by credit hours
+     * @return LengthAwarePaginator Paginated list of subjects
      */
     public function getSubjects(int $perPage, ?int $facultyId, ?int $programId, ?string $status = null, ?string $search = null, ?string $subjectType = null, ?string $classType = null, ?int $creditHours = null): LengthAwarePaginator
     {
@@ -557,6 +751,10 @@ class AcademicService
 
     /**
      * Get a specific subject by ID.
+     *
+     * @param int $id Subject ID
+     * @return Subject Subject model instance with relationships
+     * @throws ModelNotFoundException When subject is not found
      */
     public function getSubjectById(int $id): Subject
     {
@@ -565,6 +763,10 @@ class AcademicService
 
     /**
      * Create a new subject.
+     *
+     * @param array $data Subject data including name, description, programs, etc.
+     * @return Subject Created subject instance with program relationships
+     * @throws Exception When creation fails
      */
     public function createSubject(array $data): Subject
     {
@@ -576,7 +778,13 @@ class AcademicService
     }
 
     /**
-     * Update a subject.
+     * Update an existing subject.
+     *
+     * @param int $id Subject ID to update
+     * @param array $data Updated subject data
+     * @return Subject Updated subject instance with program relationships
+     * @throws ModelNotFoundException When subject is not found
+     * @throws Exception When update fails
      */
     public function updateSubject(int $id, array $data): Subject
     {
@@ -590,6 +798,11 @@ class AcademicService
 
     /**
      * Delete a subject (Soft Delete).
+     *
+     * @param int $id Subject ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When subject is not found
+     * @throws Exception When deletion fails
      */
     public function deleteSubject(int $id): bool
     {
@@ -603,6 +816,11 @@ class AcademicService
 
     /**
      * Bulk update subject status.
+     *
+     * @param array $ids Array of subject IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of subjects updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateSubjectStatus(array $ids, string $status): int
     {
@@ -613,6 +831,10 @@ class AcademicService
 
     /**
      * Bulk delete subjects (Soft Delete).
+     *
+     * @param array $ids Array of subject IDs to delete
+     * @return int Number of subjects successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteSubjects(array $ids): int
     {
@@ -636,12 +858,20 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all academic session-related operations including CRUD operations
-    | for academic sessions and academic session filtering.
+    | for academic sessions and academic session filtering. Academic session management
+    | includes creating, updating, deleting, and retrieving session information with support
+    | for program associations, current session tracking, and comprehensive filtering.
     |
     */
 
     /**
-     * Get a paginated list of academic sessions.
+     * Get a paginated list of academic sessions with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $status Filter by session status (active/inactive)
+     * @param string|null $search Search term for session name or description
+     * @param bool|null $isCurrent Filter by current session status
+     * @return LengthAwarePaginator Paginated list of academic sessions
      */
     public function getAcademicSessions(int $perPage, ?string $status = null, ?string $search = null, ?bool $isCurrent = null): LengthAwarePaginator
     {
@@ -655,6 +885,10 @@ class AcademicService
 
     /**
      * Get a specific academic session by ID.
+     *
+     * @param int $id Academic session ID
+     * @return Session Academic session model instance with relationships
+     * @throws ModelNotFoundException When academic session is not found
      */
     public function getAcademicSessionById(int $id): Session
     {
@@ -663,6 +897,10 @@ class AcademicService
 
     /**
      * Create a new academic session.
+     *
+     * @param array $data Academic session data including name, programs, is_current, etc.
+     * @return Session Created academic session instance with program relationships
+     * @throws Exception When creation fails
      */
     public function createAcademicSession(array $data): Session
     {
@@ -677,7 +915,13 @@ class AcademicService
     }
 
     /**
-     * Update an academic session.
+     * Update an existing academic session.
+     *
+     * @param int $id Academic session ID to update
+     * @param array $data Updated academic session data
+     * @return Session Updated academic session instance with program relationships
+     * @throws ModelNotFoundException When academic session is not found
+     * @throws Exception When update fails
      */
     public function updateAcademicSession(int $id, array $data): Session
     {
@@ -697,6 +941,11 @@ class AcademicService
 
     /**
      * Delete an academic session (Soft Delete).
+     *
+     * @param int $id Academic session ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When academic session is not found
+     * @throws Exception When deletion fails
      */
     public function deleteAcademicSession(int $id): bool
     {
@@ -710,6 +959,11 @@ class AcademicService
 
     /**
      * Bulk update academic session status.
+     *
+     * @param array $ids Array of academic session IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of academic sessions updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateAcademicSessionStatus(array $ids, string $status): int
     {
@@ -720,6 +974,10 @@ class AcademicService
 
     /**
      * Bulk delete academic sessions (Soft Delete).
+     *
+     * @param array $ids Array of academic session IDs to delete
+     * @return int Number of academic sessions successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteAcademicSessions(array $ids): int
     {
@@ -742,9 +1000,10 @@ class AcademicService
      *
      * This method ensures that only one session is marked as 'is_current' at a time.
      *
-     * @param int $id The ID of the session to set as current.
-     * @return Session
-     * @throws ModelNotFoundException
+     * @param int $id The ID of the session to set as current
+     * @return Session Updated academic session instance
+     * @throws ModelNotFoundException When academic session is not found
+     * @throws Exception When setting current session fails
      */
     public function setCurrentAcademicSession(int $id): Session
     {
@@ -768,12 +1027,22 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all classroom-related operations including CRUD operations
-    | for classrooms and classroom filtering.
+    | for classrooms and classroom filtering. Classroom management includes creating,
+    | updating, deleting, and retrieving classroom information with support for
+    | program associations, room type classification, availability tracking, and
+    | capacity management.
     |
     */
 
     /**
-     * Get a paginated list of classrooms.
+     * Get a paginated list of classrooms with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $status Filter by classroom status (active/inactive)
+     * @param string|null $search Search term for classroom name or description
+     * @param string|null $roomType Filter by room type
+     * @param bool|null $isAvailable Filter by availability status
+     * @return LengthAwarePaginator Paginated list of classrooms
      */
     public function getClassRooms(int $perPage, ?string $status = null, ?string $search = null, ?string $roomType = null, ?bool $isAvailable = null): LengthAwarePaginator
     {
@@ -788,6 +1057,10 @@ class AcademicService
 
     /**
      * Get a specific classroom by ID.
+     *
+     * @param int $id Classroom ID
+     * @return ClassRoom Classroom model instance with relationships
+     * @throws ModelNotFoundException When classroom is not found
      */
     public function getClassRoomById(int $id): ClassRoom
     {
@@ -796,6 +1069,10 @@ class AcademicService
 
     /**
      * Create a new classroom.
+     *
+     * @param array $data Classroom data including name, capacity, programs, etc.
+     * @return ClassRoom Created classroom instance with program relationships
+     * @throws Exception When creation fails
      */
     public function createClassRoom(array $data): ClassRoom
     {
@@ -807,7 +1084,13 @@ class AcademicService
     }
 
     /**
-     * Update a classroom.
+     * Update an existing classroom.
+     *
+     * @param int $id Classroom ID to update
+     * @param array $data Updated classroom data
+     * @return ClassRoom Updated classroom instance with program relationships
+     * @throws ModelNotFoundException When classroom is not found
+     * @throws Exception When update fails
      */
     public function updateClassRoom(int $id, array $data): ClassRoom
     {
@@ -821,6 +1104,11 @@ class AcademicService
 
     /**
      * Delete a classroom (Soft Delete).
+     *
+     * @param int $id Classroom ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When classroom is not found
+     * @throws Exception When deletion fails
      */
     public function deleteClassRoom(int $id): bool
     {
@@ -834,6 +1122,11 @@ class AcademicService
 
     /**
      * Bulk update classroom status.
+     *
+     * @param array $ids Array of classroom IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of classrooms updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateClassRoomStatus(array $ids, string $status): int
     {
@@ -844,6 +1137,10 @@ class AcademicService
 
     /**
      * Bulk delete classrooms (Soft Delete).
+     *
+     * @param array $ids Array of classroom IDs to delete
+     * @return int Number of classrooms successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteClassRooms(array $ids): int
     {
@@ -867,15 +1164,17 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle the complex many-to-many relationships for sections
-    | with programs, semesters, and items.
+    | with programs, semesters, and items. These helper methods manage the
+    | intricate relationships between sections and their associated academic
+    | entities, ensuring data integrity and proper relationship management.
     |
     */
 
     /**
      * Create section relationships (for new sections).
      *
-     * @param Section $section
-     * @param array $data
+     * @param Section $section Section instance
+     * @param array $data Section data containing programs, semesters, and items
      * @return void
      */
     private function createSectionRelationships(Section $section, array $data): void
@@ -910,8 +1209,8 @@ class AcademicService
     /**
      * Update section relationships (for existing sections).
      *
-     * @param Section $section
-     * @param array $data
+     * @param Section $section Section instance
+     * @param array $data Section data containing programs, semesters, and items
      * @return void
      */
     private function updateSectionRelationships(Section $section, array $data): void
@@ -952,12 +1251,23 @@ class AcademicService
     |--------------------------------------------------------------------------
     |
     | These methods handle all enroll subject-related operations including CRUD operations
-    | for enroll subjects and enroll subject filtering.
+    | for enroll subjects and enroll subject filtering. Enroll subject management
+    | includes creating, updating, deleting, and retrieving enrollment information
+    | with support for program, semester, and section associations, as well as
+    | comprehensive subject enrollment tracking.
     |
     */
 
     /**
-     * Get a paginated list of enroll subjects.
+     * Get a paginated list of enroll subjects with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $programId Filter by program ID
+     * @param int|null $semesterId Filter by semester ID
+     * @param int|null $sectionId Filter by section ID
+     * @param string|null $status Filter by enroll subject status (active/inactive)
+     * @param string|null $search Search term for enroll subject
+     * @return LengthAwarePaginator Paginated list of enroll subjects
      */
     public function getEnrollSubjects(int $perPage, ?int $programId = null, ?int $semesterId = null, ?int $sectionId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
@@ -972,6 +1282,10 @@ class AcademicService
 
     /**
      * Get a specific enroll subject by ID.
+     *
+     * @param int $id Enroll subject ID
+     * @return EnrollSubject Enroll subject model instance with relationships
+     * @throws ModelNotFoundException When enroll subject is not found
      */
     public function getEnrollSubjectById(int $id): EnrollSubject
     {
@@ -980,6 +1294,10 @@ class AcademicService
 
     /**
      * Create a new enroll subject.
+     *
+     * @param array $data Enroll subject data including program_id, semester_id, section_id, subjects, etc.
+     * @return EnrollSubject Created enroll subject instance with relationships
+     * @throws Exception When creation fails
      */
     public function createEnrollSubject(array $data): EnrollSubject
     {
@@ -1006,7 +1324,13 @@ class AcademicService
     }
 
     /**
-     * Update an enroll subject.
+     * Update an existing enroll subject.
+     *
+     * @param int $id Enroll subject ID to update
+     * @param array $data Updated enroll subject data
+     * @return EnrollSubject Updated enroll subject instance with relationships
+     * @throws ModelNotFoundException When enroll subject is not found
+     * @throws Exception When update fails
      */
     public function updateEnrollSubject(int $id, array $data): EnrollSubject
     {
@@ -1031,6 +1355,11 @@ class AcademicService
 
     /**
      * Delete an enroll subject (Soft Delete).
+     *
+     * @param int $id Enroll subject ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When enroll subject is not found
+     * @throws Exception When deletion fails
      */
     public function deleteEnrollSubject(int $id): bool
     {
@@ -1044,6 +1373,11 @@ class AcademicService
 
     /**
      * Bulk update enroll subject status.
+     *
+     * @param array $ids Array of enroll subject IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of enroll subjects updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateEnrollSubjectStatus(array $ids, string $status): int
     {
@@ -1054,6 +1388,10 @@ class AcademicService
 
     /**
      * Bulk delete enroll subjects (Soft Delete).
+     *
+     * @param array $ids Array of enroll subject IDs to delete
+     * @return int Number of enroll subjects successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteEnrollSubjects(array $ids): int
     {

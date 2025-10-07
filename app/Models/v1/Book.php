@@ -217,7 +217,7 @@ class Book extends Model implements Auditable
         static::deleting(function ($book) {
             if ($book->isForceDeleting() && $book->cover_image_path) {
                 // Delete the image file when force deleting
-                \Storage::disk('public')->delete($book->cover_image_path);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($book->cover_image_path);
             }
         });
     }

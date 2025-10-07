@@ -36,12 +36,23 @@ class LibraryService
     |--------------------------------------------------------------------------
     |
     | These methods handle all book-related operations including CRUD operations
-    | for books, book search, and book filtering by category.
+    | for books, book search, and book filtering by category. Book management
+    | includes creating, updating, deleting, and retrieving book information
+    | with support for cover image handling, availability tracking, Excel import,
+    | and comprehensive search capabilities.
     |
     */
 
     /**
-     * Get a paginated list of books.
+     * Get a paginated list of books with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $bookCategoryId Filter by book category ID
+     * @param string|null $status Filter by book status (active/inactive)
+     * @param string|null $author Filter by author name
+     * @param string|null $search Search term for book title, author, or ISBN
+     * @param bool|null $available Filter by availability status
+     * @return LengthAwarePaginator Paginated list of books
      */
     public function getBooks(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?bool $available = null): LengthAwarePaginator
     {
@@ -57,6 +68,10 @@ class LibraryService
 
     /**
      * Get a specific book by ID.
+     *
+     * @param int $id Book ID
+     * @return Book Book model instance with relationships
+     * @throws ModelNotFoundException When book is not found
      */
     public function getBookById(int $id): Book
     {
@@ -65,6 +80,10 @@ class LibraryService
 
     /**
      * Create a new book.
+     *
+     * @param array $data Book data including title, author, ISBN, cover image, etc.
+     * @return Book Created book instance with category relationship
+     * @throws Exception When creation fails
      */
     public function createBook(array $data): Book
     {
@@ -85,7 +104,13 @@ class LibraryService
     }
 
     /**
-     * Update a book.
+     * Update an existing book.
+     *
+     * @param int $id Book ID to update
+     * @param array $data Updated book data including cover image handling
+     * @return Book Updated book instance with category relationship
+     * @throws ModelNotFoundException When book is not found
+     * @throws Exception When update fails
      */
     public function updateBook(int $id, array $data): Book
     {
@@ -119,6 +144,11 @@ class LibraryService
 
     /**
      * Delete a book (Soft Delete).
+     *
+     * @param int $id Book ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When book is not found
+     * @throws Exception When book has active issues
      */
     public function deleteBook(int $id): bool
     {
@@ -141,6 +171,11 @@ class LibraryService
 
     /**
      * Force delete a book (Permanent Delete).
+     *
+     * @param int $id Book ID to permanently delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When book is not found
+     * @throws Exception When book has active issues
      */
     public function forceDeleteBook(int $id): bool
     {
@@ -163,6 +198,11 @@ class LibraryService
 
     /**
      * Bulk update book status.
+     *
+     * @param array $ids Array of book IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of books updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateBookStatus(array $ids, string $status): int
     {
@@ -173,6 +213,10 @@ class LibraryService
 
     /**
      * Bulk delete books (Soft Delete).
+     *
+     * @param array $ids Array of book IDs to delete
+     * @return int Number of books successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteBooks(array $ids): int
     {
@@ -199,6 +243,10 @@ class LibraryService
 
     /**
      * Bulk force delete books (Permanent Delete).
+     *
+     * @param array $ids Array of book IDs to permanently delete
+     * @return int Number of books successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkForceDeleteBooks(array $ids): int
     {
@@ -225,6 +273,11 @@ class LibraryService
 
     /**
      * Import books from Excel file.
+     *
+     * @param UploadedFile $file Excel file containing book data
+     * @param int $bookCategoryId Category ID to assign imported books
+     * @return array Import result with success status and count
+     * @throws Exception When import fails
      */
     public function importBooks(UploadedFile $file, int $bookCategoryId): array
     {
@@ -250,6 +303,8 @@ class LibraryService
 
     /**
      * Get import template for books.
+     *
+     * @return array Template structure with headers, sample data, and instructions
      */
     public function getBookImportTemplate(): array
     {
@@ -294,12 +349,23 @@ class LibraryService
     |--------------------------------------------------------------------------
     |
     | These methods handle all book request-related operations including CRUD
-    | operations for book requests and request filtering.
+    | operations for book requests and request filtering. Book request management
+    | includes creating, updating, deleting, and retrieving book request information
+    | with support for cover image handling, status tracking, and comprehensive
+    | filtering capabilities.
     |
     */
 
     /**
-     * Get a paginated list of book requests.
+     * Get a paginated list of book requests with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param int|null $bookCategoryId Filter by book category ID
+     * @param string|null $status Filter by request status (pending/in_progress/approved/rejected)
+     * @param string|null $author Filter by author name
+     * @param string|null $search Search term for book title, author, or requester
+     * @param string|null $requester Filter by requester name
+     * @return LengthAwarePaginator Paginated list of book requests
      */
     public function getBookRequests(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?string $requester = null): LengthAwarePaginator
     {
@@ -315,6 +381,10 @@ class LibraryService
 
     /**
      * Get a specific book request by ID.
+     *
+     * @param int $id Book request ID
+     * @return BookRequest Book request model instance with relationships
+     * @throws ModelNotFoundException When book request is not found
      */
     public function getBookRequestById(int $id): BookRequest
     {
@@ -323,6 +393,10 @@ class LibraryService
 
     /**
      * Create a new book request.
+     *
+     * @param array $data Book request data including title, author, cover image, etc.
+     * @return BookRequest Created book request instance with category relationship
+     * @throws Exception When creation fails
      */
     public function createBookRequest(array $data): BookRequest
     {
@@ -343,7 +417,13 @@ class LibraryService
     }
 
     /**
-     * Update a book request.
+     * Update an existing book request.
+     *
+     * @param int $id Book request ID to update
+     * @param array $data Updated book request data including cover image handling
+     * @return BookRequest Updated book request instance with category relationship
+     * @throws ModelNotFoundException When book request is not found
+     * @throws Exception When update fails
      */
     public function updateBookRequest(int $id, array $data): BookRequest
     {
@@ -377,6 +457,11 @@ class LibraryService
 
     /**
      * Delete a book request (Soft Delete).
+     *
+     * @param int $id Book request ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When book request is not found
+     * @throws Exception When deletion fails
      */
     public function deleteBookRequest(int $id): bool
     {
@@ -391,6 +476,11 @@ class LibraryService
 
     /**
      * Force delete a book request (Permanent Delete).
+     *
+     * @param int $id Book request ID to permanently delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When book request is not found
+     * @throws Exception When deletion fails
      */
     public function forceDeleteBookRequest(int $id): bool
     {
@@ -405,6 +495,11 @@ class LibraryService
 
     /**
      * Bulk update book request status.
+     *
+     * @param array $ids Array of book request IDs to update
+     * @param string $status New status (pending/in_progress/approved/rejected)
+     * @return int Number of book requests updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateBookRequestStatus(array $ids, string $status): int
     {
@@ -415,6 +510,10 @@ class LibraryService
 
     /**
      * Bulk delete book requests (Soft Delete).
+     *
+     * @param array $ids Array of book request IDs to delete
+     * @return int Number of book requests successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteBookRequests(array $ids): int
     {
@@ -433,6 +532,10 @@ class LibraryService
 
     /**
      * Bulk force delete book requests (Permanent Delete).
+     *
+     * @param array $ids Array of book request IDs to permanently delete
+     * @return int Number of book requests successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkForceDeleteBookRequests(array $ids): int
     {
@@ -454,12 +557,20 @@ class LibraryService
     | Book Category Methods
     |--------------------------------------------------------------------------
     |
-    | These methods handle all book category-related operations including CRUD.
+    | These methods handle all book category-related operations including CRUD
+    | operations for book categories and category filtering. Book category
+    | management includes creating, updating, deleting, and retrieving category
+    | information with support for book count tracking and comprehensive filtering.
     |
     */
 
     /**
-     * Get a paginated list of book categories.
+     * Get a paginated list of book categories with optional filtering and searching.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $search Search term for category name or description
+     * @param string|null $status Filter by category status (active/inactive)
+     * @return LengthAwarePaginator Paginated list of book categories with book counts
      */
     public function getBookCategories(int $perPage, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
@@ -472,6 +583,10 @@ class LibraryService
 
     /**
      * Get a specific book category by ID.
+     *
+     * @param int $id Book category ID
+     * @return BookCategory Book category model instance with book count
+     * @throws ModelNotFoundException When book category is not found
      */
     public function getBookCategoryById(int $id): BookCategory
     {
@@ -480,6 +595,10 @@ class LibraryService
 
     /**
      * Create a new book category.
+     *
+     * @param array $data Book category data including name, description, status, etc.
+     * @return BookCategory Created book category instance
+     * @throws Exception When creation fails
      */
     public function createBookCategory(array $data): BookCategory
     {
@@ -489,7 +608,13 @@ class LibraryService
     }
 
     /**
-     * Update a book category.
+     * Update an existing book category.
+     *
+     * @param int $id Book category ID to update
+     * @param array $data Updated book category data
+     * @return BookCategory Updated book category instance
+     * @throws ModelNotFoundException When book category is not found
+     * @throws Exception When update fails
      */
     public function updateBookCategory(int $id, array $data): BookCategory
     {
@@ -504,6 +629,11 @@ class LibraryService
 
     /**
      * Delete a book category (Soft Delete).
+     *
+     * @param int $id Book category ID to delete
+     * @return bool True if deletion successful
+     * @throws ModelNotFoundException When book category is not found
+     * @throws Exception When category contains books
      */
     public function deleteBookCategory(int $id): bool
     {
@@ -522,6 +652,11 @@ class LibraryService
 
     /**
      * Bulk update book category status.
+     *
+     * @param array $ids Array of book category IDs to update
+     * @param string $status New status (active/inactive)
+     * @return int Number of book categories updated
+     * @throws Exception When bulk update fails
      */
     public function bulkUpdateBookCategoryStatus(array $ids, string $status): int
     {
@@ -532,6 +667,10 @@ class LibraryService
 
     /**
      * Bulk delete book categories (Soft Delete).
+     *
+     * @param array $ids Array of book category IDs to delete
+     * @return int Number of book categories successfully deleted
+     * @throws Exception When bulk deletion fails
      */
     public function bulkDeleteBookCategories(array $ids): int
     {
@@ -558,12 +697,19 @@ class LibraryService
     |--------------------------------------------------------------------------
     |
     | These methods handle book issuing and returning operations, including
-    | validation of member eligibility and due date management.
+    | validation of member eligibility and due date management. Book circulation
+    | management includes issuing books to members, processing returns, calculating
+    | fines for overdue books, and tracking book availability with comprehensive
+    | filtering and reporting capabilities.
     |
     */
 
     /**
      * Issue a book to a member.
+     *
+     * @param array $data Issue data including book_id, member_id, due_date
+     * @return array Issue result with book and issue information
+     * @throws Exception When book is not available or member already has the book
      */
     public function issueBook(array $data): array
     {
@@ -607,6 +753,10 @@ class LibraryService
 
     /**
      * Return a book from a member.
+     *
+     * @param array $data Return data including book_id, member_id
+     * @return array Return result with book, issue information, and fine amount
+     * @throws Exception When book issue is not found
      */
     public function returnBook(array $data): array
     {
@@ -644,6 +794,12 @@ class LibraryService
 
     /**
      * Get all book issues with filtering and pagination.
+     *
+     * @param int $perPage Number of items per page
+     * @param string|null $status Filter by issue status (issued/returned)
+     * @param int|null $memberId Filter by member ID
+     * @param int|null $bookId Filter by book ID
+     * @return LengthAwarePaginator Paginated list of book issues with relationships
      */
     public function getBookIssues(int $perPage, ?string $status = null, ?int $memberId = null, ?int $bookId = null): LengthAwarePaginator
     {
@@ -668,6 +824,8 @@ class LibraryService
 
     /**
      * Get ID card setting.
+     *
+     * @return IdCardSetting ID card setting model instance
      */
     public function getIdCardSetting(): IdCardSetting
     {
@@ -676,6 +834,10 @@ class LibraryService
 
     /**
      * Update or create an ID card setting.
+     *
+     * @param array $data ID card setting data including design, layout, etc.
+     * @return IdCardSetting Updated or created ID card setting instance
+     * @throws Exception When update or creation fails
      */
     public function updateOrCreateIdCardSetting(array $data): IdCardSetting
     {

@@ -52,13 +52,20 @@ class LibraryController extends Controller
     |--------------------------------------------------------------------------
     | Book Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all book-related HTTP endpoints including CRUD operations
+    | for books, book search, and book filtering by category. Book management
+    | endpoints include creating, updating, deleting, and retrieving book information
+    | with support for cover image handling, availability tracking, Excel import,
+    | pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all books with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated book data
      * @response array{success: bool, message: string, data: BookResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getBooks(Request $request): JsonResponse
@@ -87,8 +94,8 @@ class LibraryController extends Controller
     /**
      * Get a specific book by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book ID
+     * @return JsonResponse JSON response with book data
      * @response array{success: bool, message: string, data: BookResource}
      */
     public function getBook(int $id): JsonResponse
@@ -113,8 +120,8 @@ class LibraryController extends Controller
      * Create a new book.
      *
      * @requestMediaType multipart/form-data
-     * @param BookRequest $request
-     * @return JsonResponse
+     * @param BookRequest $request Validated book creation request with file upload support
+     * @return JsonResponse JSON response with created book data
      * @response array{success: bool, message: string, data: BookResource}
      */
     public function createBook(BookRequest $request): JsonResponse
@@ -143,9 +150,9 @@ class LibraryController extends Controller
      * Update an existing book.
      *
      * @requestMediaType multipart/form-data
-     * @param BookRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param BookRequest $request Validated book update request with file upload support
+     * @param int $id Book ID to update
+     * @return JsonResponse JSON response with updated book data
      * @response array{success: bool, message: string, data: BookResource}
      */
     public function updateBook(BookRequest $request, int $id): JsonResponse
@@ -175,8 +182,8 @@ class LibraryController extends Controller
     /**
      * Delete a book (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteBook(int $id): JsonResponse
@@ -200,8 +207,8 @@ class LibraryController extends Controller
     /**
      * Force delete a book (Permanent Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book ID to permanently delete
+     * @return JsonResponse JSON response confirming permanent deletion
      * @response array{success: bool, message: string}
      */
     public function forceDeleteBook(int $id): JsonResponse
@@ -225,8 +232,8 @@ class LibraryController extends Controller
     /**
      * Bulk update book status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateBookStatus(Request $request): JsonResponse
@@ -256,8 +263,8 @@ class LibraryController extends Controller
     /**
      * Bulk delete books (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteBooks(Request $request): JsonResponse
@@ -285,8 +292,8 @@ class LibraryController extends Controller
     /**
      * Bulk force delete books (Permanent Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book IDs to permanently delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkForceDeleteBooks(Request $request): JsonResponse
@@ -314,8 +321,8 @@ class LibraryController extends Controller
     /**
      * Import books from Excel file.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing Excel file and category ID
+     * @return JsonResponse JSON response with import result
      * @response array{success: bool, message: string, data: array}
      */
     public function importBooks(Request $request): JsonResponse
@@ -351,7 +358,7 @@ class LibraryController extends Controller
     /**
      * Get book import template.
      *
-     * @return JsonResponse
+     * @return JsonResponse JSON response with import template structure
      * @response array{success: bool, message: string, data: array}
      */
     public function getBookImportTemplate(): JsonResponse
@@ -374,13 +381,20 @@ class LibraryController extends Controller
     |--------------------------------------------------------------------------
     | Book Request Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all book request-related HTTP endpoints including CRUD
+    | operations for book requests and request filtering. Book request management
+    | endpoints include creating, updating, deleting, and retrieving book request
+    | information with support for cover image handling, status tracking, pagination,
+    | and bulk operations.
+    |
     */
 
     /**
      * Get all book requests with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated book request data
      * @response array{success: bool, message: string, data: BookRequestResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getBookRequests(Request $request): JsonResponse
@@ -406,8 +420,8 @@ class LibraryController extends Controller
     /**
      * Get a specific book request by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book request ID
+     * @return JsonResponse JSON response with book request data
      * @response array{success: bool, message: string, data: BookRequestResource}
      */
     public function getBookRequest(int $id): JsonResponse
@@ -432,8 +446,8 @@ class LibraryController extends Controller
      * Create a new book request.
      *
      * @requestMediaType multipart/form-data
-     * @param BookRequestRequest $request
-     * @return JsonResponse
+     * @param BookRequestRequest $request Validated book request creation request with file upload support
+     * @return JsonResponse JSON response with created book request data
      * @response array{success: bool, message: string, data: BookRequestResource}
      */
     public function createBookRequest(BookRequestRequest $request): JsonResponse
@@ -463,9 +477,9 @@ class LibraryController extends Controller
      * Update an existing book request.
      *
      * @requestMediaType multipart/form-data
-     * @param BookRequestRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param BookRequestRequest $request Validated book request update request with file upload support
+     * @param int $id Book request ID to update
+     * @return JsonResponse JSON response with updated book request data
      * @response array{success: bool, message: string, data: BookRequestResource}
      */
     public function updateBookRequest(BookRequestRequest $request, int $id): JsonResponse
@@ -496,8 +510,8 @@ class LibraryController extends Controller
     /**
      * Delete a book request (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book request ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteBookRequest(int $id): JsonResponse
@@ -521,8 +535,8 @@ class LibraryController extends Controller
     /**
      * Force delete a book request (Permanent Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book request ID to permanently delete
+     * @return JsonResponse JSON response confirming permanent deletion
      * @response array{success: bool, message: string}
      */
     public function forceDeleteBookRequest(int $id): JsonResponse
@@ -546,8 +560,8 @@ class LibraryController extends Controller
     /**
      * Bulk update book request status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book request IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array{updated_count: int}}
      */
     public function bulkUpdateBookRequestStatus(Request $request): JsonResponse
@@ -577,8 +591,8 @@ class LibraryController extends Controller
     /**
      * Bulk delete book requests (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book request IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array{deleted_count: int}}
      */
     public function bulkDeleteBookRequests(Request $request): JsonResponse
@@ -606,8 +620,8 @@ class LibraryController extends Controller
     /**
      * Bulk force delete book requests (Permanent Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book request IDs to permanently delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array{deleted_count: int}}
      */
     public function bulkForceDeleteBookRequests(Request $request): JsonResponse
@@ -636,13 +650,19 @@ class LibraryController extends Controller
     |--------------------------------------------------------------------------
     | Book Category Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all book category-related HTTP endpoints including CRUD
+    | operations for book categories and category filtering. Book category management
+    | endpoints include creating, updating, deleting, and retrieving category
+    | information with support for book count tracking, pagination, and bulk operations.
+    |
     */
 
     /**
      * Get all book categories with filtering, searching, and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated book category data
      * @response array{success: bool, message: string, data: BookCategoryResource[], meta: array{current_page: int, last_page: int, per_page: int, total: int, from: int|null, to: int|null}}
      */
     public function getBookCategories(Request $request): JsonResponse
@@ -668,8 +688,8 @@ class LibraryController extends Controller
     /**
      * Get a specific book category by ID.
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book category ID
+     * @return JsonResponse JSON response with book category data
      * @response array{success: bool, message: string, data: BookCategoryResource}
      */
     public function getBookCategory(int $id): JsonResponse
@@ -693,8 +713,8 @@ class LibraryController extends Controller
     /**
      * Create a new book category.
      *
-     * @param BookCategoryRequest $request
-     * @return JsonResponse
+     * @param BookCategoryRequest $request Validated book category creation request
+     * @return JsonResponse JSON response with created book category data
      * @response array{success: bool, message: string, data: BookCategoryResource}
      */
     public function createBookCategory(BookCategoryRequest $request): JsonResponse
@@ -716,9 +736,9 @@ class LibraryController extends Controller
     /**
      * Update an existing book category.
      *
-     * @param BookCategoryRequest $request
-     * @param int $id
-     * @return JsonResponse
+     * @param BookCategoryRequest $request Validated book category update request
+     * @param int $id Book category ID to update
+     * @return JsonResponse JSON response with updated book category data
      * @response array{success: bool, message: string, data: BookCategoryResource}
      */
     public function updateBookCategory(BookCategoryRequest $request, int $id): JsonResponse
@@ -742,8 +762,8 @@ class LibraryController extends Controller
     /**
      * Delete a book category (Soft Delete).
      *
-     * @param int $id
-     * @return JsonResponse
+     * @param int $id Book category ID to delete
+     * @return JsonResponse JSON response confirming deletion
      * @response array{success: bool, message: string}
      */
     public function deleteBookCategory(int $id): JsonResponse
@@ -767,8 +787,8 @@ class LibraryController extends Controller
     /**
      * Bulk update book category status.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book category IDs and new status
+     * @return JsonResponse JSON response with update count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkUpdateBookCategoryStatus(Request $request): JsonResponse
@@ -798,8 +818,8 @@ class LibraryController extends Controller
     /**
      * Bulk delete book categories (Soft Delete).
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing book category IDs to delete
+     * @return JsonResponse JSON response with deletion count
      * @response array{success: bool, message: string, data: array}
      */
     public function bulkDeleteBookCategories(Request $request): JsonResponse
@@ -828,13 +848,20 @@ class LibraryController extends Controller
     |--------------------------------------------------------------------------
     | Book Issue/Return Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle book issuing and returning HTTP endpoints, including
+    | validation of member eligibility and due date management. Book circulation
+    | management endpoints include issuing books to members, processing returns,
+    | calculating fines for overdue books, and tracking book availability with
+    | comprehensive filtering and reporting capabilities.
+    |
     */
 
     /**
      * Issue a book to a member.
      *
-     * @param IssueBookRequest $request
-     * @return JsonResponse
+     * @param IssueBookRequest $request Validated book issue request
+     * @return JsonResponse JSON response with issue result
      * @response array{success: bool, message: string, data: array}
      */
     public function issueBook(IssueBookRequest $request): JsonResponse
@@ -856,8 +883,8 @@ class LibraryController extends Controller
     /**
      * Return a book from a member.
      *
-     * @param ReturnBookRequest $request
-     * @return JsonResponse
+     * @param ReturnBookRequest $request Validated book return request
+     * @return JsonResponse JSON response with return result including fine amount
      * @response array{success: bool, message: string, data: array}
      */
     public function returnBook(ReturnBookRequest $request): JsonResponse
@@ -879,8 +906,8 @@ class LibraryController extends Controller
     /**
      * Get all book issues with filtering and pagination.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param Request $request HTTP request containing query parameters
+     * @return JsonResponse JSON response with paginated book issue data
      * @response array{success: bool, message: string, data: array{data: array[], links: array, meta: array}}
      */
     public function getBookIssues(Request $request): JsonResponse
@@ -908,12 +935,19 @@ class LibraryController extends Controller
     |--------------------------------------------------------------------------
     | ID Card Settings Methods
     |--------------------------------------------------------------------------
+    |
+    | These methods handle all ID card setting-related HTTP endpoints including
+    | CRUD operations for ID card settings and ID card setting filtering.
+    | ID card management endpoints include creating, updating, and retrieving
+    | ID card design settings with support for layout customization and template
+    | management for library member identification cards.
+    |
     */
 
     /**
      * Get ID card settings.
      *
-     * @return JsonResponse
+     * @return JsonResponse JSON response with ID card setting data
      * @response array{success: bool, message: string, data: IdCardSettingResource}
      */
     public function getIdCardSetting(): JsonResponse
@@ -935,8 +969,8 @@ class LibraryController extends Controller
     /**
      * Update or create ID card settings.
      *
-     * @param IdCardSettingRequest $request
-     * @return JsonResponse
+     * @param IdCardSettingRequest $request Validated ID card setting request
+     * @return JsonResponse JSON response with updated ID card setting data
      * @response array{success: bool, message: string, data: IdCardSettingResource}
      */
     public function updateIdCardSetting(IdCardSettingRequest $request): JsonResponse
