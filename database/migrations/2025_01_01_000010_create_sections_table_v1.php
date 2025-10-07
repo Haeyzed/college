@@ -34,7 +34,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // Indexes for better performance
-            $table->index(['batch_id', 'status']);
+            $table->index(['status']);
             $table->index(['deleted_at']);
         });
     }

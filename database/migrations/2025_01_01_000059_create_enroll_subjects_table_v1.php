@@ -31,6 +31,7 @@ return new class extends Migration
             $table->foreignId('section_id')->constrained()->cascadeOnDelete();
             $table->string('status')->default(Status::ACTIVE->value);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index(['program_id', 'semester_id', 'section_id']);
             $table->index('status');
