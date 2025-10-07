@@ -1302,12 +1302,10 @@ class AcademicService
     public function createEnrollSubject(array $data): EnrollSubject
     {
         return DB::transaction(function () use ($data) {
-            // Extract subjects from data
             $subjects = $data['subjects'] ?? [];
             unset($data['subjects']);
 
-            // Use firstOrCreate like UniversitySystem pattern
-            $enrollSubject = EnrollSubject::firstOrCreate(
+            $enrollSubject = EnrollSubject::query()->firstOrCreate(
                 [
                     'program_id' => $data['program_id'],
                     'semester_id' => $data['semester_id'],

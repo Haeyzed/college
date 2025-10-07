@@ -135,7 +135,7 @@ class Session extends Model
     public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
-            $q->whereLike('name', $search);
+            $q->where('name', 'LIKE', '%' . $search . '%');
         });
     }
 }

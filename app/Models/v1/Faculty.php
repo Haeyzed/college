@@ -128,9 +128,9 @@ class Faculty extends Model implements Auditable
     public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
-            $q->whereLike('name', $search)
-                ->orWhereLike('code', $search)
-                ->orWhereLike('dean_name', $search);
+            $q->where('name', 'LIKE', '%' . $search . '%')
+                ->orWhere('code', 'LIKE', '%' . $search . '%')
+                ->orWhere('dean_name', 'LIKE', '%' . $search . '%');
         });
     }
 }
