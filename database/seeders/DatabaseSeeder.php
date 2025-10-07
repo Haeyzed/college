@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(BookCategorySeeder::class);
+        $this->call(AcademicSeeder::class);
+        $this->call(LibrarySeeder::class);
         // User::factory(10)->create();
 
         // User::factory()->create([

@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Semesters Table Migration - Version 1
- * 
+ *
  * This migration creates the semesters table for the College Management System.
  * It handles semester information storage with proper indexing, constraints, and soft deletes.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
@@ -28,16 +28,15 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->integer('academic_year');
+            $table->string('academic_year');
             $table->date('start_date');
             $table->date('end_date');
             $table->boolean('is_current')->default(false);
             $table->text('description')->nullable();
             $table->string('status')->default(Status::ACTIVE->value);
-            $table->integer('sort_order')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes for better performance
             $table->index(['status', 'is_current']);
             $table->index(['academic_year']);

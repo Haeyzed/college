@@ -35,29 +35,29 @@ class AcademicSeeder extends Seeder
         $this->command->info('Seeding Semesters...');
         $this->call(SemesterSeeder::class);
 
-        // Seed programs (depends on faculties)
-        $this->command->info('Seeding Programs...');
-        $this->call(ProgramSeeder::class);
-
-        // Seed batches (depends on programs)
-        $this->command->info('Seeding Batches...');
-        $this->call(BatchSeeder::class);
-
-        // Seed sections (depends on batches)
-        $this->command->info('Seeding Sections...');
-        $this->call(SectionSeeder::class);
-
-        // Seed subjects (independent)
-        $this->command->info('Seeding Subjects...');
-        $this->call(SubjectSeeder::class);
-
-        // Seed classrooms (independent)
-        $this->command->info('Seeding Classrooms...');
-        $this->call(ClassRoomSeeder::class);
-
-        // Seed enroll subjects (depends on programs, semesters, sections, and subjects)
-        $this->command->info('Seeding Enroll Subjects...');
-        $this->call(EnrollSubjectSeeder::class);
+//        // Seed programs (depends on faculties)
+//        $this->command->info('Seeding Programs...');
+//        $this->call(ProgramSeeder::class);
+//
+//        // Seed batches (depends on programs)
+//        $this->command->info('Seeding Batches...');
+//        $this->call(BatchSeeder::class);
+//
+//        // Seed sections (depends on batches)
+//        $this->command->info('Seeding Sections...');
+//        $this->call(SectionSeeder::class);
+//
+//        // Seed subjects (independent)
+//        $this->command->info('Seeding Subjects...');
+//        $this->call(SubjectSeeder::class);
+//
+//        // Seed classrooms (independent)
+//        $this->command->info('Seeding Classrooms...');
+//        $this->call(ClassRoomSeeder::class);
+//
+//        // Seed enroll subjects (depends on programs, semesters, sections, and subjects)
+//        $this->command->info('Seeding Enroll Subjects...');
+//        $this->call(EnrollSubjectSeeder::class);
 
         $this->command->info('Academic System Seeding Completed Successfully!');
     }

@@ -30,41 +30,38 @@ class SemesterSeeder extends Seeder
         foreach ($sessions as $session) {
             // Create semesters for each academic session
             $semesters[] = [
-                'academic_session_id' => $session->id,
+
                 'name' => 'Fall Semester ' . $session->name,
-                'code' => 'FALL-' . $session->code,
-                'academic_year' => $session->name,
+                'code' => 'FALL-01' . $session->name,
+                'academic_year' => 2025,
                 'start_date' => $session->start_date,
                 'end_date' => date('Y-m-d', strtotime($session->start_date . ' + 4 months')),
                 'is_current' => $session->is_current,
                 'description' => 'Fall semester of ' . $session->name,
-                'sort_order' => 1,
                 'status' => $session->status,
             ];
 
             $semesters[] = [
-                'academic_session_id' => $session->id,
+
                 'name' => 'Spring Semester ' . $session->name,
-                'code' => 'SPRING-' . $session->code,
-                'academic_year' => $session->name,
+                'code' => 'SPRING-' . $session->name,
+                'academic_year' => 2021,
                 'start_date' => date('Y-m-d', strtotime($session->start_date . ' + 5 months')),
                 'end_date' => date('Y-m-d', strtotime($session->start_date . ' + 8 months')),
                 'is_current' => false,
                 'description' => 'Spring semester of ' . $session->name,
-                'sort_order' => 2,
                 'status' => $session->status,
             ];
 
             $semesters[] = [
-                'academic_session_id' => $session->id,
+
                 'name' => 'Summer Semester ' . $session->name,
-                'code' => 'SUMMER-' . $session->code,
-                'academic_year' => $session->name,
+                'code' => 'SUMMER-' . $session->name,
+                'academic_year' => 2024,
                 'start_date' => date('Y-m-d', strtotime($session->start_date . ' + 9 months')),
                 'end_date' => $session->end_date,
                 'is_current' => false,
                 'description' => 'Summer semester of ' . $session->name,
-                'sort_order' => 3,
                 'status' => $session->status,
             ];
         }
