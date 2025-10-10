@@ -131,12 +131,52 @@ class AdmissionController extends Controller
                 }
             }
 
-            $application = $this->admissionService->createApplication($validatedData);
+            // Check if we should create student immediately (like UniversitySystem)
+            $createStudent = $request->boolean('create_student', false);
+            $studentData = [];
 
-            return response()->success(
-                new ApplicationResource($application),
-                'Application created successfully'
-            );
+            if ($createStudent) {
+                $request->validate([
+                    'student_id' => 'required|string|unique:students,student_id',
+                    'session_id' => 'required|integer|exists:sessions,id',
+                    'semester_id' => 'required|integer|exists:semesters,id',
+                    'section_id' => 'required|integer|exists:sections,id',
+                    'admission_date' => 'nullable|date',
+                    'relatives' => 'nullable|array',
+                    'relatives.*.relation' => 'required_with:relatives|string',
+                    'relatives.*.name' => 'required_with:relatives|string',
+                    'relatives.*.occupation' => 'nullable|string',
+                    'relatives.*.phone' => 'nullable|string',
+                    'relatives.*.address' => 'nullable|string',
+                    'documents' => 'nullable|array',
+                    'documents.*.title' => 'required_with:documents|string',
+                    'documents.*.file' => 'required_with:documents|file',
+                ]);
+
+                $studentData = $request->only([
+                    'student_id', 'session_id', 'semester_id', 'section_id',
+                    'admission_date', 'relatives', 'documents'
+                ]);
+            }
+
+            $result = $this->admissionService->createApplication($validatedData, $createStudent, $studentData);
+
+            if ($createStudent) {
+                return response()->success(
+                    [
+                        'application' => new ApplicationResource($result['application']),
+                        'student' => $result['student'],
+                        'enrollment' => $result['enrollment'],
+                        'temporary_password' => $result['password']
+                    ],
+                    'Application and student created successfully'
+                );
+            } else {
+                return response()->success(
+                    new ApplicationResource($result['application']),
+                    'Application created successfully'
+                );
+            }
         } catch (Exception $e) {
             return response()->internalServerError(
                 'Failed to create application: ' . $e->getMessage()
@@ -284,6 +324,137 @@ class AdmissionController extends Controller
         } catch (Exception $e) {
             return response()->internalServerError(
                 'Failed to retrieve application statistics: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Student Admission Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle the complete admission process including converting
+    | approved applications to students, managing student relatives, documents,
+    | enrollment, and subject assignments.
+    |
+    */
+
+    /**
+     * Get applications ready for admission (approved applications).
+     *
+     * @param Request $request
+     * @return JsonResponse JSON response with approved applications
+     * @response array{success: bool, message: string, data: ApplicationResource[]}
+     */
+    public function getApplicationsReadyForAdmission(Request $request): JsonResponse
+    {
+        try {
+            $perPage = $request->query('per_page', 15);
+            $applications = $this->admissionService->getApplicationsReadyForAdmission($perPage);
+
+            return response()->paginated(
+                ApplicationResource::collection($applications),
+                'Applications ready for admission retrieved successfully'
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to retrieve applications ready for admission: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Convert approved application to student.
+     *
+     * @param int $id Application ID
+     * @param Request $request
+     * @return JsonResponse JSON response with created student data
+     * @response array{success: bool, message: string, data: array}
+     */
+    public function convertApplicationToStudent(int $id, Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'student_id' => 'required|string|unique:students,student_id',
+                'session_id' => 'required|integer|exists:sessions,id',
+                'semester_id' => 'required|integer|exists:semesters,id',
+                'section_id' => 'required|integer|exists:sections,id',
+                'admission_date' => 'nullable|date',
+                'relatives' => 'nullable|array',
+                'relatives.*.relation' => 'required_with:relatives|string',
+                'relatives.*.name' => 'required_with:relatives|string',
+                'relatives.*.occupation' => 'nullable|string',
+                'relatives.*.phone' => 'nullable|string',
+                'relatives.*.address' => 'nullable|string',
+                'documents' => 'nullable|array',
+                'documents.*.title' => 'required_with:documents|string',
+                'documents.*.file' => 'required_with:documents|file',
+            ]);
+
+            $additionalData = $request->only([
+                'student_id', 'session_id', 'semester_id', 'section_id',
+                'admission_date', 'relatives', 'documents'
+            ]);
+            $additionalData['program_id'] = $request->input('program_id'); // Get from application
+
+            $result = $this->admissionService->convertApplicationToStudent($id, $additionalData);
+
+            return response()->success(
+                [
+                    'student' => $result['student'],
+                    'enrollment' => $result['enrollment'],
+                    'application' => $result['application'],
+                    'temporary_password' => $result['password']
+                ],
+                'Application successfully converted to student'
+            );
+        } catch (ModelNotFoundException $e) {
+            return response()->notFound('Application not found');
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to convert application to student: ' . $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Bulk convert applications to students.
+     *
+     * @param Request $request
+     * @return JsonResponse JSON response with conversion results
+     * @response array{success: bool, message: string, data: array}
+     */
+    public function bulkConvertApplicationsToStudents(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+            'application_ids' => 'required|array|min:1',
+            'application_ids.*' => 'integer|exists:applications,id',
+            'student_id_prefix' => 'required|string',
+            'session_id' => 'required|integer|exists:sessions,id',
+            'semester_id' => 'required|integer|exists:semesters,id',
+            'section_id' => 'required|integer|exists:sections,id',
+            'admission_date' => 'nullable|date',
+        ]);
+
+            $applicationIds = $request->input('application_ids');
+            $defaultData = [
+                'student_id_prefix' => $request->input('student_id_prefix'),
+                'session_id' => $request->input('session_id'),
+                'semester_id' => $request->input('semester_id'),
+                'section_id' => $request->input('section_id'),
+                'admission_date' => $request->input('admission_date'),
+            ];
+
+            $results = $this->admissionService->bulkConvertApplicationsToStudents($applicationIds, $defaultData);
+
+            return response()->success(
+                $results,
+                "Bulk conversion completed: {$results['success_count']} successful, {$results['failed_count']} failed"
+            );
+        } catch (Exception $e) {
+            return response()->internalServerError(
+                'Failed to bulk convert applications to students: ' . $e->getMessage()
             );
         }
     }

@@ -353,66 +353,66 @@ class ApplicationResource extends JsonResource
 
             /**
              * The college name.
-             * @var string $collage_name
+             * @var string $college_name
              * @example "State University"
              */
-            'collage_name' => $this->collage_name,
+            'college_name' => $this->college_name,
 
             /**
              * The college exam ID.
-             * @var string $collage_exam_id
+             * @var string $college_exam_id
              * @example "COL-2023-001"
              */
-            'collage_exam_id' => $this->collage_exam_id,
+            'college_exam_id' => $this->college_exam_id,
 
             /**
              * The college graduation field.
-             * @var string $collage_graduation_field
+             * @var string $college_graduation_field
              * @example "Computer Science"
              */
-            'collage_graduation_field' => $this->collage_graduation_field,
+            'college_graduation_field' => $this->college_graduation_field,
 
             /**
              * The college graduation year.
-             * @var int $collage_graduation_year
+             * @var int $college_graduation_year
              * @example 2023
              */
-            'collage_graduation_year' => $this->collage_graduation_year,
+            'college_graduation_year' => $this->college_graduation_year,
 
             /**
              * The college graduation point.
-             * @var float $collage_graduation_point
+             * @var float $college_graduation_point
              * @example 3.5
              */
-            'collage_graduation_point' => $this->collage_graduation_point,
+            'college_graduation_point' => $this->college_graduation_point,
 
             /**
              * The path to the college transcript.
-             * @var string|null $collage_transcript
-             * @example "applications/collage_transcript.pdf"
+             * @var string|null $college_transcript
+             * @example "applications/college_transcript.pdf"
              */
-            'collage_transcript' => $this->collage_transcript,
+            'college_transcript' => $this->college_transcript,
 
             /**
              * The college transcript URL.
-             * @var string|null $collage_transcript_url
-             * @example "http://localhost/storage/applications/collage_transcript.pdf"
+             * @var string|null $college_transcript_url
+             * @example "http://localhost/storage/applications/college_transcript.pdf"
              */
-            'collage_transcript_url' => StorageHelper::getConfigurableStorageUrl($this->collage_transcript, 'filesystems.default'),
+            'college_transcript_url' => StorageHelper::getConfigurableStorageUrl($this->college_transcript, 'filesystems.default'),
 
             /**
              * The path to the college certificate.
-             * @var string|null $collage_certificate
-             * @example "applications/collage_certificate.pdf"
+             * @var string|null $college_certificate
+             * @example "applications/college_certificate.pdf"
              */
-            'collage_certificate' => $this->collage_certificate,
+            'college_certificate' => $this->college_certificate,
 
             /**
              * The college certificate URL.
-             * @var string|null $collage_certificate_url
-             * @example "http://localhost/storage/applications/collage_certificate.pdf"
+             * @var string|null $college_certificate_url
+             * @example "http://localhost/storage/applications/college_certificate.pdf"
              */
-            'collage_certificate_url' => StorageHelper::getConfigurableStorageUrl($this->collage_certificate, 'filesystems.default'),
+            'college_certificate_url' => StorageHelper::getConfigurableStorageUrl($this->college_certificate, 'filesystems.default'),
 
             /**
              * The path to the applicant's photo.

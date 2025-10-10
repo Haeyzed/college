@@ -497,10 +497,10 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college name.
-             * @var string $collage_name
+             * @var string $college_name
              * @example "State University"
              */
-            'collage_name' => [
+            'college_name' => [
                 'nullable',
                 'string',
                 'max:255'
@@ -508,10 +508,10 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college exam ID.
-             * @var string $collage_exam_id
+             * @var string $college_exam_id
              * @example "COL-2023-001"
              */
-            'collage_exam_id' => [
+            'college_exam_id' => [
                 'nullable',
                 'string',
                 'max:50'
@@ -519,10 +519,10 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college graduation field.
-             * @var string $collage_graduation_field
+             * @var string $college_graduation_field
              * @example "Computer Science"
              */
-            'collage_graduation_field' => [
+            'college_graduation_field' => [
                 'nullable',
                 'string',
                 'max:255'
@@ -530,10 +530,10 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college graduation year.
-             * @var int $collage_graduation_year
+             * @var int $college_graduation_year
              * @example 2023
              */
-            'collage_graduation_year' => [
+            'college_graduation_year' => [
                 'nullable',
                 'integer',
                 'min:1900',
@@ -542,10 +542,10 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college graduation point.
-             * @var float $collage_graduation_point
+             * @var float $college_graduation_point
              * @example 3.5
              */
-            'collage_graduation_point' => [
+            'college_graduation_point' => [
                 'nullable',
                 'numeric',
                 'min:0',
@@ -554,9 +554,9 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college transcript file.
-             * @var mixed|null $collage_transcript
+             * @var mixed|null $college_transcript
              */
-            'collage_transcript' => [
+            'college_transcript' => [
                 'sometimes',
                 'nullable',
                 'file',
@@ -566,14 +566,100 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The college certificate file.
-             * @var mixed|null $collage_certificate
+             * @var mixed|null $college_certificate
              */
-            'collage_certificate' => [
+            'college_certificate' => [
                 'sometimes',
                 'nullable',
                 'file',
                 'mimes:pdf,doc,docx,jpg,jpeg,png',
                 'max:5120'
+            ],
+
+            // Student Creation Fields (Optional - only when create_student = true)
+            /**
+             * Whether to create student immediately.
+             * @var bool|null $create_student
+             * @example true
+             */
+            'create_student' => [
+                'nullable',
+                'boolean',
+            ],
+
+            /**
+             * The student ID for immediate student creation.
+             * @var string|null $student_id
+             * @example "STU-2024-001"
+             */
+            'student_id' => [
+                'nullable',
+                'string',
+                'max:50',
+                'unique:students,student_id',
+            ],
+
+            /**
+             * The session ID for student enrollment.
+             * @var int|null $session_id
+             * @example 1
+             */
+            'session_id' => [
+                'nullable',
+                'integer',
+                'exists:sessions,id',
+            ],
+
+            /**
+             * The semester ID for student enrollment.
+             * @var int|null $semester_id
+             * @example 1
+             */
+            'semester_id' => [
+                'nullable',
+                'integer',
+                'exists:semesters,id',
+            ],
+
+            /**
+             * The section ID for student enrollment.
+             * @var int|null $section_id
+             * @example 1
+             */
+            'section_id' => [
+                'nullable',
+                'integer',
+                'exists:sections,id',
+            ],
+
+            /**
+             * The admission date for the student.
+             * @var string|null $admission_date
+             * @example "2024-01-15"
+             */
+            'admission_date' => [
+                'nullable',
+                'date',
+            ],
+
+            /**
+             * Student relatives information.
+             * @var array|null $relatives
+             * @example [{"relation": "Father", "name": "John Doe", "occupation": "Engineer", "phone": "+1234567890", "address": "123 Main St"}]
+             */
+            'relatives' => [
+                'nullable',
+                'array',
+            ],
+
+            /**
+             * Additional documents for the student.
+             * @var array|null $documents
+             * @example [{"title": "Medical Certificate", "file": "medical_cert.pdf"}]
+             */
+            'documents' => [
+                'nullable',
+                'array',
             ],
 
             /**
@@ -764,14 +850,14 @@ class ApplicationRequest extends BaseRequest
             'school_graduation_point.max' => 'The school graduation point cannot exceed 5.',
 
             // College Graduation Year
-            'collage_graduation_year.integer' => 'The college graduation year must be a valid integer.',
-            'collage_graduation_year.min' => 'The college graduation year must be after 1899.',
-            'collage_graduation_year.max' => 'The college graduation year cannot be in the future.',
+            'college_graduation_year.integer' => 'The college graduation year must be a valid integer.',
+            'college_graduation_year.min' => 'The college graduation year must be after 1899.',
+            'college_graduation_year.max' => 'The college graduation year cannot be in the future.',
 
             // College Graduation Point
-            'collage_graduation_point.numeric' => 'The college graduation point must be a valid number.',
-            'collage_graduation_point.min' => 'The college graduation point must be at least 0.',
-            'collage_graduation_point.max' => 'The college graduation point cannot exceed 5.',
+            'college_graduation_point.numeric' => 'The college graduation point must be a valid number.',
+            'college_graduation_point.min' => 'The college graduation point must be at least 0.',
+            'college_graduation_point.max' => 'The college graduation point cannot exceed 5.',
 
             // Photo
             'photo.file' => 'The photo must be a valid file.',
@@ -804,14 +890,14 @@ class ApplicationRequest extends BaseRequest
             'school_certificate.max' => 'The school certificate may not be greater than 5MB.',
 
             // College Transcript
-            'collage_transcript.file' => 'The college transcript must be a valid file.',
-            'collage_transcript.mimes' => 'The college transcript must be a file of type: pdf, doc, docx, jpg, jpeg, png.',
-            'collage_transcript.max' => 'The college transcript may not be greater than 5MB.',
+            'college_transcript.file' => 'The college transcript must be a valid file.',
+            'college_transcript.mimes' => 'The college transcript must be a file of type: pdf, doc, docx, jpg, jpeg, png.',
+            'college_transcript.max' => 'The college transcript may not be greater than 5MB.',
 
             // College Certificate
-            'collage_certificate.file' => 'The college certificate must be a valid file.',
-            'collage_certificate.mimes' => 'The college certificate must be a file of type: pdf, doc, docx, jpg, jpeg, png.',
-            'collage_certificate.max' => 'The college certificate may not be greater than 5MB.',
+            'college_certificate.file' => 'The college certificate must be a valid file.',
+            'college_certificate.mimes' => 'The college certificate must be a file of type: pdf, doc, docx, jpg, jpeg, png.',
+            'college_certificate.max' => 'The college certificate may not be greater than 5MB.',
 
             // Fee Amount
             'fee_amount.numeric' => 'The fee amount must be a valid number.',
@@ -876,13 +962,21 @@ class ApplicationRequest extends BaseRequest
             'school_graduation_point' => 'school graduation point',
             'school_transcript' => 'school transcript',
             'school_certificate' => 'school certificate',
-            'collage_name' => 'college name',
-            'collage_exam_id' => 'college exam ID',
-            'collage_graduation_field' => 'college graduation field',
-            'collage_graduation_year' => 'college graduation year',
-            'collage_graduation_point' => 'college graduation point',
-            'collage_transcript' => 'college transcript',
-            'collage_certificate' => 'college certificate',
+            'college_name' => 'college name',
+            'college_exam_id' => 'college exam ID',
+            'college_graduation_field' => 'college graduation field',
+            'college_graduation_year' => 'college graduation year',
+            'college_graduation_point' => 'college graduation point',
+            'college_transcript' => 'college transcript',
+            'college_certificate' => 'college certificate',
+            'create_student' => 'create student',
+            'student_id' => 'student ID',
+            'session_id' => 'session',
+            'semester_id' => 'semester',
+            'section_id' => 'section',
+            'admission_date' => 'admission date',
+            'relatives' => 'relatives',
+            'documents' => 'documents',
             'photo' => 'photo',
             'signature' => 'signature',
             'fee_amount' => 'fee amount',
