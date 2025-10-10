@@ -2,6 +2,10 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\ApplicationStatus;
+use App\Enums\v1\BloodGroup;
+use App\Enums\v1\MaritalStatus;
+use App\Enums\v1\Religion;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -61,13 +65,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $school_graduation_point
  * @property string|null $school_transcript
  * @property string|null $school_certificate
- * @property string $collage_name
- * @property string $collage_exam_id
- * @property string $collage_graduation_field
- * @property int $collage_graduation_year
- * @property float $collage_graduation_point
- * @property string|null $collage_transcript
- * @property string|null $collage_certificate
+ * @property string $college_name
+ * @property string $college_exam_id
+ * @property string $college_graduation_field
+ * @property int $college_graduation_year
+ * @property float $college_graduation_point
+ * @property string|null $college_transcript
+ * @property string|null $college_certificate
  * @property string|null $photo
  * @property string|null $signature
  * @property float $fee_amount
@@ -137,13 +141,13 @@ class Application extends Model
         'school_graduation_point',
         'school_transcript',
         'school_certificate',
-        'collage_name',
-        'collage_exam_id',
-        'collage_graduation_field',
-        'collage_graduation_year',
-        'collage_graduation_point',
-        'collage_transcript',
-        'collage_certificate',
+        'college_name',
+        'college_exam_id',
+        'college_graduation_field',
+        'college_graduation_year',
+        'college_graduation_point',
+        'college_transcript',
+        'college_certificate',
         'photo',
         'signature',
         'fee_amount',
@@ -291,9 +295,12 @@ class Application extends Model
             'dob' => 'datetime',
             'school_graduation_year' => 'integer',
             'school_graduation_point' => 'float',
-            'collage_graduation_year' => 'integer',
-            'collage_graduation_point' => 'float',
+            'college_graduation_year' => 'integer',
+            'college_graduation_point' => 'float',
             'fee_amount' => 'float',
+            'blood_group' => BloodGroup::class,
+            'religion' => Religion::class,
+            'marital_status' => MaritalStatus::class,
         ];
     }
 }

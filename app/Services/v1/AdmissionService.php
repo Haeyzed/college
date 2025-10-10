@@ -90,7 +90,6 @@ class AdmissionService
     public function createApplication(array $data): Application
     {
         return DB::transaction(function () use ($data) {
-            // Handle file uploads
             if (isset($data['photo']) && $data['photo']) {
                 $data['photo'] = $this->uploadImage(
                     file: $data['photo'],
@@ -131,7 +130,6 @@ class AdmissionService
                 $data['school_transcript'] = $this->uploadMedia(
                     file: $data['school_transcript'],
                     directory: 'applications',
-                    disk: 'public',
                     allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
                     maxSize: 5 * 1024 * 1024 // 5MB
                 );
@@ -141,7 +139,6 @@ class AdmissionService
                 $data['school_certificate'] = $this->uploadMedia(
                     file: $data['school_certificate'],
                     directory: 'applications',
-                    disk: 'public',
                     allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
                     maxSize: 5 * 1024 * 1024 // 5MB
                 );
@@ -151,7 +148,6 @@ class AdmissionService
                 $data['college_certificate'] = $this->uploadMedia(
                     file: $data['college_certificate'],
                     directory: 'applications',
-                    disk: 'public',
                     allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
                     maxSize: 5 * 1024 * 1024 // 5MB
                 );
@@ -161,7 +157,6 @@ class AdmissionService
                 $data['collage_certificate'] = $this->uploadMedia(
                     file: $data['collage_certificate'],
                     directory: 'applications',
-                    disk: 'public',
                     allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
                     maxSize: 5 * 1024 * 1024 // 5MB
                 );

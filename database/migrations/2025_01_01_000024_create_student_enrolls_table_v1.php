@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\v1\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -29,7 +30,7 @@ return new class extends Migration {
             $table->foreignId('session_id')->constrained('academic_sessions')->cascadeOnDelete();
             $table->foreignId('semester_id')->constrained()->cascadeOnDelete();
             $table->foreignId('section_id')->constrained()->cascadeOnDelete();
-            $table->string('status')->default('active');
+            $table->string('status')->default(Status::ACTIVE->value);
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

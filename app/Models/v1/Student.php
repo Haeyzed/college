@@ -2,6 +2,10 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\BloodGroup;
+use App\Enums\v1\MaritalStatus;
+use App\Enums\v1\Religion;
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -192,10 +197,10 @@ class Student extends Authenticatable implements AuthenticatableContract
      * @param int $id
      * @return StudentEnroll|null
      */
-    public static function enroll($id)
+    public static function enroll(int $id): ?StudentEnroll
     {
-        return StudentEnroll::where('student_id', $id)
-            ->where('status', '1')
+        return StudentEnroll::query()->where('student_id', $id)
+            ->where('status', Status::ACTIVE->value)
             ->orderBy('id', 'desc')
             ->first();
     }
@@ -233,25 +238,25 @@ class Student extends Authenticatable implements AuthenticatableContract
     /**
      * Get the current enrollment.
      *
-     * @return HasMany
+     * @return HasOne
      */
-    public function currentEnroll(): HasMany
+    public function currentEnroll(): HasOne
     {
-        return $this->hasOne(StudentEnroll::class)->ofMany([
+        return $this->hasOne(StudentEnroll::class, 'student_id')->ofMany([
             'id' => 'max',
         ], function ($query) {
-            $query->where('status', '1');
+            $query->where('status', Status::ACTIVE->value);
         });
     }
 
     /**
      * Get the first enrollment.
      *
-     * @return HasMany
+     * @return HasOne
      */
-    public function firstEnroll(): HasMany
+    public function firstEnroll(): HasOne
     {
-        return $this->hasOne(StudentEnroll::class)->ofMany([
+        return $this->hasOne(StudentEnroll::class, 'student_id')->ofMany([
             'id' => 'min',
         ]);
     }
@@ -259,11 +264,11 @@ class Student extends Authenticatable implements AuthenticatableContract
     /**
      * Get the last enrollment.
      *
-     * @return HasMany
+     * @return HasOne
      */
-    public function lastEnroll(): HasMany
+    public function lastEnroll(): HasOne
     {
-        return $this->hasOne(StudentEnroll::class)->ofMany([
+        return $this->hasOne(StudentEnroll::class, 'student_id')->ofMany([
             'id' => 'max',
         ]);
     }
@@ -275,7 +280,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      */
     public function relatives(): HasMany
     {
-        return $this->hasMany(StudentRelative::class);
+        return $this->hasMany(StudentRelative::class, 'student_id', 'id');
     }
 
     /**
@@ -285,7 +290,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      */
     public function exams(): HasMany
     {
-        return $this->hasMany(Exam::class);
+        return $this->hasMany(Exam::class, 'student_id', 'id');
     }
 
     /**
@@ -295,7 +300,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      */
     public function leaves(): HasMany
     {
-        return $this->hasMany(StudentLeave::class);
+        return $this->hasMany(StudentLeave::class, 'student_id', 'id');
     }
 
     /**
@@ -305,7 +310,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      */
     public function certificates(): HasMany
     {
-        return $this->hasMany(Certificate::class);
+        return $this->hasMany(Certificate::class, 'student_id', 'id');
     }
 
     /**
@@ -361,11 +366,11 @@ class Student extends Authenticatable implements AuthenticatableContract
     /**
      * Get the student transfer.
      *
-     * @return HasMany
+     * @return HasOne
      */
-    public function studentTransfer(): HasMany
+    public function studentTransfer(): HasOne
     {
-        return $this->hasOne(StudentTransfer::class);
+        return $this->hasOne(StudentTransfer::class, 'student_id');
     }
 
     /**
@@ -375,7 +380,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      */
     public function transferCredits(): HasMany
     {
-        return $this->hasMany(TransferCredit::class);
+        return $this->hasMany(TransferCredit::class, 'student_id');
     }
 
     /**
@@ -465,7 +470,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      * @param string $status
      * @return Builder
      */
-    public function scopeFilterByStatus($query, $status)
+    public function scopeFilterByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
@@ -477,7 +482,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      * @param int $programId
      * @return Builder
      */
-    public function scopeFilterByProgram($query, $programId)
+    public function scopeFilterByProgram(Builder $query, int $programId): Builder
     {
         return $query->where('program_id', $programId);
     }
@@ -489,7 +494,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      * @param int $batchId
      * @return Builder
      */
-    public function scopeFilterByBatch($query, $batchId)
+    public function scopeFilterByBatch(Builder $query, int $batchId): Builder
     {
         return $query->where('batch_id', $batchId);
     }
@@ -501,7 +506,7 @@ class Student extends Authenticatable implements AuthenticatableContract
      * @param string $search
      * @return Builder
      */
-    public function scopeSearch($query, $search)
+    public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
             $q->whereLike('first_name', $search)
@@ -528,6 +533,10 @@ class Student extends Authenticatable implements AuthenticatableContract
             'collage_graduation_point' => 'float',
             'is_transfer' => 'boolean',
             'password' => 'hashed',
+            'blood_group' => BloodGroup::class,
+            'religion' => Religion::class,
+            'marital_status' => MaritalStatus::class,
+            'status' => Status::class,
         ];
     }
 }
