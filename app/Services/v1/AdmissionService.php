@@ -4,15 +4,18 @@ namespace App\Services\v1;
 
 use App\Enums\v1\ApplicationStatus;
 use App\Models\v1\Application;
-use App\Models\v1\Batch;
-use App\Models\v1\Program;
-use App\Models\v1\Province;
-use App\Models\v1\District;
+use App\Models\v1\Document;
+use App\Models\v1\EnrollSubject;
+use App\Models\v1\Student;
+use App\Models\v1\StudentEnroll;
+use App\Models\v1\StudentRelative;
 use App\Traits\v1\FileUploader;
 use Exception;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * AdmissionService - Version 1
@@ -92,7 +95,6 @@ class AdmissionService
     public function createApplication(array $data, bool $createStudent = false, array $studentData = []): array
     {
         return DB::transaction(function () use ($data, $createStudent, $studentData) {
-            // Handle file uploads for application
             if (isset($data['photo']) && $data['photo']) {
                 $data['photo'] = $this->uploadImage(
                     file: $data['photo'],
@@ -192,7 +194,7 @@ class AdmissionService
     protected function createStudentFromApplication(Application $application, array $studentData): array
     {
         // Generate random password
-        $password = \Illuminate\Support\Str::password(8);
+        $password = Str::password(8);
 
         // Create student data from application
         $studentRecord = [
@@ -210,8 +212,8 @@ class AdmissionService
             'father_occupation' => $application->father_occupation,
             'mother_occupation' => $application->mother_occupation,
             'email' => $application->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($password),
-            'password_text' => \Illuminate\Support\Facades\Crypt::encryptString($password),
+            'password' => Hash::make($password),
+            'password_text' => Crypt::encryptString($password),
 
             // Address Information
             'country' => $application->country,
@@ -243,10 +245,10 @@ class AdmissionService
             'school_exam_id' => $application->school_exam_id,
             'school_graduation_year' => $application->school_graduation_year,
             'school_graduation_point' => $application->school_graduation_point,
-            'collage_name' => $application->collage_name,
-            'collage_exam_id' => $application->collage_exam_id,
-            'collage_graduation_year' => $application->collage_graduation_year,
-            'collage_graduation_point' => $application->collage_graduation_point,
+            'college_name' => $application->college_name,
+            'college_exam_id' => $application->college_exam_id,
+            'college_graduation_year' => $application->college_graduation_year,
+            'college_graduation_point' => $application->college_graduation_point,
 
             // File paths
             'photo' => $application->photo,
@@ -263,7 +265,7 @@ class AdmissionService
         ];
 
         // Create student
-        $student = \App\Models\v1\Student::create($studentRecord);
+        $student = Student::query()->create($studentRecord);
 
         // Handle student relatives if provided
         if (isset($studentData['relatives']) && is_array($studentData['relatives'])) {
@@ -292,6 +294,103 @@ class AdmissionService
             'enrollment' => $enrollment,
             'password' => $password
         ];
+    }
+
+    /**
+     * Create student relatives.
+     *
+     * @param int $studentId Student ID
+     * @param array $relatives Relatives data
+     * @return void
+     */
+    protected function createStudentRelatives(int $studentId, array $relatives): void
+    {
+        foreach ($relatives as $relative) {
+            if (!empty($relative['relation']) && !empty($relative['name'])) {
+                StudentRelative::create([
+                    'student_id' => $studentId,
+                    'relation' => $relative['relation'],
+                    'name' => $relative['name'],
+                    'occupation' => $relative['occupation'] ?? null,
+                    'phone' => $relative['phone'] ?? null,
+                    'address' => $relative['address'] ?? null,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Create student documents.
+     *
+     * @param int $studentId Student ID
+     * @param array $documents Documents data
+     * @return void
+     */
+    protected function createStudentDocuments(int $studentId, array $documents): void
+    {
+        foreach ($documents as $document) {
+            if (!empty($document['title']) && !empty($document['file'])) {
+                $filePath = $this->uploadMedia(
+                    file: $document['file'],
+                    directory: 'student-documents',
+                    disk: 'public',
+                    allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
+                    maxSize: 5 * 1024 * 1024 // 5MB
+                );
+
+                if ($filePath) {
+                    $documentModel = Document::create([
+                        'title' => $document['title'],
+                        'attach' => $filePath,
+                    ]);
+
+                    $documentModel->students()->attach($studentId);
+                }
+            }
+        }
+    }
+
+    /**
+     * Create student enrollment.
+     *
+     * @param int $studentId Student ID
+     * @param array $data Enrollment data
+     * @return StudentEnroll
+     */
+    protected function createStudentEnrollment(int $studentId, array $data): StudentEnroll
+    {
+        return StudentEnroll::create([
+            'student_id' => $studentId,
+            'program_id' => $data['program_id'],
+            'session_id' => $data['session_id'],
+            'semester_id' => $data['semester_id'],
+            'section_id' => $data['section_id'],
+            'created_by' => auth()->id() ?? 1,
+        ]);
+    }
+
+    /**
+     * Assign subjects to student based on program/semester/section.
+     *
+     * @param int $enrollmentId Enrollment ID
+     * @param array $data Enrollment data
+     * @return void
+     */
+    protected function assignSubjectsToStudent(int $enrollmentId, array $data): void
+    {
+        $enrollment = StudentEnroll::findOrFail($enrollmentId);
+
+        // Find enroll subject configuration
+        $enrollSubject = EnrollSubject::where('program_id', $data['program_id'])
+            ->where('semester_id', $data['semester_id'])
+            ->where('section_id', $data['section_id'])
+            ->first();
+
+        if ($enrollSubject) {
+            foreach ($enrollSubject->subjects as $subject) {
+                $enrollment->subjects()->attach($subject->id);
+            }
+        }
     }
 
     /**
@@ -390,7 +489,7 @@ class AdmissionService
             }
 
             // Handle document uploads
-            $documentFields = ['school_transcript', 'school_certificate', 'college_certificate', 'collage_certificate'];
+            $documentFields = ['school_transcript', 'school_certificate', 'college_certificate', 'college_certificate'];
             foreach ($documentFields as $field) {
                 if (isset($data[$field]) && $data[$field]) {
                     if ($application->$field) {
@@ -420,6 +519,17 @@ class AdmissionService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Student Admission Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle the complete admission process including converting
+    | approved applications to students, managing student relatives, documents,
+    | enrollment, and subject assignments.
+    |
+    */
+
     /**
      * Delete an application.
      *
@@ -434,7 +544,7 @@ class AdmissionService
             $application = Application::query()->findOrFail($id);
 
             // Delete associated files
-            $fileFields = ['photo', 'signature', 'father_photo', 'mother_photo', 'school_transcript', 'school_certificate', 'college_certificate', 'collage_certificate'];
+            $fileFields = ['photo', 'signature', 'father_photo', 'mother_photo', 'school_transcript', 'school_certificate', 'college_certificate', 'college_certificate'];
             foreach ($fileFields as $field) {
                 if ($application->$field) {
                     $this->deleteMedia($application->$field, 'public');
@@ -477,7 +587,7 @@ class AdmissionService
 
             foreach ($applications as $application) {
                 // Delete associated files
-                $fileFields = ['photo', 'signature', 'father_photo', 'mother_photo', 'school_transcript', 'school_certificate', 'college_certificate', 'collage_certificate'];
+                $fileFields = ['photo', 'signature', 'father_photo', 'mother_photo', 'school_transcript', 'school_certificate', 'college_certificate', 'college_certificate'];
                 foreach ($fileFields as $field) {
                     if ($application->$field) {
                         $this->deleteMedia($application->$field, 'public');
@@ -507,237 +617,6 @@ class AdmissionService
             'rejected_applications' => Application::where('status', ApplicationStatus::REJECTED->value)->count(),
             'admitted_applications' => Application::where('status', ApplicationStatus::ADMITTED->value)->count(),
         ];
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Student Admission Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle the complete admission process including converting
-    | approved applications to students, managing student relatives, documents,
-    | enrollment, and subject assignments.
-    |
-    */
-
-    /**
-     * Convert approved application to student.
-     *
-     * @param int $applicationId Application ID to convert
-     * @param array $additionalData Additional student data (student_id, session, semester, section, etc.)
-     * @return array Created student and related data
-     * @throws Exception When conversion fails
-     */
-    public function convertApplicationToStudent(int $applicationId, array $additionalData): array
-    {
-        return DB::transaction(function () use ($applicationId, $additionalData) {
-            $application = Application::with(['batch', 'program'])->findOrFail($applicationId);
-
-            // Validate application is approved
-            if ($application->status !== ApplicationStatus::APPROVED->value) {
-                throw new Exception('Application must be approved before converting to student');
-            }
-
-            // Generate random password
-            $password = \Illuminate\Support\Str::random(8);
-
-            // Create student from application data
-            $studentData = [
-                'student_id' => $additionalData['student_id'],
-                'registration_no' => $application->registration_no,
-                'batch_id' => $application->batch_id,
-                'program_id' => $application->program_id,
-                'admission_date' => $additionalData['admission_date'] ?? now(),
-
-                // Personal Information
-                'first_name' => $application->first_name,
-                'last_name' => $application->last_name,
-                'father_name' => $application->father_name,
-                'mother_name' => $application->mother_name,
-                'father_occupation' => $application->father_occupation,
-                'mother_occupation' => $application->mother_occupation,
-                'email' => $application->email,
-                'password' => \Illuminate\Support\Facades\Hash::make($password),
-                'password_text' => \Illuminate\Support\Facades\Crypt::encryptString($password),
-
-                // Address Information
-                'country' => $application->country,
-                'present_province' => $application->present_province,
-                'present_district' => $application->present_district,
-                'present_village' => $application->present_village,
-                'present_address' => $application->present_address,
-                'permanent_province' => $application->permanent_province,
-                'permanent_district' => $application->permanent_district,
-                'permanent_village' => $application->permanent_village,
-                'permanent_address' => $application->permanent_address,
-
-                // Personal Details
-                'gender' => $application->gender,
-                'dob' => $application->dob,
-                'phone' => $application->phone,
-                'emergency_phone' => $application->emergency_phone,
-                'religion' => $application->religion,
-                'caste' => $application->caste,
-                'mother_tongue' => $application->mother_tongue,
-                'marital_status' => $application->marital_status,
-                'blood_group' => $application->blood_group,
-                'nationality' => $application->nationality,
-                'national_id' => $application->national_id,
-                'passport_no' => $application->passport_no,
-
-                // Academic Information
-                'school_name' => $application->school_name,
-                'school_exam_id' => $application->school_exam_id,
-                'school_graduation_year' => $application->school_graduation_year,
-                'school_graduation_point' => $application->school_graduation_point,
-                'collage_name' => $application->collage_name,
-                'collage_exam_id' => $application->collage_exam_id,
-                'collage_graduation_year' => $application->collage_graduation_year,
-                'collage_graduation_point' => $application->collage_graduation_point,
-
-                // File paths
-                'photo' => $application->photo,
-                'signature' => $application->signature,
-                'father_photo' => $application->father_photo,
-                'mother_photo' => $application->mother_photo,
-                'school_transcript' => $application->school_transcript,
-                'school_certificate' => $application->school_certificate,
-                'collage_transcript' => $application->collage_transcript,
-                'collage_certificate' => $application->collage_certificate,
-
-                'status' => '1',
-                'created_by' => auth()->id(),
-            ];
-
-            // Create student
-            $student = \App\Models\v1\Student::create($studentData);
-
-            // Handle student relatives if provided
-            if (isset($additionalData['relatives']) && is_array($additionalData['relatives'])) {
-                $this->createStudentRelatives($student->id, $additionalData['relatives']);
-            }
-
-            // Handle additional documents if provided
-            if (isset($additionalData['documents']) && is_array($additionalData['documents'])) {
-                $this->createStudentDocuments($student->id, $additionalData['documents']);
-            }
-
-            // Create student enrollment
-            $enrollment = $this->createStudentEnrollment($student->id, $additionalData);
-
-            // Assign subjects based on program/semester/section
-            $this->assignSubjectsToStudent($enrollment->id, $additionalData);
-
-            // Update application status to admitted
-            $application->update([
-                'status' => ApplicationStatus::ADMITTED->value,
-                'updated_by' => auth()->id() ?? 1,
-            ]);
-
-            return [
-                'student' => $student->load(['batch', 'program']),
-                'enrollment' => $enrollment,
-                'password' => $password,
-                'application' => $application
-            ];
-        });
-    }
-
-    /**
-     * Create student relatives.
-     *
-     * @param int $studentId Student ID
-     * @param array $relatives Relatives data
-     * @return void
-     */
-    protected function createStudentRelatives(int $studentId, array $relatives): void
-    {
-        foreach ($relatives as $relative) {
-            if (!empty($relative['relation']) && !empty($relative['name'])) {
-                \App\Models\v1\StudentRelative::create([
-                    'student_id' => $studentId,
-                    'relation' => $relative['relation'],
-                    'name' => $relative['name'],
-                    'occupation' => $relative['occupation'] ?? null,
-                    'phone' => $relative['phone'] ?? null,
-                    'address' => $relative['address'] ?? null,
-                ]);
-            }
-        }
-    }
-
-    /**
-     * Create student documents.
-     *
-     * @param int $studentId Student ID
-     * @param array $documents Documents data
-     * @return void
-     */
-    protected function createStudentDocuments(int $studentId, array $documents): void
-    {
-        foreach ($documents as $document) {
-            if (!empty($document['title']) && !empty($document['file'])) {
-                $filePath = $this->uploadMedia(
-                    file: $document['file'],
-                    directory: 'student-documents',
-                    disk: 'public',
-                    allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
-                    maxSize: 5 * 1024 * 1024 // 5MB
-                );
-
-                if ($filePath) {
-                    $documentModel = \App\Models\v1\Document::create([
-                        'title' => $document['title'],
-                        'attach' => $filePath,
-                    ]);
-
-                    $documentModel->students()->attach($studentId);
-                }
-            }
-        }
-    }
-
-    /**
-     * Create student enrollment.
-     *
-     * @param int $studentId Student ID
-     * @param array $data Enrollment data
-     * @return \App\Models\v1\StudentEnroll
-     */
-    protected function createStudentEnrollment(int $studentId, array $data): \App\Models\v1\StudentEnroll
-    {
-        return \App\Models\v1\StudentEnroll::create([
-            'student_id' => $studentId,
-            'program_id' => $data['program_id'],
-            'session_id' => $data['session_id'],
-            'semester_id' => $data['semester_id'],
-            'section_id' => $data['section_id'],
-            'created_by' => auth()->id() ?? 1,
-        ]);
-    }
-
-    /**
-     * Assign subjects to student based on program/semester/section.
-     *
-     * @param int $enrollmentId Enrollment ID
-     * @param array $data Enrollment data
-     * @return void
-     */
-    protected function assignSubjectsToStudent(int $enrollmentId, array $data): void
-    {
-        $enrollment = \App\Models\v1\StudentEnroll::findOrFail($enrollmentId);
-
-        // Find enroll subject configuration
-        $enrollSubject = \App\Models\v1\EnrollSubject::where('program_id', $data['program_id'])
-            ->where('semester_id', $data['semester_id'])
-            ->where('section_id', $data['section_id'])
-            ->first();
-
-        if ($enrollSubject) {
-            foreach ($enrollSubject->subjects as $subject) {
-                $enrollment->subjects()->attach($subject->id);
-            }
-        }
     }
 
     /**
@@ -793,6 +672,129 @@ class AdmissionService
             }
 
             return $results;
+        });
+    }
+
+    /**
+     * Convert approved application to student.
+     *
+     * @param int $applicationId Application ID to convert
+     * @param array $additionalData Additional student data (student_id, session, semester, section, etc.)
+     * @return array Created student and related data
+     * @throws Exception When conversion fails
+     */
+    public function convertApplicationToStudent(int $applicationId, array $additionalData): array
+    {
+        return DB::transaction(function () use ($applicationId, $additionalData) {
+            $application = Application::with(['batch', 'program'])->findOrFail($applicationId);
+
+            // Validate application is approved
+            if ($application->status !== ApplicationStatus::APPROVED->value) {
+                throw new Exception('Application must be approved before converting to student');
+            }
+
+            // Generate random password
+            $password = Str::random(8);
+
+            // Create student from application data
+            $studentData = [
+                'student_id' => $additionalData['student_id'],
+                'registration_no' => $application->registration_no,
+                'batch_id' => $application->batch_id,
+                'program_id' => $application->program_id,
+                'admission_date' => $additionalData['admission_date'] ?? now(),
+
+                // Personal Information
+                'first_name' => $application->first_name,
+                'last_name' => $application->last_name,
+                'father_name' => $application->father_name,
+                'mother_name' => $application->mother_name,
+                'father_occupation' => $application->father_occupation,
+                'mother_occupation' => $application->mother_occupation,
+                'email' => $application->email,
+                'password' => Hash::make($password),
+                'password_text' => Crypt::encryptString($password),
+
+                // Address Information
+                'country' => $application->country,
+                'present_province' => $application->present_province,
+                'present_district' => $application->present_district,
+                'present_village' => $application->present_village,
+                'present_address' => $application->present_address,
+                'permanent_province' => $application->permanent_province,
+                'permanent_district' => $application->permanent_district,
+                'permanent_village' => $application->permanent_village,
+                'permanent_address' => $application->permanent_address,
+
+                // Personal Details
+                'gender' => $application->gender,
+                'dob' => $application->dob,
+                'phone' => $application->phone,
+                'emergency_phone' => $application->emergency_phone,
+                'religion' => $application->religion,
+                'caste' => $application->caste,
+                'mother_tongue' => $application->mother_tongue,
+                'marital_status' => $application->marital_status,
+                'blood_group' => $application->blood_group,
+                'nationality' => $application->nationality,
+                'national_id' => $application->national_id,
+                'passport_no' => $application->passport_no,
+
+                // Academic Information
+                'school_name' => $application->school_name,
+                'school_exam_id' => $application->school_exam_id,
+                'school_graduation_year' => $application->school_graduation_year,
+                'school_graduation_point' => $application->school_graduation_point,
+                'college_name' => $application->college_name,
+                'college_exam_id' => $application->college_exam_id,
+                'college_graduation_year' => $application->college_graduation_year,
+                'college_graduation_point' => $application->college_graduation_point,
+
+                // File paths
+                'photo' => $application->photo,
+                'signature' => $application->signature,
+                'father_photo' => $application->father_photo,
+                'mother_photo' => $application->mother_photo,
+                'school_transcript' => $application->school_transcript,
+                'school_certificate' => $application->school_certificate,
+                'college_transcript' => $application->college_transcript,
+                'college_certificate' => $application->college_certificate,
+
+                'status' => '1',
+                'created_by' => auth()->id(),
+            ];
+
+            // Create student
+            $student = Student::create($studentData);
+
+            // Handle student relatives if provided
+            if (isset($additionalData['relatives']) && is_array($additionalData['relatives'])) {
+                $this->createStudentRelatives($student->id, $additionalData['relatives']);
+            }
+
+            // Handle additional documents if provided
+            if (isset($additionalData['documents']) && is_array($additionalData['documents'])) {
+                $this->createStudentDocuments($student->id, $additionalData['documents']);
+            }
+
+            // Create student enrollment
+            $enrollment = $this->createStudentEnrollment($student->id, $additionalData);
+
+            // Assign subjects based on program/semester/section
+            $this->assignSubjectsToStudent($enrollment->id, $additionalData);
+
+            // Update application status to admitted
+            $application->update([
+                'status' => ApplicationStatus::ADMITTED->value,
+                'updated_by' => auth()->id() ?? 1,
+            ]);
+
+            return [
+                'student' => $student->load(['batch', 'program']),
+                'enrollment' => $enrollment,
+                'password' => $password,
+                'application' => $application
+            ];
         });
     }
 }
