@@ -3,6 +3,7 @@
 namespace App\Services\v1;
 
 use App\Enums\v1\ApplicationStatus;
+use App\Enums\v1\Status;
 use App\Models\v1\Application;
 use App\Models\v1\Document;
 use App\Models\v1\EnrollSubject;
@@ -261,7 +262,7 @@ class AdmissionService
             'college_transcript' => $application->college_transcript,
             'college_certificate' => $application->college_certificate,
 
-            'status' => '1',
+            'status' => Status::ACTIVE->value,
             'created_by' => auth()->id() ?? 1,
         ];
 
@@ -342,10 +343,11 @@ class AdmissionService
                     $documentModel = Document::query()->create([
                         'title' => $document['title'],
                         'file_path' => $filePath,
-                        'status' => \App\Enums\Status::ACTIVE->value,
+                        'status' => Status::ACTIVE->value,
                     ]);
 
                     $documentModel->students()->attach($studentId);
+                }
             }
         }
     }

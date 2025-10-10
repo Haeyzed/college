@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\v1\AcademicController;
+use App\Http\Controllers\v1\AdmissionController;
 use App\Http\Controllers\v1\AttendanceController;
 use App\Http\Controllers\v1\BatchController;
 use App\Http\Controllers\v1\DashboardController;
@@ -295,6 +296,24 @@ Route::prefix('v1')->group(function () {
         Route::delete('/enroll-subjects/{id}', [AcademicController::class, 'deleteEnrollSubject']);
         Route::post('/enroll-subjects/bulk-status', [AcademicController::class, 'bulkUpdateEnrollSubjectStatus']);
         Route::delete('/enroll-subjects/bulk-delete', [AcademicController::class, 'bulkDeleteEnrollSubjects']);
+    });
+
+    // Admissions Management Routes
+    Route::prefix('admissions')->group(function () {
+
+        // Applications Management
+        Route::prefix('applications')->group(function () {
+            // Individual Application Operations
+            Route::get('/', [AdmissionController::class, 'getApplications']);
+            Route::post('/', [AdmissionController::class, 'createApplication']);
+            Route::get('/{id}', [AdmissionController::class, 'getApplication']);
+            Route::put('/{id}', [AdmissionController::class, 'updateApplication']);
+            Route::delete('/{id}', [AdmissionController::class, 'deleteApplication']);
+
+            // Bulk Application Operations
+            Route::post('/bulk/status', [AdmissionController::class, 'bulkUpdateApplicationStatus']);
+            Route::post('/bulk/delete', [AdmissionController::class, 'bulkDeleteApplications']);
+        });
     });
 
     // Library Management Routes

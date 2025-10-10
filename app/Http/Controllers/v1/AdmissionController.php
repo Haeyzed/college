@@ -123,7 +123,6 @@ class AdmissionController extends Controller
         try {
             $validatedData = $request->validated();
 
-            // Handle file uploads
             $fileFields = ['photo', 'signature', 'father_photo', 'mother_photo', 'school_transcript', 'school_certificate', 'collage_transcript', 'collage_certificate'];
             foreach ($fileFields as $field) {
                 if ($request->hasFile($field)) {
@@ -131,7 +130,6 @@ class AdmissionController extends Controller
                 }
             }
 
-            // Create student immediately (like UniversitySystem)
             $studentData = $request->only([
                 'student_id', 'session_id', 'semester_id', 'section_id',
                 'admission_date', 'relatives', 'documents'
