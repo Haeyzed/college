@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\AcademicSession;
 use App\Enums\v1\Status;
+use App\Models\v1\AcademicSession;
 use App\Models\v1\Session;
 use Illuminate\Database\Seeder;
 

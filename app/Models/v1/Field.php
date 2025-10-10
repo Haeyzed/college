@@ -38,18 +38,6 @@ class Field extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get a field by slug.
      *
      * @param string $slug
@@ -70,5 +58,17 @@ class Field extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

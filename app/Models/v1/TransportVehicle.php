@@ -60,20 +60,6 @@ class TransportVehicle extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'capacity' => 'integer',
-            'year_made' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the transport routes for the transport vehicle.
      *
      * @return BelongsToMany
@@ -118,5 +104,19 @@ class TransportVehicle extends Model
             $q->whereLike('number', $search)
                 ->orWhereLike('driver_name', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'capacity' => 'integer',
+            'year_made' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

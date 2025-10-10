@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\Faculty;
 use App\Enums\v1\Status;
+use App\Models\v1\Faculty;
 use Illuminate\Database\Seeder;
 
 /**

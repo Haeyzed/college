@@ -62,22 +62,6 @@ class Course extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'language_id' => 'integer',
-            'semesters' => 'integer',
-            'credits' => 'integer',
-            'fee' => 'decimal:2',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the language for the course.
      *
      * @return BelongsTo
@@ -112,5 +96,21 @@ class Course extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'language_id' => 'integer',
+            'semesters' => 'integer',
+            'credits' => 'integer',
+            'fee' => 'decimal:2',
+            'status' => 'boolean',
+        ];
     }
 }

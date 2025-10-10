@@ -145,7 +145,7 @@ class ScheduleSettingRequest extends BaseRequest
     protected function prepareForValidation(): void
     {
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
-        
+
         if ($isUpdate) {
             $this->merge([
                 'updated_by' => auth()->id() ?? 1,

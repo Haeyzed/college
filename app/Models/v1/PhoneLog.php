@@ -63,23 +63,6 @@ class PhoneLog extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'call_duration' => 'integer',
-            'date' => 'date',
-            'follow_up_date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the user who recorded the phone log.
      *
      * @return BelongsTo
@@ -114,5 +97,22 @@ class PhoneLog extends Model
             $q->whereLike('name', $search)
                 ->orWhereLike('phone', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'call_duration' => 'integer',
+            'date' => 'date',
+            'follow_up_date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

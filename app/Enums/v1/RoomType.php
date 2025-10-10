@@ -21,22 +21,6 @@ enum RoomType: string
     case CONFERENCE = 'conference';
 
     /**
-     * Get the string representation of the room type.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::CLASSROOM => 'Classroom',
-            self::LAB => 'Laboratory',
-            self::LIBRARY => 'Library',
-            self::AUDITORIUM => 'Auditorium',
-            self::CONFERENCE => 'Conference Room',
-        };
-    }
-
-    /**
      * Get all room type values as an array.
      *
      * @return array
@@ -54,6 +38,22 @@ enum RoomType: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the room type.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::CLASSROOM => 'Classroom',
+            self::LAB => 'Laboratory',
+            self::LIBRARY => 'Library',
+            self::AUDITORIUM => 'Auditorium',
+            self::CONFERENCE => 'Conference Room',
+        };
     }
 
     /**

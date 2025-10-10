@@ -49,20 +49,6 @@ class ExamType extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'marks' => 'integer',
-            'contribution' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the exams for the exam type.
      *
      * @return HasMany
@@ -94,5 +80,19 @@ class ExamType extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'marks' => 'integer',
+            'contribution' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

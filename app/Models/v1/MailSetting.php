@@ -55,19 +55,6 @@ class MailSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'port' => 'integer',
-            'status' => Status::class,
-        ];
-    }
-
-    /**
      * Scope to filter mail settings by status.
      *
      * @param Builder $query
@@ -95,5 +82,18 @@ class MailSetting extends Model
                 ->orWhereLike('sender_name', $search)
                 ->orWhereLike('username', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'port' => 'integer',
+            'status' => Status::class,
+        ];
     }
 }

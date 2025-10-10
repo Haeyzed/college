@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Fees Discounts Table Migration - Version 1
- * 
+ *
  * This migration creates the fees_discounts table for the College Management System.
  * It handles fee discount information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -32,7 +31,7 @@ return new class extends Migration
             $table->string('type')->default('fixed'); // fixed, percentage
             $table->string('status')->default('active');
             $table->timestamps();
-            
+
             $table->index(['start_date', 'end_date']);
             $table->index(['status']);
         });

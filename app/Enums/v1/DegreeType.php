@@ -21,22 +21,6 @@ enum DegreeType: string
     case CERTIFICATE = 'certificate';
 
     /**
-     * Get the string representation of the degree type.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::BACHELOR => 'Bachelor\'s Degree',
-            self::MASTER => 'Master\'s Degree',
-            self::PHD => 'Doctor of Philosophy',
-            self::DIPLOMA => 'Diploma',
-            self::CERTIFICATE => 'Certificate',
-        };
-    }
-
-    /**
      * Get all degree type values as an array.
      *
      * @return array
@@ -54,6 +38,22 @@ enum DegreeType: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the degree type.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::BACHELOR => 'Bachelor\'s Degree',
+            self::MASTER => 'Master\'s Degree',
+            self::PHD => 'Doctor of Philosophy',
+            self::DIPLOMA => 'Diploma',
+            self::CERTIFICATE => 'Certificate',
+        };
     }
 
     /**
@@ -98,7 +98,7 @@ enum DegreeType: string
      */
     public function getTypicalDuration(): int
     {
-        return match($this) {
+        return match ($this) {
             self::BACHELOR => 4,
             self::MASTER => 2,
             self::PHD => 3,

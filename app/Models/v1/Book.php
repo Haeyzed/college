@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\BookStatus;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,8 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Enums\v1\BookStatus;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -93,18 +94,20 @@ class Book extends Model implements Auditable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Boot the model.
+     * Handle image deletion on force delete.
      */
-    protected function casts(): array
+    protected static function boot(): void
     {
-        return [
-            'publication_year' => 'integer',
-            'price' => 'float',
-            'quantity' => 'integer',
-            'status' => BookStatus::class,
-        ];
+        parent::boot();
+
+        // Handle image deletion on force delete
+        static::deleting(function ($book) {
+            if ($book->isForceDeleting() && $book->cover_image_path) {
+                // Delete the image file when force deleting
+                Storage::disk('public')->delete($book->cover_image_path);
+            }
+        });
     }
 
     /**
@@ -200,25 +203,23 @@ class Book extends Model implements Auditable
      */
     public function scopeFilterByAvailability(Builder $query, bool $available): Builder
     {
-        return $available 
+        return $available
             ? $query->where('quantity', '>', 0)
             : $query->where('quantity', '<=', 0);
     }
 
     /**
-     * Boot the model.
-     * Handle image deletion on force delete.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    protected static function boot(): void
+    protected function casts(): array
     {
-        parent::boot();
-
-        // Handle image deletion on force delete
-        static::deleting(function ($book) {
-            if ($book->isForceDeleting() && $book->cover_image_path) {
-                // Delete the image file when force deleting
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($book->cover_image_path);
-            }
-        });
+        return [
+            'publication_year' => 'integer',
+            'price' => 'float',
+            'quantity' => 'integer',
+            'status' => BookStatus::class,
+        ];
     }
 }

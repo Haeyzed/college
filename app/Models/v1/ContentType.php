@@ -46,18 +46,6 @@ class ContentType extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the contents for the content type.
      *
      * @return HasMany
@@ -92,5 +80,17 @@ class ContentType extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

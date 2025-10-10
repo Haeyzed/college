@@ -59,7 +59,7 @@ class AcademicSessionResource extends JsonResource
              * @var bool $is_current
              * @example true
              */
-            'is_current' => (bool) $this->is_current,
+            'is_current' => (bool)$this->is_current,
 
             /**
              * The description of the academic session.

@@ -51,41 +51,6 @@ class FeesDiscount extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'amount' => 'decimal:2',
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
-     * Get the fees categories for the fees discount.
-     *
-     * @return BelongsToMany
-     */
-    public function feesCategories(): BelongsToMany
-    {
-        return $this->belongsToMany(FeesCategory::class, 'fees_category_fees_discount', 'fees_discount_id', 'fees_category_id');
-    }
-
-    /**
-     * Get the status types for the fees discount.
-     *
-     * @return BelongsToMany
-     */
-    public function statusTypes(): BelongsToMany
-    {
-        return $this->belongsToMany(StatusType::class, 'fees_discount_status_type', 'fees_discount_id', 'status_type_id');
-    }
-
-    /**
      * Check if the student is eligible for the discount based on their statuses.
      *
      * @param int $discount
@@ -115,6 +80,26 @@ class FeesDiscount extends Model
     }
 
     /**
+     * Get the fees categories for the fees discount.
+     *
+     * @return BelongsToMany
+     */
+    public function feesCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(FeesCategory::class, 'fees_category_fees_discount', 'fees_discount_id', 'fees_category_id');
+    }
+
+    /**
+     * Get the status types for the fees discount.
+     *
+     * @return BelongsToMany
+     */
+    public function statusTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(StatusType::class, 'fees_discount_status_type', 'fees_discount_id', 'status_type_id');
+    }
+
+    /**
      * Scope to filter fees discounts by status.
      *
      * @param Builder $query
@@ -136,5 +121,20 @@ class FeesDiscount extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'decimal:2',
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => 'boolean',
+        ];
     }
 }

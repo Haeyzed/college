@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\v1\Status;
 use App\Models\v1\Batch;
 use App\Models\v1\Program;
-use App\Enums\v1\Status;
 use Illuminate\Database\Seeder;
 
 /**
@@ -30,7 +30,7 @@ class BatchSeeder extends Seeder
         foreach ($programs as $program) {
             // Create multiple batches for each program
             $academicYears = ['2021-2022', '2022-2023', '2023-2024', '2024-2025'];
-            
+
             foreach ($academicYears as $index => $academicYear) {
                 $batchNumber = $index + 1;
                 $startDate = date('Y-m-d', strtotime("2021-09-01 +{$index} years"));

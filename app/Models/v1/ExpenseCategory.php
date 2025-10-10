@@ -46,18 +46,6 @@ class ExpenseCategory extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the expenses for the expense category.
      *
      * @return HasMany
@@ -92,5 +80,17 @@ class ExpenseCategory extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

@@ -47,18 +47,6 @@ class Certificate extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'issue_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the student that owns the certificate.
      *
      * @return BelongsTo
@@ -90,5 +78,17 @@ class Certificate extends Model
     public function scopeFilterByStudent(Builder $query, int $studentId): Builder
     {
         return $query->where('student_id', $studentId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'issue_date' => 'datetime',
+        ];
     }
 }

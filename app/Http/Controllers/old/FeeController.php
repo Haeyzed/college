@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Services\v1\FeeService;
 use App\Http\Requests\v1\StoreFeeRequest;
 use App\Http\Requests\v1\UpdateFeeRequest;
 use App\Http\Resources\v1\FeeResource;
+use App\Services\v1\FeeService;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * FeeController - Version 1

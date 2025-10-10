@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\v1;
 
-use App\Http\Requests\BaseRequest;
 use App\Enums\v1\MemberType;
+use App\Http\Requests\BaseRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
 /**
@@ -30,7 +31,7 @@ class IssueBookRequest extends BaseRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

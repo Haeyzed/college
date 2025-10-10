@@ -51,19 +51,6 @@ class HostelRoom extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'capacity' => 'integer',
-            'rent' => 'float',
-        ];
-    }
-
-    /**
      * Get the hostel that owns the room.
      *
      * @return BelongsTo
@@ -119,5 +106,18 @@ class HostelRoom extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('room_no', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'capacity' => 'integer',
+            'rent' => 'float',
+        ];
     }
 }

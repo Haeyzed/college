@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Student Assignments Table Migration - Version 1
- * 
+ *
  * This migration creates the student_assignments table for the College Management System.
  * It handles student assignment submission information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -34,7 +33,7 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            
+
             $table->index(['student_enroll_id', 'assignment_id']);
             $table->index(['assignment_id']);
         });

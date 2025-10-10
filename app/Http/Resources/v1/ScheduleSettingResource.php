@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\v1;
 
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -170,9 +172,9 @@ class ScheduleSettingResource extends JsonResource
     private function formatTime(string $time): string
     {
         try {
-            $timeObj = \Carbon\Carbon::createFromFormat('H:i', $time);
+            $timeObj = Carbon::createFromFormat('H:i', $time);
             return $timeObj->format('g:i A');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $time;
         }
     }
@@ -185,15 +187,15 @@ class ScheduleSettingResource extends JsonResource
     private function getNotificationSummary(): string
     {
         $methods = [];
-        
+
         if ($this->email) {
             $methods[] = 'Email';
         }
-        
+
         if ($this->sms) {
             $methods[] = 'SMS';
         }
-        
+
         return empty($methods) ? 'None' : implode(' & ', $methods);
     }
 
@@ -214,7 +216,7 @@ class ScheduleSettingResource extends JsonResource
             'Friday' => 5,
             'Saturday' => 6,
         ];
-        
+
         return $days[$day] ?? 0;
     }
 }

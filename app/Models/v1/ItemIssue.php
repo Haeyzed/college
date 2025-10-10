@@ -64,27 +64,6 @@ class ItemIssue extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'item_id' => 'integer',
-            'user_id' => 'integer',
-            'quantity' => 'integer',
-            'issue_date' => 'date',
-            'due_date' => 'date',
-            'return_date' => 'date',
-            'penalty' => 'decimal:2',
-            'issued_by' => 'integer',
-            'received_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the item for the item issue.
      *
      * @return BelongsTo
@@ -134,5 +113,26 @@ class ItemIssue extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'item_id' => 'integer',
+            'user_id' => 'integer',
+            'quantity' => 'integer',
+            'issue_date' => 'date',
+            'due_date' => 'date',
+            'return_date' => 'date',
+            'penalty' => 'decimal:2',
+            'issued_by' => 'integer',
+            'received_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

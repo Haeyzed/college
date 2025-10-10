@@ -17,19 +17,6 @@ enum MemberType: string
     case STAFF = 'staff';
 
     /**
-     * Get the string representation of the member type.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::STUDENT => 'Student',
-            self::STAFF => 'Staff',
-        };
-    }
-
-    /**
      * Get all member type values as an array.
      *
      * @return array
@@ -47,6 +34,19 @@ enum MemberType: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the member type.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::STUDENT => 'Student',
+            self::STAFF => 'Staff',
+        };
     }
 
     /**

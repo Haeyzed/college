@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\BookCategory;
 use App\Enums\v1\Status;
+use App\Models\v1\BookCategory;
 use Illuminate\Database\Seeder;
 
 /**

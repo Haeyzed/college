@@ -46,19 +46,6 @@ class Language extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'default' => 'boolean',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the language version based on session or default.
      *
      * @return Language|null
@@ -97,5 +84,18 @@ class Language extends Model
             $q->whereLike('name', $search)
                 ->orWhereLike('code', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'default' => 'boolean',
+            'status' => 'boolean',
+        ];
     }
 }

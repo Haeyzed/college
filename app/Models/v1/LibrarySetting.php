@@ -47,21 +47,13 @@ class LibrarySetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get the active library setting.
      *
-     * @return array<string, string>
+     * @return LibrarySetting|null
      */
-    protected function casts(): array
+    public static function active(): ?LibrarySetting
     {
-        return [
-            'fine_per_day' => 'decimal:2',
-            'max_books_per_student' => 'integer',
-            'max_borrow_days' => 'integer',
-            'auto_approve_requests' => 'boolean',
-            'require_approval' => 'boolean',
-            'send_notifications' => 'boolean',
-            'status' => Status::class,
-        ];
+        return static::query()->where('status', Status::ACTIVE->value)->first();
     }
 
     /**
@@ -96,12 +88,20 @@ class LibrarySetting extends Model
     }
 
     /**
-     * Get the active library setting.
+     * Get the attributes that should be cast.
      *
-     * @return LibrarySetting|null
+     * @return array<string, string>
      */
-    public static function active(): ?LibrarySetting
+    protected function casts(): array
     {
-        return static::query()->where('status', Status::ACTIVE->value)->first();
+        return [
+            'fine_per_day' => 'decimal:2',
+            'max_books_per_student' => 'integer',
+            'max_borrow_days' => 'integer',
+            'auto_approve_requests' => 'boolean',
+            'require_approval' => 'boolean',
+            'send_notifications' => 'boolean',
+            'status' => Status::class,
+        ];
     }
 }

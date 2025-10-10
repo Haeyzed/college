@@ -69,22 +69,6 @@ class PrintSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'width' => 'integer',
-            'height' => 'integer',
-            'student_photo' => 'boolean',
-            'barcode' => 'boolean',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter print settings by status.
      *
      * @param Builder $query
@@ -113,5 +97,21 @@ class PrintSetting extends Model
                 ->orWhereLike('header_right', $search)
                 ->orWhereLike('body', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'width' => 'integer',
+            'height' => 'integer',
+            'student_photo' => 'boolean',
+            'barcode' => 'boolean',
+            'status' => 'boolean',
+        ];
     }
 }

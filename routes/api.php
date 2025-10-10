@@ -1,14 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /**
  * College Management System API Routes
- * 
+ *
  * Main API routes file that includes versioned API routes.
  * This file serves as the entry point for all API routes.
- * 
+ *
  * @package Routes\Api
  * @version 1.0.0
  * @author Softmax Technologies

@@ -2,13 +2,13 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\IssueStatus;
+use App\Enums\v1\MemberType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Enums\v1\MemberType;
-use App\Enums\v1\IssueStatus;
 
 /**
  * IssueReturn Model - Version 1
@@ -56,23 +56,6 @@ class IssueReturn extends Model
         'status',
         'note',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'issue_date' => 'datetime',
-            'due_date' => 'datetime',
-            'return_date' => 'datetime',
-            'fine_amount' => 'float',
-            'member_type' => MemberType::class,
-            'status' => IssueStatus::class,
-        ];
-    }
 
     /**
      * Get the book that owns the issue return.
@@ -128,5 +111,22 @@ class IssueReturn extends Model
     {
         return $query->where('due_date', '<', now())
             ->where('status', IssueStatus::ISSUED->value);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'issue_date' => 'datetime',
+            'due_date' => 'datetime',
+            'return_date' => 'datetime',
+            'fine_amount' => 'float',
+            'member_type' => MemberType::class,
+            'status' => IssueStatus::class,
+        ];
     }
 }

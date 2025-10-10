@@ -74,19 +74,6 @@ class AboutUs extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'language_id' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the language for the about us.
      *
      * @return BelongsTo
@@ -121,5 +108,18 @@ class AboutUs extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('label', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'language_id' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -62,26 +62,6 @@ class SMSNotify extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'faculty_id' => 'integer',
-            'program_id' => 'integer',
-            'session_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
-            'receive_count' => 'integer',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the faculty for the SMS notification.
      *
      * @return BelongsTo
@@ -151,5 +131,25 @@ class SMSNotify extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'faculty_id' => 'integer',
+            'program_id' => 'integer',
+            'session_id' => 'integer',
+            'semester_id' => 'integer',
+            'section_id' => 'integer',
+            'receive_count' => 'integer',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

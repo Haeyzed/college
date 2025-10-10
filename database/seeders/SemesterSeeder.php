@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\v1\Semester;
-use App\Enums\v1\Status;
 use App\Models\v1\Session;
 use Illuminate\Database\Seeder;
 

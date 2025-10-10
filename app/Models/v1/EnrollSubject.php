@@ -2,12 +2,15 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\Status;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -25,14 +28,14 @@ use OwenIt\Auditing\Contracts\Auditable;
  * @property int $semester_id
  * @property int $section_id
  * @property string $status
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $deleted_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
  *
  * @property-read Program $program
  * @property-read Semester $semester
  * @property-read Section $section
- * @property-read \Illuminate\Database\Eloquent\Collection|Subject[] $subjects
+ * @property-read Collection|Subject[] $subjects
  */
 class EnrollSubject extends Model implements Auditable
 {
@@ -50,19 +53,6 @@ class EnrollSubject extends Model implements Auditable
         'section_id',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the program for the enroll subject.
@@ -107,9 +97,9 @@ class EnrollSubject extends Model implements Auditable
     /**
      * Scope to filter enroll subjects by status.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @param string $status
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeFilterByStatus($query, string $status)
     {
@@ -119,9 +109,9 @@ class EnrollSubject extends Model implements Auditable
     /**
      * Scope to filter enroll subjects by program.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @param int $programId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeFilterByProgram($query, int $programId)
     {
@@ -131,9 +121,9 @@ class EnrollSubject extends Model implements Auditable
     /**
      * Scope to filter enroll subjects by semester.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @param int $semesterId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeFilterBySemester($query, int $semesterId)
     {
@@ -143,12 +133,25 @@ class EnrollSubject extends Model implements Auditable
     /**
      * Scope to filter enroll subjects by section.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param Builder $query
      * @param int $sectionId
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeFilterBySection($query, int $sectionId)
     {
         return $query->where('section_id', $sectionId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

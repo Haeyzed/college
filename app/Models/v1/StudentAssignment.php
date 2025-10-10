@@ -50,19 +50,6 @@ class StudentAssignment extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'marks' => 'float',
-            'submitted_at' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the assignment that owns the student assignment.
      *
      * @return BelongsTo
@@ -116,5 +103,18 @@ class StudentAssignment extends Model
     public function scopeFilterByAssignment($query, $assignmentId)
     {
         return $query->where('assignment_id', $assignmentId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'marks' => 'float',
+            'submitted_at' => 'datetime',
+        ];
     }
 }

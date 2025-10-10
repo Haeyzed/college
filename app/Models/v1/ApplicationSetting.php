@@ -3,8 +3,8 @@
 namespace App\Models\v1;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * ApplicationSetting Model - Version 1
@@ -44,17 +44,13 @@ class ApplicationSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get the application status setting.
      *
-     * @return array<string, string>
+     * @return ApplicationSetting|null
      */
-    protected function casts(): array
+    public static function status(): ?ApplicationSetting
     {
-        return [
-            'fee_amount' => 'decimal:2',
-            'pay_online' => 'boolean',
-            'status' => 'boolean',
-        ];
+        return static::query()->where('status', true)->first();
     }
 
     /**
@@ -89,12 +85,16 @@ class ApplicationSetting extends Model
     }
 
     /**
-     * Get the application status setting.
+     * Get the attributes that should be cast.
      *
-     * @return ApplicationSetting|null
+     * @return array<string, string>
      */
-    public static function status(): ?ApplicationSetting
+    protected function casts(): array
     {
-        return static::query()->where('status', true)->first();
+        return [
+            'fee_amount' => 'decimal:2',
+            'pay_online' => 'boolean',
+            'status' => 'boolean',
+        ];
     }
 }

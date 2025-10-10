@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\v1;
 
+use App\Helpers\StorageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Helpers\StorageHelper;
 
 /**
  * PrintSettingResource - Version 1
@@ -225,8 +225,8 @@ class PrintSettingResource extends JsonResource
              * @var string $configuration_summary
              * @example "Certificate Template (800x600) - College Name"
              */
-            'configuration_summary' => $this->title . 
-                ($this->width && $this->height ? ' (' . $this->width . 'x' . $this->height . ')' : '') . 
+            'configuration_summary' => $this->title .
+                ($this->width && $this->height ? ' (' . $this->width . 'x' . $this->height . ')' : '') .
                 ($this->header_left ? ' - ' . $this->header_left : ''),
 
             /**

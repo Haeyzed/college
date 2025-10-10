@@ -46,19 +46,6 @@ class HostelRoomType extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'fee' => 'decimal:2',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the rooms for the hostel room type.
      *
      * @return HasMany
@@ -90,5 +77,18 @@ class HostelRoomType extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'fee' => 'decimal:2',
+            'status' => 'boolean',
+        ];
     }
 }

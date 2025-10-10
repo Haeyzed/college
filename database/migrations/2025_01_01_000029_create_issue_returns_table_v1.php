@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Issue Returns Table Migration - Version 1
- * 
+ *
  * This migration creates the issue_returns table for the College Management System.
  * It handles book issue and return information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -35,7 +34,7 @@ return new class extends Migration
             $table->foreignId('issued_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            
+
             $table->index(['member_id', 'book_id']);
             $table->index(['status']);
             $table->index(['due_date']);

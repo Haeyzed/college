@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Exam Model - Version 1
@@ -51,18 +50,6 @@ class Exam extends Model
         'grade',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'marks' => 'float',
-        ];
-    }
 
     /**
      * Get the student that owns the exam.
@@ -128,5 +115,17 @@ class Exam extends Model
     public function scopeFilterBySubject($query, $subjectId)
     {
         return $query->where('subject_id', $subjectId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'marks' => 'float',
+        ];
     }
 }

@@ -48,18 +48,6 @@ class SMSSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter SMS settings by status.
      *
      * @param Builder $query
@@ -69,5 +57,17 @@ class SMSSetting extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

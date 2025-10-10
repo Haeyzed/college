@@ -2,17 +2,17 @@
 
 namespace App\Imports\v1;
 
-use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Illuminate\Support\Facades\Log;
-use App\Models\v1\Student;
 use App\Models\v1\Batch;
 use App\Models\v1\Program;
+use App\Models\v1\Student;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
 /**
  * StudentsImport - Version 1
@@ -99,6 +99,18 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     }
 
     /**
+     * Generate a unique student ID.
+     *
+     * @return string
+     */
+    protected function generateStudentId(): string
+    {
+        $year = now()->year;
+        $count = Student::whereYear('created_at', $year)->count() + 1;
+        return 'STU' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Get the validation rules.
      *
      * @return array
@@ -123,17 +135,5 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
             'admission_date' => 'nullable|date',
             'status' => 'nullable|in:active,inactive,graduated,suspended',
         ];
-    }
-
-    /**
-     * Generate a unique student ID.
-     *
-     * @return string
-     */
-    protected function generateStudentId(): string
-    {
-        $year = now()->year;
-        $count = Student::whereYear('created_at', $year)->count() + 1;
-        return 'STU' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 }

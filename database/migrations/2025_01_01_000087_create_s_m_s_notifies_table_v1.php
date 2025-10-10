@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create SMS Notifies Table Migration - Version 1
- * 
+ *
  * This migration creates the s_m_s_notifies table for the College Management System.
  * It handles SMS notification information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -36,7 +35,7 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            
+
             $table->index(['faculty_id', 'program_id', 'session_id']);
             $table->index(['status']);
         });

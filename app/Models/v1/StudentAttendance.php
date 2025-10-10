@@ -54,18 +54,6 @@ class StudentAttendance extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'attendance_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the student that owns the attendance.
      *
      * @return BelongsTo
@@ -140,5 +128,17 @@ class StudentAttendance extends Model
     public function scopeFilterByDateRange($query, $startDate, $endDate)
     {
         return $query->whereBetween('attendance_date', [$startDate, $endDate]);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'attendance_date' => 'datetime',
+        ];
     }
 }

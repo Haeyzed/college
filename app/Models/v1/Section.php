@@ -2,19 +2,14 @@
 
 namespace App\Models\v1;
 
-use App\Models\v1\ClassRoutine;
-use App\Models\v1\Content;
-use App\Models\v1\ProgramSemesterSection;
-use App\Models\v1\StudentEnroll;
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -62,19 +57,6 @@ class Section extends Model implements Auditable
         'description',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the program semester sections associated with the section.
@@ -175,5 +157,18 @@ class Section extends Model implements Auditable
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

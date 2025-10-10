@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands\v1;
 
+use App\Models\v1\Notice;
 use Exception;
 use Illuminate\Console\Command;
-use App\Models\v1\Notice;
 
 /**
  * NoticePublishDate Command - Version 1

@@ -71,18 +71,6 @@ class Complain extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the type that owns the complaint.
      *
      * @return BelongsTo
@@ -172,5 +160,17 @@ class Complain extends Model
                 ->orWhereLike('phone', $search)
                 ->orWhereLike('issue', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime',
+        ];
     }
 }

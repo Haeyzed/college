@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Application Model - Version 1
@@ -156,24 +155,6 @@ class Application extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'apply_date' => 'datetime',
-            'dob' => 'datetime',
-            'school_graduation_year' => 'integer',
-            'school_graduation_point' => 'float',
-            'collage_graduation_year' => 'integer',
-            'collage_graduation_point' => 'float',
-            'fee_amount' => 'float',
-        ];
-    }
-
-    /**
      * Get the batch that owns the application.
      *
      * @return BelongsTo
@@ -296,5 +277,23 @@ class Application extends Model
                 ->orWhereLike('email', $search)
                 ->orWhereLike('registration_no', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'apply_date' => 'datetime',
+            'dob' => 'datetime',
+            'school_graduation_year' => 'integer',
+            'school_graduation_point' => 'float',
+            'collage_graduation_year' => 'integer',
+            'collage_graduation_point' => 'float',
+            'fee_amount' => 'float',
+        ];
     }
 }

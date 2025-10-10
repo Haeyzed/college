@@ -116,15 +116,15 @@ class SmsSettingResource extends JsonResource
              * @var bool $has_credentials
              * @example true
              */
-            'has_credentials' => (!empty($this->nexmo_key) && !empty($this->nexmo_secret)) || 
-                                (!empty($this->twilio_sid) && !empty($this->twilio_auth_token)),
+            'has_credentials' => (!empty($this->nexmo_key) && !empty($this->nexmo_secret)) ||
+                (!empty($this->twilio_sid) && !empty($this->twilio_auth_token)),
 
             /**
              * The masked API key for display.
              * @var string|null $masked_api_key
              * @example "nex***key"
              */
-            'masked_api_key' => $this->nexmo_key 
+            'masked_api_key' => $this->nexmo_key
                 ? substr($this->nexmo_key, 0, 3) . '***' . substr($this->nexmo_key, -3)
                 : ($this->twilio_sid ? substr($this->twilio_sid, 0, 3) . '***' . substr($this->twilio_sid, -3) : null),
         ];

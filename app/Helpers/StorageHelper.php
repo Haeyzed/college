@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Exception;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -16,6 +17,21 @@ use Illuminate\Support\Facades\Storage;
  */
 class StorageHelper
 {
+    /**
+     * Get the URL for a file with specific disk configuration.
+     * Useful for settings that have their own disk configuration.
+     *
+     * @param string|null $filePath
+     * @param string $configKey The config key for the disk (e.g., 'filesystems.print_settings_disk')
+     * @param string $defaultDisk Default disk if config not found
+     * @return string|null
+     */
+    public static function getConfigurableStorageUrl(?string $filePath, string $configKey, string $defaultDisk = 'public'): ?string
+    {
+        $disk = config($configKey, $defaultDisk);
+        return self::getStorageUrl($filePath, $disk);
+    }
+
     /**
      * Get the URL for a file path, handling different filesystem disks.
      * This is a reusable method that can work with any file type and disk configuration.
@@ -51,17 +67,17 @@ class StorageHelper
             if (Storage::disk($disk)->exists($filePath)) {
                 return Storage::disk($disk)->url($filePath);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // If the specified disk fails, try fallback disks
             $fallbackDisks = $fallbackDisk ? [$fallbackDisk] : ['public', 's3', 'local', 'ftp'];
-            
+
             foreach ($fallbackDisks as $fallbackDiskName) {
                 if ($fallbackDiskName !== $disk && config("filesystems.disks.{$fallbackDiskName}")) {
                     try {
                         if (Storage::disk($fallbackDiskName)->exists($filePath)) {
                             return Storage::disk($fallbackDiskName)->url($filePath);
                         }
-                    } catch (\Exception $e2) {
+                    } catch (Exception $e2) {
                         // Continue to next fallback
                         continue;
                     }
@@ -79,21 +95,6 @@ class StorageHelper
     }
 
     /**
-     * Get the URL for a file with specific disk configuration.
-     * Useful for settings that have their own disk configuration.
-     *
-     * @param string|null $filePath
-     * @param string $configKey The config key for the disk (e.g., 'filesystems.print_settings_disk')
-     * @param string $defaultDisk Default disk if config not found
-     * @return string|null
-     */
-    public static function getConfigurableStorageUrl(?string $filePath, string $configKey, string $defaultDisk = 'public'): ?string
-    {
-        $disk = config($configKey, $defaultDisk);
-        return self::getStorageUrl($filePath, $disk);
-    }
-
-    /**
      * Get the URL for an image file with common image processing options.
      *
      * @param string|null $imagePath
@@ -104,12 +105,12 @@ class StorageHelper
     public static function getImageUrl(?string $imagePath, ?string $disk = null, bool $addTimestamp = false): ?string
     {
         $url = self::getStorageUrl($imagePath, $disk);
-        
+
         if ($url && $addTimestamp && file_exists(public_path('storage/' . $imagePath))) {
             $timestamp = filemtime(public_path('storage/' . $imagePath));
             $url .= '?v=' . $timestamp;
         }
-        
+
         return $url;
     }
 
@@ -139,11 +140,11 @@ class StorageHelper
                 if (Storage::disk($disk)->exists($filePath)) {
                     return true;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 continue;
             }
         }
-        
+
         return false;
     }
 
@@ -173,7 +174,7 @@ class StorageHelper
                 'last_modified' => Storage::disk($disk)->lastModified($filePath),
                 'url' => self::getStorageUrl($filePath, $disk),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

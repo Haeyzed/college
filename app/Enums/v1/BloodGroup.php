@@ -23,25 +23,6 @@ enum BloodGroup: string
     case O_NEGATIVE = 'o_negative';
 
     /**
-     * Get the label for the blood group.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::A_POSITIVE => 'A+',
-            self::A_NEGATIVE => 'A-',
-            self::B_POSITIVE => 'B+',
-            self::B_NEGATIVE => 'B-',
-            self::AB_POSITIVE => 'AB+',
-            self::AB_NEGATIVE => 'AB-',
-            self::O_POSITIVE => 'O+',
-            self::O_NEGATIVE => 'O-',
-        };
-    }
-
-    /**
      * Get all blood group options with labels.
      *
      * @return array
@@ -54,5 +35,24 @@ enum BloodGroup: string
                 'label' => $case->label(),
             ];
         })->toArray();
+    }
+
+    /**
+     * Get the label for the blood group.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::A_POSITIVE => 'A+',
+            self::A_NEGATIVE => 'A-',
+            self::B_POSITIVE => 'B+',
+            self::B_NEGATIVE => 'B-',
+            self::AB_POSITIVE => 'AB+',
+            self::AB_NEGATIVE => 'AB-',
+            self::O_POSITIVE => 'O+',
+            self::O_NEGATIVE => 'O-',
+        };
     }
 }

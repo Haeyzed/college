@@ -46,18 +46,6 @@ class IncomeCategory extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the incomes for the income category.
      *
      * @return HasMany
@@ -92,5 +80,17 @@ class IncomeCategory extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

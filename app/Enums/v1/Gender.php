@@ -18,20 +18,6 @@ enum Gender: string
     case OTHER = 'other';
 
     /**
-     * Get the label for the gender.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::MALE => 'Male',
-            self::FEMALE => 'Female',
-            self::OTHER => 'Other',
-        };
-    }
-
-    /**
      * Get all gender options with labels.
      *
      * @return array
@@ -44,5 +30,19 @@ enum Gender: string
                 'label' => $case->label(),
             ];
         })->toArray();
+    }
+
+    /**
+     * Get the label for the gender.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::MALE => 'Male',
+            self::FEMALE => 'Female',
+            self::OTHER => 'Other',
+        };
     }
 }

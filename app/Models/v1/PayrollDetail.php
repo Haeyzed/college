@@ -49,22 +49,6 @@ class PayrollDetail extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'payroll_id' => 'integer',
-            'amount' => 'decimal:2',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the payroll for the payroll detail.
      *
      * @return BelongsTo
@@ -84,5 +68,21 @@ class PayrollDetail extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'payroll_id' => 'integer',
+            'amount' => 'decimal:2',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

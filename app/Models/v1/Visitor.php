@@ -77,24 +77,6 @@ class Visitor extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'purpose_id' => 'integer',
-            'department_id' => 'integer',
-            'persons' => 'integer',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'date' => 'date',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the visit purpose for the visitor.
      *
      * @return BelongsTo
@@ -150,5 +132,23 @@ class Visitor extends Model
                 ->orWhereLike('phone', $search)
                 ->orWhereLike('email', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'purpose_id' => 'integer',
+            'department_id' => 'integer',
+            'persons' => 'integer',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'date' => 'date',
+            'status' => 'boolean',
+        ];
     }
 }

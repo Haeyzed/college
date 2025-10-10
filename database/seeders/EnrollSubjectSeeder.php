@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\v1\Status;
 use App\Models\v1\EnrollSubject;
 use App\Models\v1\Program;
-use App\Models\v1\Semester;
 use App\Models\v1\Section;
+use App\Models\v1\Semester;
 use App\Models\v1\Subject;
-use App\Enums\v1\Status;
 use Illuminate\Database\Seeder;
 
 /**
@@ -39,11 +39,11 @@ class EnrollSubjectSeeder extends Seeder
             foreach ($semesters as $semester) {
                 // Get sections for this program's batches
                 $programSections = $sections->where('batch.program_id', $program->id);
-                
+
                 foreach ($programSections as $section) {
                     // Get relevant subjects for this program
                     $programSubjects = $this->getSubjectsForProgram($program, $subjects);
-                    
+
                     if (!empty($programSubjects)) {
                         $enrollSubject = EnrollSubject::firstOrCreate(
                             [
@@ -61,7 +61,7 @@ class EnrollSubjectSeeder extends Seeder
 
                         // Attach subjects to this enroll subject
                         $enrollSubject->subjects()->sync($programSubjects);
-                        
+
                         $enrollSubjects[] = $enrollSubject;
                     }
                 }

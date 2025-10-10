@@ -2,17 +2,17 @@
 
 namespace App\Imports\v1;
 
-use Exception;
-use Illuminate\Database\Eloquent\Model;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Illuminate\Support\Facades\Log;
 use App\Models\v1\Application;
 use App\Models\v1\Batch;
 use App\Models\v1\Program;
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
 
 /**
  * ApplicationsImport - Version 1
@@ -101,6 +101,18 @@ class ApplicationsImport implements ToModel, WithHeadingRow, WithValidation, Wit
     }
 
     /**
+     * Generate a unique registration number.
+     *
+     * @return string
+     */
+    protected function generateRegistrationNo(): string
+    {
+        $year = now()->year;
+        $count = Application::whereYear('created_at', $year)->count() + 1;
+        return 'APP' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Get the validation rules.
      *
      * @return array
@@ -127,17 +139,5 @@ class ApplicationsImport implements ToModel, WithHeadingRow, WithValidation, Wit
             'payment_status' => 'nullable|in:paid,unpaid,partial',
             'status' => 'nullable|in:pending,approved,rejected',
         ];
-    }
-
-    /**
-     * Generate a unique registration number.
-     *
-     * @return string
-     */
-    protected function generateRegistrationNo(): string
-    {
-        $year = now()->year;
-        $count = Application::whereYear('created_at', $year)->count() + 1;
-        return 'APP' . $year . str_pad($count, 4, '0', STR_PAD_LEFT);
     }
 }

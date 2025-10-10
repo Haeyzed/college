@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands\v1;
 
+use App\Jobs\v1\SMSFeesReminderJob;
+use App\Models\v1\Fee;
 use Exception;
 use Illuminate\Console\Command;
-use App\Models\v1\Fee;
-use App\Jobs\v1\SMSFeesReminderJob;
 use Illuminate\Database\Eloquent\Collection;
 
 /**

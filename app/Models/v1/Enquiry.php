@@ -75,27 +75,6 @@ class Enquiry extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'reference_id' => 'integer',
-            'source_id' => 'integer',
-            'program_id' => 'integer',
-            'assigned' => 'integer',
-            'number_of_students' => 'integer',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'date' => 'date',
-            'follow_up_date' => 'date',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the enquiry reference for the enquiry.
      *
      * @return BelongsTo
@@ -171,5 +150,26 @@ class Enquiry extends Model
                 ->orWhereLike('email', $search)
                 ->orWhereLike('phone', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'reference_id' => 'integer',
+            'source_id' => 'integer',
+            'program_id' => 'integer',
+            'assigned' => 'integer',
+            'number_of_students' => 'integer',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'date' => 'date',
+            'follow_up_date' => 'date',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -7,9 +7,7 @@ use App\Http\Requests\v1\PrintSettingRequest;
 use App\Http\Resources\v1\PrintSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * PrintSettingsController - Version 1
@@ -74,22 +72,22 @@ class PrintSettingsController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            
+
             // Handle file uploads
             if ($request->hasFile('logo_left_file')) {
                 $validatedData['logo_left_file'] = $request->file('logo_left_file');
             }
-            
+
             if ($request->hasFile('logo_right_file')) {
                 $validatedData['logo_right_file'] = $request->file('logo_right_file');
             }
-            
+
             if ($request->hasFile('background_file')) {
                 $validatedData['background_file'] = $request->file('background_file');
             }
-            
+
             $result = $this->settingsService->updateOrCreatePrintSetting($validatedData);
-            
+
             return response()->success(
                 new PrintSettingResource($result),
                 'Print setting updated successfully'

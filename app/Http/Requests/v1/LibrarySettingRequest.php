@@ -3,6 +3,7 @@
 namespace App\Http\Requests\v1;
 
 use App\Http\Requests\BaseRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 
 /**
@@ -118,7 +119,7 @@ class LibrarySettingRequest extends BaseRequest
 
             /**
              * The library logo file.
-             * @var \Illuminate\Http\UploadedFile|null $logo_file
+             * @var UploadedFile|null $logo_file
              */
             'logo_file' => [
                 'nullable',
@@ -129,7 +130,7 @@ class LibrarySettingRequest extends BaseRequest
 
             /**
              * The background image file.
-             * @var \Illuminate\Http\UploadedFile|null $background_file
+             * @var UploadedFile|null $background_file
              */
             'background_file' => [
                 'nullable',

@@ -3,9 +3,9 @@
 namespace App\Traits\v1;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Http\Request;
 
-trait EnvironmentVariable {
+trait EnvironmentVariable
+{
 
     /**
      * Update or create an environment variable in the .env file.

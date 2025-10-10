@@ -46,18 +46,6 @@ class WorkShiftType extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the staffs for the work shift type.
      *
      * @return HasMany
@@ -92,5 +80,17 @@ class WorkShiftType extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

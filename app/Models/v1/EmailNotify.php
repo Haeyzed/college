@@ -64,26 +64,6 @@ class EmailNotify extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'faculty_id' => 'integer',
-            'program_id' => 'integer',
-            'session_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
-            'receive_count' => 'integer',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the faculty for the email notification.
      *
      * @return BelongsTo
@@ -168,5 +148,25 @@ class EmailNotify extends Model
             $q->whereLike('subject', $search)
                 ->orWhereLike('message', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'faculty_id' => 'integer',
+            'program_id' => 'integer',
+            'session_id' => 'integer',
+            'semester_id' => 'integer',
+            'section_id' => 'integer',
+            'receive_count' => 'integer',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

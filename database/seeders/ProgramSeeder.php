@@ -3,9 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\v1\Program;
-use App\Models\v1\Faculty;
-use App\Enums\v1\Status;
-use App\Enums\v1\DegreeType;
 use Illuminate\Database\Seeder;
 
 /**

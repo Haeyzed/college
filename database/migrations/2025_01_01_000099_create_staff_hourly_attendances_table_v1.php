@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Staff Hourly Attendances Table Migration - Version 1
- * 
+ *
  * This migration creates the staff_hourly_attendances table for the College Management System.
  * It handles staff hourly attendance information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -39,7 +38,7 @@ return new class extends Migration
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            
+
             $table->index(['user_id', 'date']);
             $table->index(['subject_id', 'date']);
             $table->index(['date']);

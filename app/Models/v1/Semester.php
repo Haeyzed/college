@@ -2,12 +2,7 @@
 
 namespace App\Models\v1;
 
-use App\Models\v1\ClassRoutine;
-use App\Models\v1\Content;
-use App\Models\v1\Program;
-use App\Models\v1\ProgramSemesterSection;
-use App\Models\v1\StudentEnroll;
-use App\Models\v1\Session; // Added missing use statement for Session
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,8 +11,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
 use OwenIt\Auditing\Contracts\Auditable;
+
+// Added missing use statement for Session
 
 /**
  * Semester Model - Version 1
@@ -72,22 +68,6 @@ class Semester extends Model implements Auditable
         'description',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'is_current' => 'boolean',
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the program semester sections associated with the semester.
@@ -188,5 +168,21 @@ class Semester extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'is_current' => 'boolean',
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

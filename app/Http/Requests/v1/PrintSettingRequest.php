@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\v1;
 
-use App\Http\Requests\BaseRequest;
-use Illuminate\Validation\Rule;
 use App\Enums\v1\Status;
+use App\Http\Requests\BaseRequest;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\Rule;
 
 /**
  * PrintSettingRequest - Version 1
@@ -117,7 +118,7 @@ class PrintSettingRequest extends BaseRequest
 
             /**
              * The left logo file upload.
-             * @var \Illuminate\Http\UploadedFile|null $logo_left_file
+             * @var UploadedFile|null $logo_left_file
              * @example "college_logo.png"
              */
             'logo_left_file' => [
@@ -129,7 +130,7 @@ class PrintSettingRequest extends BaseRequest
 
             /**
              * The right logo file upload.
-             * @var \Illuminate\Http\UploadedFile|null $logo_right_file
+             * @var UploadedFile|null $logo_right_file
              * @example "university_logo.png"
              */
             'logo_right_file' => [
@@ -141,7 +142,7 @@ class PrintSettingRequest extends BaseRequest
 
             /**
              * The background image file upload.
-             * @var \Illuminate\Http\UploadedFile|null $background_file
+             * @var UploadedFile|null $background_file
              * @example "certificate_bg.jpg"
              */
             'background_file' => [
@@ -304,25 +305,25 @@ class PrintSettingRequest extends BaseRequest
     protected function prepareForValidation(): void
     {
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
-        
+
         // Convert string boolean values to actual booleans
         $dataToMerge = [];
-        
+
         if ($this->has('student_photo')) {
             $dataToMerge['student_photo'] = $this->convertToBoolean($this->student_photo);
         }
-        
+
         if ($this->has('barcode')) {
             $dataToMerge['barcode'] = $this->convertToBoolean($this->barcode);
         }
-        
+
         if ($isUpdate) {
             $dataToMerge['updated_by'] = auth()->id() ?? 1;
         } else {
             $dataToMerge['created_by'] = auth()->id() ?? 1;
             $dataToMerge['status'] = $this->status ?? Status::ACTIVE->value; // Default to active
         }
-        
+
         if (!empty($dataToMerge)) {
             $this->merge($dataToMerge);
         }
@@ -339,7 +340,7 @@ class PrintSettingRequest extends BaseRequest
         if (is_bool($value)) {
             return $value;
         }
-        
+
         // Use PHP's built-in filter for boolean validation
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
     }

@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Applications Table Migration - Version 1
- * 
+ *
  * This migration creates the applications table for the College Management System.
  * It handles student application information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -57,7 +56,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->string('emergency_phone')->nullable();
-            
+
             $table->string('religion')->nullable();
             $table->string('caste')->nullable();
             $table->string('mother_tongue')->nullable();
@@ -82,7 +81,7 @@ return new class extends Migration
             $table->decimal('collage_graduation_point', 5, 2)->nullable();
             $table->string('collage_transcript')->nullable();
             $table->string('collage_certificate')->nullable();
-            
+
             // Documents
             $table->text('photo')->nullable();
             $table->text('signature')->nullable();
@@ -92,7 +91,7 @@ return new class extends Migration
             $table->tinyInteger('pay_status')->default(0)->comment('0 Unpaid, 1 Paid, 2 Cancel');
             $table->string('payment_method')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0 Rejected, 1 Pending, 2 Approve');
-            
+
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

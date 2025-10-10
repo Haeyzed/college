@@ -58,18 +58,6 @@ class ItemSupplier extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the stocks for the item supplier.
      *
      * @return HasMany
@@ -105,5 +93,17 @@ class ItemSupplier extends Model
                 ->orWhereLike('email', $search)
                 ->orWhereLike('phone', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

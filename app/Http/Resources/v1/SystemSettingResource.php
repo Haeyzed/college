@@ -207,8 +207,8 @@ class SystemSettingResource extends JsonResource
              * @var string $configuration_summary
              * @example "College Management System (CMS2024) - info@college.edu"
              */
-            'configuration_summary' => ($this->title ?: 'System') . 
-                ($this->academy_code ? ' (' . $this->academy_code . ')' : '') . 
+            'configuration_summary' => ($this->title ?: 'System') .
+                ($this->academy_code ? ' (' . $this->academy_code . ')' : '') .
                 ($this->email ? ' - ' . $this->email : ''),
 
             /**

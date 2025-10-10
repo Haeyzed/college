@@ -77,24 +77,6 @@ class MeetingSchedule extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'type_id' => 'integer',
-            'user_id' => 'integer',
-            'persons' => 'integer',
-            'date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the meeting type for the meeting schedule.
      *
      * @return BelongsTo
@@ -150,5 +132,23 @@ class MeetingSchedule extends Model
                 ->orWhereLike('phone', $search)
                 ->orWhereLike('email', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'type_id' => 'integer',
+            'user_id' => 'integer',
+            'persons' => 'integer',
+            'date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

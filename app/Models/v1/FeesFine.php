@@ -48,21 +48,6 @@ class FeesFine extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_day' => 'integer',
-            'end_day' => 'integer',
-            'amount' => 'decimal:2',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the fees categories for the fees fine.
      *
      * @return BelongsToMany
@@ -82,5 +67,20 @@ class FeesFine extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_day' => 'integer',
+            'end_day' => 'integer',
+            'amount' => 'decimal:2',
+            'status' => 'boolean',
+        ];
     }
 }

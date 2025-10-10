@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Enums\v1\Status;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -62,19 +62,6 @@ class Faculty extends Model implements Auditable
         'dean_phone',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Boot the model.
@@ -132,5 +119,18 @@ class Faculty extends Model implements Auditable
                 ->orWhere('code', 'LIKE', '%' . $search . '%')
                 ->orWhere('dean_name', 'LIKE', '%' . $search . '%');
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

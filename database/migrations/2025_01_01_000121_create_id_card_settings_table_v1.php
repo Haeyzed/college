@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create ID Card Settings Table Migration - Version 1
- * 
+ *
  * This migration creates the id_card_settings table for the College Management System.
  * It handles ID card settings information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -39,7 +38,7 @@ return new class extends Migration
             $table->boolean('barcode')->default(false);
             $table->string('status')->default('active');
             $table->timestamps();
-            
+
             $table->index(['status']);
         });
     }

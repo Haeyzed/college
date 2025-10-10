@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests\v1;
 
-use App\Http\Requests\BaseRequest;
 use App\Enums\v1\Status;
+use App\Http\Requests\BaseRequest;
+use App\Models\v1\EnrollSubject;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 /**
  * EnrollSubject Request - Version 1
@@ -31,7 +34,7 @@ class EnrollSubjectRequest extends BaseRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -104,7 +107,7 @@ class EnrollSubjectRequest extends BaseRequest
     /**
      * Configure the validator instance.
      *
-     * @param \Illuminate\Validation\Validator $validator
+     * @param Validator $validator
      * @return void
      */
     public function withValidator($validator)
@@ -117,7 +120,7 @@ class EnrollSubjectRequest extends BaseRequest
                 $enrollSubjectId = $this->route('id');
 
                 // Check for duplicate combination (excluding current record for updates)
-                $query = \App\Models\v1\EnrollSubject::query()
+                $query = EnrollSubject::query()
                     ->where('program_id', $programId)
                     ->where('semester_id', $semesterId)
                     ->where('section_id', $sectionId);

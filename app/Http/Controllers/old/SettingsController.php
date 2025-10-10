@@ -3,21 +3,11 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\v1\ApplicationSettingRequest;
-use App\Http\Requests\v1\MailSettingRequest;
-use App\Http\Requests\v1\SmsSettingRequest;
-use App\Http\Requests\v1\SocialSettingRequest;
 use App\Http\Requests\v1\SystemSettingRequest;
-use App\Http\Resources\v1\ApplicationSettingResource;
-use App\Http\Resources\v1\MailSettingResource;
-use App\Http\Resources\v1\SmsSettingResource;
-use App\Http\Resources\v1\SocialSettingResource;
-use App\Http\Resources\v1\SystemSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * SettingsController - Version 1

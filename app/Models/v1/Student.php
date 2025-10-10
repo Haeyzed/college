@@ -3,18 +3,17 @@
 namespace App\Models\v1;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 /**
  * Student Model - Version 1
@@ -188,22 +187,17 @@ class Student extends Authenticatable implements AuthenticatableContract
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get current enrollment for a student.
      *
-     * @return array<string, string>
+     * @param int $id
+     * @return StudentEnroll|null
      */
-    protected function casts(): array
+    public static function enroll($id)
     {
-        return [
-            'admission_date' => 'datetime',
-            'dob' => 'datetime',
-            'school_graduation_year' => 'integer',
-            'school_graduation_point' => 'float',
-            'collage_graduation_year' => 'integer',
-            'collage_graduation_point' => 'float',
-            'is_transfer' => 'boolean',
-            'password' => 'hashed',
-        ];
+        return StudentEnroll::where('student_id', $id)
+            ->where('status', '1')
+            ->orderBy('id', 'desc')
+            ->first();
     }
 
     /**
@@ -465,20 +459,6 @@ class Student extends Authenticatable implements AuthenticatableContract
     }
 
     /**
-     * Get current enrollment for a student.
-     *
-     * @param int $id
-     * @return StudentEnroll|null
-     */
-    public static function enroll($id)
-    {
-        return StudentEnroll::where('student_id', $id)
-            ->where('status', '1')
-            ->orderBy('id', 'desc')
-            ->first();
-    }
-
-    /**
      * Scope to filter students by status.
      *
      * @param Builder $query
@@ -530,5 +510,24 @@ class Student extends Authenticatable implements AuthenticatableContract
                 ->orWhereLike('student_id', $search)
                 ->orWhereLike('registration_no', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'admission_date' => 'datetime',
+            'dob' => 'datetime',
+            'school_graduation_year' => 'integer',
+            'school_graduation_point' => 'float',
+            'collage_graduation_year' => 'integer',
+            'collage_graduation_point' => 'float',
+            'is_transfer' => 'boolean',
+            'password' => 'hashed',
+        ];
     }
 }

@@ -15,8 +15,7 @@ use Illuminate\Support\Facades\Schema;
  * @version 2.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *

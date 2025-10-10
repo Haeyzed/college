@@ -2,6 +2,8 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\RoomType;
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,8 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
-use App\Enums\v1\RoomType;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -65,22 +65,6 @@ class ClassRoom extends Model implements Auditable
         'is_available',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'facilities' => 'array',
-            'is_available' => 'boolean',
-            'room_type' => RoomType::class,
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the programs for the classroom.
@@ -196,5 +180,21 @@ class ClassRoom extends Model implements Auditable
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'facilities' => 'array',
+            'is_available' => 'boolean',
+            'room_type' => RoomType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

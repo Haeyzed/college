@@ -46,21 +46,6 @@ class Grade extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'point' => 'decimal:2',
-            'min_mark' => 'integer',
-            'max_mark' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter grades by status.
      *
      * @param Builder $query
@@ -82,5 +67,20 @@ class Grade extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'point' => 'decimal:2',
+            'min_mark' => 'integer',
+            'max_mark' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -2,14 +2,15 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\BookRequestStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\BookRequestStatus;
 use OwenIt\Auditing\Contracts\Auditable;
+use Storage;
 
 /**
  * BookRequest Model - Version 1
@@ -83,19 +84,20 @@ class BookRequest extends Model implements Auditable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Boot the model.
+     * Handle image deletion on force delete.
      */
-    protected function casts(): array
+    protected static function boot(): void
     {
-        return [
-            'price' => 'decimal:2',
-            'quantity' => 'integer',
-            'publication_year' => 'integer',
-            'status' => BookRequestStatus::class,
-            'deleted_at' => 'datetime',
-        ];
+        parent::boot();
+
+        // Handle image deletion on force delete
+        static::deleting(function ($bookRequest) {
+            if ($bookRequest->isForceDeleting() && $bookRequest->cover_image_path) {
+                // Delete the image file when force deleting
+                Storage::disk('public')->delete($bookRequest->cover_image_path);
+            }
+        });
     }
 
     /**
@@ -160,8 +162,7 @@ class BookRequest extends Model implements Auditable
                 ->orWhereLike('accession_number', $search)
                 ->orWhereLike('requester_name', $search)
                 ->orWhereLike('requester_phone', $search)
-                ->orWhereLike('requester_email', $search)
-            ;
+                ->orWhereLike('requester_email', $search);
         });
     }
 
@@ -178,19 +179,18 @@ class BookRequest extends Model implements Auditable
     }
 
     /**
-     * Boot the model.
-     * Handle image deletion on force delete.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    protected static function boot(): void
+    protected function casts(): array
     {
-        parent::boot();
-
-        // Handle image deletion on force delete
-        static::deleting(function ($bookRequest) {
-            if ($bookRequest->isForceDeleting() && $bookRequest->cover_image_path) {
-                // Delete the image file when force deleting
-                \Storage::disk('public')->delete($bookRequest->cover_image_path);
-            }
-        });
+        return [
+            'price' => 'decimal:2',
+            'quantity' => 'integer',
+            'publication_year' => 'integer',
+            'status' => BookRequestStatus::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

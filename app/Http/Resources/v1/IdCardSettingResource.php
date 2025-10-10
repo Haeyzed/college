@@ -64,7 +64,7 @@ class IdCardSettingResource extends JsonResource
              * The address for the ID card.
              * @var string|null $address
              * @example "123 College Street, City, State 12345"
-             */ 
+             */
             'address' => $this->address,
 
             /**

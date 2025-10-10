@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Students Table Migration - Version 1
- * 
+ *
  * This migration creates the students table for the College Management System.
  * It handles student information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -63,7 +62,7 @@ return new class extends Migration
             $table->date('dob');
             $table->string('phone')->nullable();
             $table->string('emergency_phone')->nullable();
-            
+
             $table->string('religion')->nullable();
             $table->string('caste')->nullable();
             $table->string('mother_tongue')->nullable();
@@ -88,7 +87,7 @@ return new class extends Migration
             $table->decimal('collage_graduation_point', 5, 2)->nullable();
             $table->string('collage_transcript')->nullable();
             $table->string('collage_certificate')->nullable();
-            
+
             // Documents
             $table->text('photo')->nullable();
             $table->text('signature')->nullable();
@@ -97,7 +96,7 @@ return new class extends Migration
             $table->boolean('login')->default(true);
             $table->tinyInteger('status')->default(1)->comment('0 Inactive, 1 Active, 2 Passed Out, 3 Transfer Out');
             $table->boolean('is_transfer')->default(false)->comment('0 Not Transfer, 1 Transfer In');
-            
+
             $table->rememberToken();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

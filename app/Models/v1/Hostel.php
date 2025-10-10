@@ -54,18 +54,6 @@ class Hostel extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'capacity' => 'integer',
-        ];
-    }
-
-    /**
      * Get the rooms for the hostel.
      *
      * @return HasMany
@@ -112,5 +100,17 @@ class Hostel extends Model
             $q->whereLike('name', $search)
                 ->orWhereLike('warden_name', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'capacity' => 'integer',
+        ];
     }
 }

@@ -75,18 +75,6 @@ class Notice extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the category that owns the notice.
      *
      * @return BelongsTo
@@ -216,5 +204,17 @@ class Notice extends Model
                 ->orWhereLike('description', $search)
                 ->orWhereLike('notice_no', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime',
+        ];
     }
 }

@@ -52,18 +52,6 @@ class ItemStore extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the stocks for the item store.
      *
      * @return HasMany
@@ -98,5 +86,17 @@ class ItemStore extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('store_no', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => 'boolean',
+        ];
     }
 }

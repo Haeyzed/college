@@ -7,9 +7,7 @@ use App\Http\Requests\v1\IdCardSettingRequest;
 use App\Http\Resources\v1\IdCardSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * IdCardSettingsController - Version 1

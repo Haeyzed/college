@@ -48,19 +48,6 @@ class LeaveType extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'limit' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the leaves for the leave type.
      *
      * @return HasMany
@@ -95,5 +82,18 @@ class LeaveType extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'limit' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

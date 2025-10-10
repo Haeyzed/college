@@ -4,8 +4,8 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\v1\AssignmentRequest;
-use App\Http\Requests\v1\SubmitAssignmentRequest;
 use App\Http\Requests\v1\GradeAssignmentRequest;
+use App\Http\Requests\v1\SubmitAssignmentRequest;
 use App\Http\Resources\v1\AssignmentResource;
 use App\Http\Resources\v1\StudentAssignmentResource;
 use App\Services\v1\AssignmentService;

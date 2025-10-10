@@ -74,30 +74,6 @@ class Payroll extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'user_id' => 'integer',
-            'basic_salary' => 'decimal:2',
-            'total_earning' => 'decimal:2',
-            'total_allowance' => 'decimal:2',
-            'bonus' => 'decimal:2',
-            'total_deduction' => 'decimal:2',
-            'gross_salary' => 'decimal:2',
-            'tax' => 'decimal:2',
-            'net_salary' => 'decimal:2',
-            'pay_date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the user for the payroll.
      *
      * @return BelongsTo
@@ -127,5 +103,29 @@ class Payroll extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'user_id' => 'integer',
+            'basic_salary' => 'decimal:2',
+            'total_earning' => 'decimal:2',
+            'total_allowance' => 'decimal:2',
+            'bonus' => 'decimal:2',
+            'total_deduction' => 'decimal:2',
+            'gross_salary' => 'decimal:2',
+            'tax' => 'decimal:2',
+            'net_salary' => 'decimal:2',
+            'pay_date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

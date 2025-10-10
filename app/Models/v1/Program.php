@@ -2,6 +2,8 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\DegreeType;
+use App\Enums\v1\Status;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -9,12 +11,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Enums\v1\Status;
-use App\Enums\v1\DegreeType;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -86,22 +86,6 @@ class Program extends Model implements Auditable
         'is_registration_open',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'fee_amount' => 'decimal:2',
-            'is_registration_open' => 'boolean',
-            'degree_type' => DegreeType::class,
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Boot the model.
@@ -305,5 +289,21 @@ class Program extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'fee_amount' => 'decimal:2',
+            'is_registration_open' => 'boolean',
+            'degree_type' => DegreeType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

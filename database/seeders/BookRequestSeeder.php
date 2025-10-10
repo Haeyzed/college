@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\BookRequest;
-use App\Models\v1\BookCategory;
 use App\Enums\v1\BookRequestStatus;
+use App\Models\v1\BookCategory;
+use App\Models\v1\BookRequest;
 use Illuminate\Database\Seeder;
 
 /**

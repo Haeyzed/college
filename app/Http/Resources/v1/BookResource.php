@@ -3,9 +3,9 @@
 namespace App\Http\Resources\v1;
 
 use App\Enums\v1\IssueStatus;
+use App\Helpers\StorageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Helpers\StorageHelper;
 
 /**
  * BookResource - Version 1

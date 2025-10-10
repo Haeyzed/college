@@ -7,9 +7,7 @@ use App\Http\Requests\v1\MarksheetSettingRequest;
 use App\Http\Resources\v1\MarksheetSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * MarksheetSettingsController - Version 1

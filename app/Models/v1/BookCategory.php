@@ -2,6 +2,7 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\BookCategoryStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
-use App\Enums\v1\BookCategoryStatus;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -60,19 +60,6 @@ class BookCategory extends Model implements Auditable
         'created_by',
         'updated_by',
     ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'status' => BookCategoryStatus::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Boot the model.
@@ -129,5 +116,18 @@ class BookCategory extends Model implements Auditable
             $q->whereLike('title', $search)
                 ->orWhereLike('code', $search); // Searching by new 'code' field
         });
+    }
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'status' => BookCategoryStatus::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

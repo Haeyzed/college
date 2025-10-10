@@ -20,22 +20,6 @@ enum MaritalStatus: string
     case SEPARATED = 'separated';
 
     /**
-     * Get the label for the marital status.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::SINGLE => 'Single',
-            self::MARRIED => 'Married',
-            self::DIVORCED => 'Divorced',
-            self::WIDOWED => 'Widowed',
-            self::SEPARATED => 'Separated',
-        };
-    }
-
-    /**
      * Get all marital status options with labels.
      *
      * @return array
@@ -48,5 +32,21 @@ enum MaritalStatus: string
                 'label' => $case->label(),
             ];
         })->toArray();
+    }
+
+    /**
+     * Get the label for the marital status.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::SINGLE => 'Single',
+            self::MARRIED => 'Married',
+            self::DIVORCED => 'Divorced',
+            self::WIDOWED => 'Widowed',
+            self::SEPARATED => 'Separated',
+        };
     }
 }

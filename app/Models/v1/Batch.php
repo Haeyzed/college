@@ -2,16 +2,15 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\Status;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -63,21 +62,6 @@ class Batch extends Model implements Auditable
         'description',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the programs for the batch.
@@ -136,5 +120,20 @@ class Batch extends Model implements Auditable
             $q->whereLike('name', $search)
                 ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Program Session Pivot Table Migration - Version 1
- * 
+ *
  * This migration creates the program_session pivot table for the College Management System.
  * It handles many-to-many relationships between programs and sessions.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *

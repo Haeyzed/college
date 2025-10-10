@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\v1\BookRequest;
 use App\Http\Requests\v1\BookCategoryRequest;
+use App\Http\Requests\v1\BookRequest;
 use App\Http\Requests\v1\BookRequestRequest;
 use App\Http\Requests\v1\IdCardSettingRequest;
 use App\Http\Requests\v1\IssueBookRequest;
 use App\Http\Requests\v1\ReturnBookRequest;
-use App\Http\Resources\v1\BookResource;
 use App\Http\Resources\v1\BookCategoryResource;
 use App\Http\Resources\v1\BookRequestResource;
+use App\Http\Resources\v1\BookResource;
 use App\Http\Resources\v1\IdCardSettingResource;
 use App\Services\v1\LibraryService;
 use Exception;

@@ -68,26 +68,6 @@ class StaffHourlyAttendance extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'user_id' => 'integer',
-            'subject_id' => 'integer',
-            'session_id' => 'integer',
-            'program_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
-            'date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-        ];
-    }
-
-    /**
      * Get the user for the staff hourly attendance.
      *
      * @return BelongsTo
@@ -157,5 +137,25 @@ class StaffHourlyAttendance extends Model
     public function scopeFilterByAttendance($query, $attendance)
     {
         return $query->where('attendance', $attendance);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'user_id' => 'integer',
+            'subject_id' => 'integer',
+            'session_id' => 'integer',
+            'program_id' => 'integer',
+            'semester_id' => 'integer',
+            'section_id' => 'integer',
+            'date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+        ];
     }
 }

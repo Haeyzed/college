@@ -44,20 +44,6 @@ class ProgramSemesterSection extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'program_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
-        ];
-    }
-
-    /**
      * Get the program for the program semester section.
      *
      * @return BelongsTo
@@ -85,5 +71,19 @@ class ProgramSemesterSection extends Model
     public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class, 'section_id');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'program_id' => 'integer',
+            'semester_id' => 'integer',
+            'section_id' => 'integer',
+        ];
     }
 }

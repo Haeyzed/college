@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Notifications Table Migration - Version 1
- * 
+ *
  * This migration creates the notifications table for the College Management System.
  * It handles notification information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -32,7 +31,7 @@ return new class extends Migration
             $table->timestamp('read_at')->nullable();
             $table->json('data')->nullable();
             $table->timestamps();
-            
+
             $table->index(['read_at']);
         });
     }

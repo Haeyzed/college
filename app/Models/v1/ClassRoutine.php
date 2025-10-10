@@ -50,19 +50,6 @@ class ClassRoutine extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the program that owns the class routine.
      *
      * @return BelongsTo
@@ -128,5 +115,18 @@ class ClassRoutine extends Model
     public function scopeFilterByDay(Builder $query, string $day): Builder
     {
         return $query->where('day', $day);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

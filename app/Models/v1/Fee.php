@@ -66,24 +66,6 @@ class Fee extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'fee_amount' => 'float',
-            'fine_amount' => 'float',
-            'discount_amount' => 'float',
-            'paid_amount' => 'float',
-            'assign_date' => 'datetime',
-            'due_date' => 'datetime',
-            'pay_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the student enrollment that owns the fee.
      *
      * @return BelongsTo
@@ -159,5 +141,23 @@ class Fee extends Model
     public function scopeUnpaid($query)
     {
         return $query->where('status', 'unpaid');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'fee_amount' => 'float',
+            'fine_amount' => 'float',
+            'discount_amount' => 'float',
+            'paid_amount' => 'float',
+            'assign_date' => 'datetime',
+            'due_date' => 'datetime',
+            'pay_date' => 'datetime',
+        ];
     }
 }

@@ -14,8 +14,7 @@ use Illuminate\Support\Facades\Schema;
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -31,7 +30,7 @@ return new class extends Migration
 
             // Unique constraint to prevent duplicates
             $table->unique(['enroll_subject_id', 'subject_id'], 'enroll_subject_subject_unique');
-            
+
             // Indexes for better performance
             $table->index('enroll_subject_id');
             $table->index('subject_id');

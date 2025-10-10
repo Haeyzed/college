@@ -128,8 +128,8 @@ class IssueReturnResource extends JsonResource
              * @var int $days_overdue
              * @example 0
              */
-            'days_overdue' => $this->due_date < now() && $this->status === 'issued' 
-                ? now()->diffInDays($this->due_date) 
+            'days_overdue' => $this->due_date < now() && $this->status === 'issued'
+                ? now()->diffInDays($this->due_date)
                 : 0,
 
             /**

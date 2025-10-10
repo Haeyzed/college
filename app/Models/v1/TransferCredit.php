@@ -49,19 +49,6 @@ class TransferCredit extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'credit_hours' => 'integer',
-            'grade' => 'float',
-        ];
-    }
-
-    /**
      * Get the student that owns the transfer credit.
      *
      * @return BelongsTo
@@ -81,5 +68,18 @@ class TransferCredit extends Model
     public function scopeFilterByStudent($query, $studentId)
     {
         return $query->where('student_id', $studentId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'credit_hours' => 'integer',
+            'grade' => 'float',
+        ];
     }
 }

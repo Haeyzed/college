@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Web Events Table Migration - Version 1
- * 
+ *
  * This migration creates the web_events table for the College Management System.
  * It handles web event information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -35,7 +34,7 @@ return new class extends Migration
             $table->text('attach')->nullable();
             $table->string('status')->default('active');
             $table->timestamps();
-            
+
             $table->index(['language_id', 'status']);
             $table->index(['slug']);
             $table->index(['status']);

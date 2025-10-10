@@ -62,28 +62,6 @@ class SubjectMarking extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'student_enroll_id' => 'integer',
-            'subject_id' => 'integer',
-            'exam_marks' => 'decimal:2',
-            'attendances' => 'integer',
-            'assignments' => 'decimal:2',
-            'activities' => 'decimal:2',
-            'total_marks' => 'decimal:2',
-            'publish_date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the student enroll for the subject marking.
      *
      * @return BelongsTo
@@ -113,5 +91,27 @@ class SubjectMarking extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'student_enroll_id' => 'integer',
+            'subject_id' => 'integer',
+            'exam_marks' => 'decimal:2',
+            'attendances' => 'integer',
+            'assignments' => 'decimal:2',
+            'activities' => 'decimal:2',
+            'total_marks' => 'decimal:2',
+            'publish_date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

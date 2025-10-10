@@ -2,11 +2,10 @@
 
 namespace App\Console\Commands\v1;
 
-use Exception;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use App\Models\v1\Content;
 use App\Models\v1\Notice;
+use Exception;
+use Illuminate\Console\Command;
 
 /**
  * ContentPublishDate Command - Version 1

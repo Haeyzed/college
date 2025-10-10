@@ -7,9 +7,7 @@ use App\Http\Requests\v1\ScheduleSettingRequest;
 use App\Http\Resources\v1\ScheduleSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * ScheduleSettingsController - Version 1

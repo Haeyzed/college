@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Item Issues Table Migration - Version 1
- * 
+ *
  * This migration creates the item_issues table for the College Management System.
  * It handles item issue information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -38,7 +37,7 @@ return new class extends Migration
             $table->foreignId('issued_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('received_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
-            
+
             $table->index(['item_id', 'user_id']);
             $table->index(['issue_date']);
             $table->index(['status']);

@@ -46,20 +46,6 @@ class ScheduleSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email' => 'boolean',
-            'sms' => 'boolean',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter schedule settings by status.
      *
      * @param Builder $query
@@ -85,5 +71,19 @@ class ScheduleSetting extends Model
                 ->orWhereLike('day', $search)
                 ->orWhereLike('time', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email' => 'boolean',
+            'sms' => 'boolean',
+            'status' => 'boolean',
+        ];
     }
 }

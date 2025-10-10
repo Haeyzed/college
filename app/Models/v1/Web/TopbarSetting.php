@@ -55,6 +55,18 @@ class TopbarSetting extends Model
     ];
 
     /**
+     * Scope to filter topbar settings by status.
+     *
+     * @param Builder $query
+     * @param string $status
+     * @return Builder
+     */
+    public function scopeFilterByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -65,17 +77,5 @@ class TopbarSetting extends Model
             'social_status' => 'boolean',
             'status' => Status::class,
         ];
-    }
-
-    /**
-     * Scope to filter topbar settings by status.
-     *
-     * @param Builder $query
-     * @param string $status
-     * @return Builder
-     */
-    public function scopeFilterByStatus($query, $status)
-    {
-        return $query->where('status', $status);
     }
 }

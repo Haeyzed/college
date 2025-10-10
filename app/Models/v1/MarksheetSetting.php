@@ -66,22 +66,6 @@ class MarksheetSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'width' => 'integer',
-            'height' => 'integer',
-            'student_photo' => 'boolean',
-            'barcode' => 'boolean',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter marksheet settings by status.
      *
      * @param Builder $query
@@ -109,5 +93,21 @@ class MarksheetSetting extends Model
                 ->orWhereLike('header_right', $search)
                 ->orWhereLike('body', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'width' => 'integer',
+            'height' => 'integer',
+            'student_photo' => 'boolean',
+            'barcode' => 'boolean',
+            'status' => 'boolean',
+        ];
     }
 }

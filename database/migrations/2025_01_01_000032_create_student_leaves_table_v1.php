@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Student Leaves Table Migration - Version 1
- * 
+ *
  * This migration creates the student_leaves table for the College Management System.
  * It handles student leave information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -36,7 +35,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
-            
+
             $table->index(['student_id', 'status']);
             $table->index(['status']);
             $table->index(['from_date', 'to_date']);

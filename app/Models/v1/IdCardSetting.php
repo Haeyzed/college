@@ -2,8 +2,8 @@
 
 namespace App\Models\v1;
 
-use Carbon\Carbon;
 use App\Enums\v1\Status;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -81,21 +81,6 @@ class IdCardSetting extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'student_photo' => 'boolean',
-            'signature' => 'boolean',
-            'barcode' => 'boolean',
-            'status' => Status::class,
-        ];
-    }
-
-    /**
      * Scope to filter ID card settings by status.
      *
      * @param Builder $query
@@ -122,5 +107,20 @@ class IdCardSetting extends Model
                 ->orWhereLike('address', $search)
                 ->orWhereLike('slug', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'student_photo' => 'boolean',
+            'signature' => 'boolean',
+            'barcode' => 'boolean',
+            'status' => Status::class,
+        ];
     }
 }

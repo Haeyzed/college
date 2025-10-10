@@ -71,29 +71,6 @@ class FeesMaster extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'category_id' => 'integer',
-            'faculty_id' => 'integer',
-            'program_id' => 'integer',
-            'session_id' => 'integer',
-            'semester_id' => 'integer',
-            'section_id' => 'integer',
-            'amount' => 'decimal:2',
-            'assign_date' => 'date',
-            'due_date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the student enrolls for the fees master.
      *
      * @return BelongsToMany
@@ -173,5 +150,28 @@ class FeesMaster extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'category_id' => 'integer',
+            'faculty_id' => 'integer',
+            'program_id' => 'integer',
+            'session_id' => 'integer',
+            'semester_id' => 'integer',
+            'section_id' => 'integer',
+            'amount' => 'decimal:2',
+            'assign_date' => 'date',
+            'due_date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

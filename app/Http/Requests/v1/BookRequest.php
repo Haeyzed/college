@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\v1;
 
-use App\Http\Requests\BaseRequest;
 use App\Enums\v1\BookStatus;
+use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 
 /**

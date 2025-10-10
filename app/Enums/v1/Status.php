@@ -4,7 +4,7 @@ namespace App\Enums\v1;
 
 /**
  * Status Enum
- * 
+ *
  * Defines the available status values for the system.
  *
  * @package App\Enums\v1
@@ -15,19 +15,6 @@ enum Status: string
 {
     case ACTIVE = 'active';
     case INACTIVE = 'inactive';
-
-    /**
-     * Get the string representation of the status.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::ACTIVE => 'Active',
-            self::INACTIVE => 'Inactive',
-        };
-    }
 
     /**
      * Get all status values as an array.
@@ -47,6 +34,19 @@ enum Status: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the status.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::ACTIVE => 'Active',
+            self::INACTIVE => 'Inactive',
+        };
     }
 
     /**

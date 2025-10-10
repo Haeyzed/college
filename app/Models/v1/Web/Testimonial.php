@@ -52,20 +52,6 @@ class Testimonial extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'language_id' => 'integer',
-            'rating' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the language for the testimonial.
      *
      * @return BelongsTo
@@ -97,5 +83,19 @@ class Testimonial extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('name', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'language_id' => 'integer',
+            'rating' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

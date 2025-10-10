@@ -4,8 +4,9 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use App\Services\v1\FileUploadService;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * FileUploadController - Version 1
@@ -59,7 +60,7 @@ class FileUploadController extends Controller
 
             return response()->error($result['message'], 400);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Document upload failed: ' . $e->getMessage(), 500);
         }
     }
@@ -100,7 +101,7 @@ class FileUploadController extends Controller
 
             return response()->badRequest($result['message']);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Image upload failed: ' . $e->getMessage(), 500);
         }
     }
@@ -132,7 +133,7 @@ class FileUploadController extends Controller
 
             return response()->badRequest($result['message']);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Multiple files upload failed: ' . $e->getMessage(), 500);
         }
     }
@@ -170,7 +171,7 @@ class FileUploadController extends Controller
 
             return response()->badRequest($result['message']);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('File update failed: ' . $e->getMessage(), 500);
         }
     }
@@ -200,7 +201,7 @@ class FileUploadController extends Controller
 
             return response()->badRequest($result['message']);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('File deletion failed: ' . $e->getMessage(), 500);
         }
     }
@@ -230,7 +231,7 @@ class FileUploadController extends Controller
 
             return response()->notFound($result['message']);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Failed to get file info: ' . $e->getMessage(), 500);
         }
     }
@@ -244,13 +245,13 @@ class FileUploadController extends Controller
     {
         try {
             $fileTypes = $this->fileUploadService->getSupportedFileTypes();
-            
+
             return response()->success('Supported file types retrieved successfully', [
                 'file_types' => $fileTypes,
                 'count' => count($fileTypes)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Failed to get supported file types: ' . $e->getMessage(), 500);
         }
     }
@@ -277,7 +278,7 @@ class FileUploadController extends Controller
                 'count' => count($extensions)
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Failed to get allowed extensions: ' . $e->getMessage(), 500);
         }
     }
@@ -303,7 +304,7 @@ class FileUploadController extends Controller
                 'is_supported' => $isSupported
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->error('Failed to check file type support: ' . $e->getMessage(), 500);
         }
     }

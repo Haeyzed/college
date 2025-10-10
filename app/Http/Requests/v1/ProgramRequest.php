@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\v1;
 
-use App\Http\Requests\BaseRequest;
-use App\Enums\v1\Status;
 use App\Enums\v1\DegreeType;
+use App\Enums\v1\Status;
+use App\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
 
 /**

@@ -62,22 +62,6 @@ class PostalExchange extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'category_id' => 'integer',
-            'date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the postal exchange type for the postal exchange.
      *
      * @return BelongsTo
@@ -122,5 +106,21 @@ class PostalExchange extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('reference', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'category_id' => 'integer',
+            'date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -19,21 +19,6 @@ enum BookRequestStatus: string
     case REJECTED = 'rejected';
 
     /**
-     * Get the label for the book request status.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::PENDING => 'Pending',
-            self::IN_PROGRESS => 'In Progress',
-            self::APPROVED => 'Approved',
-            self::REJECTED => 'Rejected',
-        };
-    }
-
-    /**
      * Get all enum values.
      *
      * @return array
@@ -51,6 +36,21 @@ enum BookRequestStatus: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the label for the book request status.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::PENDING => 'Pending',
+            self::IN_PROGRESS => 'In Progress',
+            self::APPROVED => 'Approved',
+            self::REJECTED => 'Rejected',
+        };
     }
 
     /**

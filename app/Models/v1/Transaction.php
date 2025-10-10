@@ -49,18 +49,6 @@ class Transaction extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'amount' => 'float',
-        ];
-    }
-
-    /**
      * Get the transactionable model.
      *
      * @return MorphTo
@@ -92,5 +80,17 @@ class Transaction extends Model
     public function scopeFilterByType($query, $type)
     {
         return $query->where('type', $type);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'float',
+        ];
     }
 }

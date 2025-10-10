@@ -56,20 +56,6 @@ class ExamRoutine extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'exam_date' => 'datetime',
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the subject that owns the exam routine.
      *
      * @return BelongsTo
@@ -133,5 +119,19 @@ class ExamRoutine extends Model
     public function scopeFilterBySubject($query, $subjectId)
     {
         return $query->where('subject_id', $subjectId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'exam_date' => 'datetime',
+            'start_time' => 'datetime',
+            'end_time' => 'datetime',
+        ];
     }
 }

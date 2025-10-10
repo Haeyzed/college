@@ -47,19 +47,6 @@ class StudentLeave extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_date' => 'datetime',
-            'end_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the student that owns the leave.
      *
      * @return BelongsTo
@@ -91,5 +78,18 @@ class StudentLeave extends Model
     public function scopeFilterByStudent($query, $studentId)
     {
         return $query->where('student_id', $studentId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
+        ];
     }
 }

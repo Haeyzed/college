@@ -42,6 +42,18 @@ class ResultContribution extends Model
     ];
 
     /**
+     * Scope to filter result contributions by status.
+     *
+     * @param Builder $query
+     * @param string $status
+     * @return Builder
+     */
+    public function scopeFilterByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -54,17 +66,5 @@ class ResultContribution extends Model
             'activities' => 'decimal:2',
             'status' => 'boolean',
         ];
-    }
-
-    /**
-     * Scope to filter result contributions by status.
-     *
-     * @param Builder $query
-     * @param string $status
-     * @return Builder
-     */
-    public function scopeFilterByStatus($query, $status)
-    {
-        return $query->where('status', $status);
     }
 }

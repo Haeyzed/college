@@ -75,20 +75,6 @@ class Assignment extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'total_marks' => 'float',
-            'start_date' => 'datetime',
-            'end_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the faculty that owns the assignment.
      *
      * @return BelongsTo
@@ -275,11 +261,11 @@ class Assignment extends Model
     public function scopeFilterByDateRange(Builder $query, string $startDate, ?string $endDate = null): Builder
     {
         $query->whereDate('start_date', '>=', $startDate);
-        
+
         if ($endDate) {
             $query->whereDate('end_date', '<=', $endDate);
         }
-        
+
         return $query;
     }
 
@@ -328,8 +314,8 @@ class Assignment extends Model
     {
         $today = now()->format('Y-m-d');
         return $query->where('start_date', '<=', $today)
-                    ->where('end_date', '>=', $today)
-                    ->where('status', 'active');
+            ->where('end_date', '>=', $today)
+            ->where('status', 'active');
     }
 
     /**
@@ -342,7 +328,7 @@ class Assignment extends Model
     {
         $today = now()->format('Y-m-d');
         return $query->where('end_date', '<', $today)
-                    ->where('status', 'active');
+            ->where('status', 'active');
     }
 
     /**
@@ -355,7 +341,7 @@ class Assignment extends Model
     {
         $today = now()->format('Y-m-d');
         return $query->where('start_date', '>', $today)
-                    ->where('status', 'active');
+            ->where('status', 'active');
     }
 
     /**
@@ -372,7 +358,7 @@ class Assignment extends Model
                 ->orWhereLike('description', $search)
                 ->orWhereHas('subject', function ($subjectQuery) use ($search) {
                     $subjectQuery->whereLike('title', $search)
-                               ->orWhereLike('code', $search);
+                        ->orWhereLike('code', $search);
                 });
         });
     }
@@ -387,15 +373,29 @@ class Assignment extends Model
     public function scopeFilterBy(Builder $query, array $filters): Builder
     {
         return $query->when(isset($filters['faculty_id']), fn($q) => $q->filterByFaculty($filters['faculty_id']))
-                    ->when(isset($filters['program_id']), fn($q) => $q->filterByProgram($filters['program_id']))
-                    ->when(isset($filters['session_id']), fn($q) => $q->filterBySession($filters['session_id']))
-                    ->when(isset($filters['semester_id']), fn($q) => $q->filterBySemester($filters['semester_id']))
-                    ->when(isset($filters['section_id']), fn($q) => $q->filterBySection($filters['section_id']))
-                    ->when(isset($filters['subject_id']), fn($q) => $q->filterBySubject($filters['subject_id']))
-                    ->when(isset($filters['teacher_id']), fn($q) => $q->filterByTeacher($filters['teacher_id']))
-                    ->when(isset($filters['status']), fn($q) => $q->filterByStatus($filters['status']))
-                    ->when(isset($filters['start_date']), fn($q) => $q->filterByStartDate($filters['start_date']))
-                    ->when(isset($filters['end_date']), fn($q) => $q->filterByEndDate($filters['end_date']))
-                    ->when(isset($filters['search']), fn($q) => $q->search($filters['search']));
+            ->when(isset($filters['program_id']), fn($q) => $q->filterByProgram($filters['program_id']))
+            ->when(isset($filters['session_id']), fn($q) => $q->filterBySession($filters['session_id']))
+            ->when(isset($filters['semester_id']), fn($q) => $q->filterBySemester($filters['semester_id']))
+            ->when(isset($filters['section_id']), fn($q) => $q->filterBySection($filters['section_id']))
+            ->when(isset($filters['subject_id']), fn($q) => $q->filterBySubject($filters['subject_id']))
+            ->when(isset($filters['teacher_id']), fn($q) => $q->filterByTeacher($filters['teacher_id']))
+            ->when(isset($filters['status']), fn($q) => $q->filterByStatus($filters['status']))
+            ->when(isset($filters['start_date']), fn($q) => $q->filterByStartDate($filters['start_date']))
+            ->when(isset($filters['end_date']), fn($q) => $q->filterByEndDate($filters['end_date']))
+            ->when(isset($filters['search']), fn($q) => $q->search($filters['search']));
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'total_marks' => 'float',
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
+        ];
     }
 }

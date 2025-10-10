@@ -7,7 +7,6 @@ use App\Http\Requests\v1\SocialSettingRequest;
 use App\Http\Resources\v1\SocialSettingResource;
 use App\Services\v1\SettingsService;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

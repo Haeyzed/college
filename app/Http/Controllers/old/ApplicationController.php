@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Services\v1\ApplicationService;
-use App\Services\v1\StudentService;
 use App\Http\Requests\v1\StoreApplicationRequest;
 use App\Http\Requests\v1\UpdateApplicationRequest;
-use App\Http\Requests\v1\LoginRequest;
-use App\Http\Requests\v1\RegisterRequest;
 use App\Http\Resources\v1\ApplicationResource;
+use App\Services\v1\ApplicationService;
+use App\Services\v1\StudentService;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * Application Controller - Version 1

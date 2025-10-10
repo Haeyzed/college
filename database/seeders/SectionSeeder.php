@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\Section;
-use App\Models\v1\Batch;
 use App\Enums\v1\Status;
+use App\Models\v1\Batch;
+use App\Models\v1\Section;
 use Illuminate\Database\Seeder;
 
 /**
@@ -30,11 +30,11 @@ class SectionSeeder extends Seeder
         foreach ($batches as $batch) {
             // Create 2-4 sections per batch
             $sectionCount = rand(2, 4);
-            
+
             for ($i = 1; $i <= $sectionCount; $i++) {
                 $sectionNames = ['A', 'B', 'C', 'D'];
                 $sectionName = $sectionNames[$i - 1] ?? 'A';
-                
+
                 $sections[] = [
                     'batch_id' => $batch->id,
                     'name' => 'Section ' . $sectionName,

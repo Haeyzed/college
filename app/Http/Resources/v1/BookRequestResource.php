@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\v1;
 
+use App\Helpers\StorageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Helpers\StorageHelper;
 
 /**
  * BookRequestResource - Version 1
@@ -81,7 +81,7 @@ class BookRequestResource extends JsonResource
              * @var int|null $publication_year
              * @example 2023
              */
-            'publication_year' => (int) $this->publication_year,
+            'publication_year' => (int)$this->publication_year,
 
             /**
              * The language of the book.
@@ -95,14 +95,14 @@ class BookRequestResource extends JsonResource
              * @var float|null $price
              * @example 50.99
              */
-            'price' => (float) $this->price,
+            'price' => (float)$this->price,
 
             /**
              * The quantity of copies requested.
              * @var int $quantity
              * @example 1
              */
-            'quantity' => (int) $this->quantity,
+            'quantity' => (int)$this->quantity,
 
             /**
              * The name of the person/department requesting the book.

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\Subject;
+use App\Enums\v1\ClassType;
 use App\Enums\v1\Status;
 use App\Enums\v1\SubjectType;
-use App\Enums\v1\ClassType;
+use App\Models\v1\Subject;
 use Illuminate\Database\Seeder;
 
 /**

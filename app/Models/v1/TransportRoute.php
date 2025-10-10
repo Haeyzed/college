@@ -48,19 +48,6 @@ class TransportRoute extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'fee' => 'decimal:2',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the vehicles for the transport route.
      *
      * @return BelongsToMany
@@ -102,5 +89,18 @@ class TransportRoute extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'fee' => 'decimal:2',
+            'status' => 'boolean',
+        ];
     }
 }

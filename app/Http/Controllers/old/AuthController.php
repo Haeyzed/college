@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Http\Requests\v1\LoginRequest;
-use App\Http\Requests\v1\RegisterRequest;
 use App\Http\Requests\v1\ChangePasswordRequest;
 use App\Http\Requests\v1\ForgotPasswordRequest;
+use App\Http\Requests\v1\LoginRequest;
+use App\Http\Requests\v1\RegisterRequest;
 use App\Http\Requests\v1\ResetPasswordRequest;
+use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 /**

@@ -2,6 +2,9 @@
 
 namespace App\Models\v1;
 
+use App\Enums\v1\ClassType;
+use App\Enums\v1\Status;
+use App\Enums\v1\SubjectType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,9 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Enums\v1\Status;
-use App\Enums\v1\SubjectType;
-use App\Enums\v1\ClassType;
 use OwenIt\Auditing\Contracts\Auditable;
 
 /**
@@ -78,24 +78,6 @@ class Subject extends Model implements Auditable
         'prerequisites',
         'status',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'credit_hours' => 'integer',
-            'total_marks' => 'decimal:2',
-            'passing_marks' => 'decimal:2',
-            'subject_type' => SubjectType::class,
-            'class_type' => ClassType::class,
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
 
     /**
      * Get the programs for the subject.
@@ -267,5 +249,23 @@ class Subject extends Model implements Auditable
                 ->orWhereLike('code', $search)
                 ->orWhereLike('description', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'credit_hours' => 'integer',
+            'total_marks' => 'decimal:2',
+            'passing_marks' => 'decimal:2',
+            'subject_type' => SubjectType::class,
+            'class_type' => ClassType::class,
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

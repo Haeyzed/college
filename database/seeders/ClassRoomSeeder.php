@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\v1\ClassRoom;
-use App\Enums\v1\Status;
 use App\Enums\v1\RoomType;
+use App\Enums\v1\Status;
+use App\Models\v1\ClassRoom;
 use Illuminate\Database\Seeder;
 
 /**

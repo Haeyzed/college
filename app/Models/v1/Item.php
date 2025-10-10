@@ -57,20 +57,6 @@ class Item extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'category_id' => 'integer',
-            'quantity' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the item category for the item.
      *
      * @return BelongsTo
@@ -125,5 +111,19 @@ class Item extends Model
             $q->whereLike('name', $search)
                 ->orWhereLike('serial_number', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'category_id' => 'integer',
+            'quantity' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

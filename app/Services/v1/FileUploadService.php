@@ -3,8 +3,8 @@
 namespace App\Services\v1;
 
 use App\Traits\v1\FileUploader;
+use Exception;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -60,7 +60,7 @@ class FileUploadService
                 ]
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Document upload failed', [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName()
@@ -69,6 +69,50 @@ class FileUploadService
             return [
                 'success' => false,
                 'message' => 'Document upload failed: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Get file information.
+     *
+     * @param string $filePath
+     * @param string $disk
+     * @return array
+     */
+    public function getFileInfo(string $filePath, string $disk = 'public'): array
+    {
+        try {
+            $info = $this->getFileInfo($filePath, $disk);
+
+            if (!$info) {
+                return [
+                    'success' => false,
+                    'message' => 'File not found',
+                    'data' => null
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => 'File information retrieved successfully',
+                'data' => [
+                    'file_info' => $info,
+                    'formatted_size' => $this->formatFileSize($info['size']),
+                    'file_url' => $info['url']
+                ]
+            ];
+
+        } catch (Exception $e) {
+            Log::error('Failed to get file info', [
+                'error' => $e->getMessage(),
+                'file_path' => $filePath
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Failed to get file info: ' . $e->getMessage(),
                 'data' => null
             ];
         }
@@ -86,11 +130,12 @@ class FileUploadService
      */
     public function uploadImage(
         UploadedFile $file,
-        string $disk = 'public',
-        int $width = 800,
-        int $height = 600,
-        string $fit = 'contain'
-    ): array {
+        string       $disk = 'public',
+        int          $width = 800,
+        int          $height = 600,
+        string       $fit = 'contain'
+    ): array
+    {
         try {
             $path = $this->uploadImage(
                 file: $file,
@@ -125,7 +170,7 @@ class FileUploadService
                 ]
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Image upload failed', [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName()
@@ -174,7 +219,7 @@ class FileUploadService
                 ]
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Multiple files upload failed', [
                 'error' => $e->getMessage(),
                 'file_count' => count($files)
@@ -189,6 +234,24 @@ class FileUploadService
     }
 
     /**
+     * Get maximum file size for file type.
+     *
+     * @param string $type
+     * @return int
+     */
+    protected function getMaxSizeForType(string $type): int
+    {
+        return match ($type) {
+            'image' => 5 * 1024 * 1024, // 5MB
+            'document' => 10 * 1024 * 1024, // 10MB
+            'video' => 100 * 1024 * 1024, // 100MB
+            'audio' => 20 * 1024 * 1024, // 20MB
+            'archive' => 50 * 1024 * 1024, // 50MB
+            default => 10 * 1024 * 1024, // 10MB default
+        };
+    }
+
+    /**
      * Update an existing file.
      *
      * @param UploadedFile $file
@@ -199,10 +262,11 @@ class FileUploadService
      */
     public function updateFile(
         UploadedFile $file,
-        string $oldFilePath,
-        string $type = 'document',
-        string $disk = 'public'
-    ): array {
+        string       $oldFilePath,
+        string       $type = 'document',
+        string       $disk = 'public'
+    ): array
+    {
         try {
             $allowedExtensions = $this->getAllowedExtensions($type);
             $maxSize = $this->getMaxSizeForType($type);
@@ -238,7 +302,7 @@ class FileUploadService
                 ]
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('File update failed', [
                 'error' => $e->getMessage(),
                 'file' => $file->getClientOriginalName(),
@@ -279,7 +343,7 @@ class FileUploadService
                 'data' => null
             ];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('File deletion failed', [
                 'error' => $e->getMessage(),
                 'file_path' => $filePath
@@ -291,68 +355,6 @@ class FileUploadService
                 'data' => null
             ];
         }
-    }
-
-    /**
-     * Get file information.
-     *
-     * @param string $filePath
-     * @param string $disk
-     * @return array
-     */
-    public function getFileInfo(string $filePath, string $disk = 'public'): array
-    {
-        try {
-            $info = $this->getFileInfo($filePath, $disk);
-
-            if (!$info) {
-                return [
-                    'success' => false,
-                    'message' => 'File not found',
-                    'data' => null
-                ];
-            }
-
-            return [
-                'success' => true,
-                'message' => 'File information retrieved successfully',
-                'data' => [
-                    'file_info' => $info,
-                    'formatted_size' => $this->formatFileSize($info['size']),
-                    'file_url' => $info['url']
-                ]
-            ];
-
-        } catch (\Exception $e) {
-            Log::error('Failed to get file info', [
-                'error' => $e->getMessage(),
-                'file_path' => $filePath
-            ]);
-
-            return [
-                'success' => false,
-                'message' => 'Failed to get file info: ' . $e->getMessage(),
-                'data' => null
-            ];
-        }
-    }
-
-    /**
-     * Get maximum file size for file type.
-     *
-     * @param string $type
-     * @return int
-     */
-    protected function getMaxSizeForType(string $type): int
-    {
-        return match ($type) {
-            'image' => 5 * 1024 * 1024, // 5MB
-            'document' => 10 * 1024 * 1024, // 10MB
-            'video' => 100 * 1024 * 1024, // 100MB
-            'audio' => 20 * 1024 * 1024, // 20MB
-            'archive' => 50 * 1024 * 1024, // 50MB
-            default => 10 * 1024 * 1024, // 10MB default
-        };
     }
 
     /**

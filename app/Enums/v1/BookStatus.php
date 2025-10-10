@@ -17,19 +17,6 @@ enum BookStatus: string
     case INACTIVE = 'inactive';
 
     /**
-     * Get the string representation of the status.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::ACTIVE => 'Active',
-            self::INACTIVE => 'Inactive',
-        };
-    }
-
-    /**
      * Get all status values as an array.
      *
      * @return array
@@ -47,6 +34,19 @@ enum BookStatus: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the status.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::ACTIVE => 'Active',
+            self::INACTIVE => 'Inactive',
+        };
     }
 
     /**

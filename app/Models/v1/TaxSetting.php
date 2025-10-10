@@ -44,22 +44,6 @@ class TaxSetting extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'min_amount' => 'decimal:2',
-            'max_amount' => 'decimal:2',
-            'percentange' => 'decimal:2',
-            'max_no_taxable_amount' => 'decimal:2',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Scope to filter tax settings by status.
      *
      * @param Builder $query
@@ -86,5 +70,21 @@ class TaxSetting extends Model
                 ->orWhere('percentange', 'like', "%{$search}%")
                 ->orWhere('max_no_taxable_amount', 'like', "%{$search}%");
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'min_amount' => 'decimal:2',
+            'max_amount' => 'decimal:2',
+            'percentange' => 'decimal:2',
+            'max_no_taxable_amount' => 'decimal:2',
+            'status' => 'boolean',
+        ];
     }
 }

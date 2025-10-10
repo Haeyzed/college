@@ -65,26 +65,6 @@ class ItemStock extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'item_id' => 'integer',
-            'supplier_id' => 'integer',
-            'store_id' => 'integer',
-            'quantity' => 'integer',
-            'price' => 'decimal:2',
-            'date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the item for the item stock.
      *
      * @return BelongsTo
@@ -124,5 +104,25 @@ class ItemStock extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'item_id' => 'integer',
+            'supplier_id' => 'integer',
+            'store_id' => 'integer',
+            'quantity' => 'integer',
+            'price' => 'decimal:2',
+            'date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

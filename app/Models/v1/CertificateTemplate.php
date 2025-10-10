@@ -70,21 +70,6 @@ class CertificateTemplate extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'width' => 'integer',
-            'height' => 'integer',
-            'student_photo' => 'boolean',
-            'barcode' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the certificates for the template.
      *
      * @return HasMany
@@ -116,5 +101,20 @@ class CertificateTemplate extends Model
     public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'width' => 'integer',
+            'height' => 'integer',
+            'student_photo' => 'boolean',
+            'barcode' => 'boolean',
+        ];
     }
 }

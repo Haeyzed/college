@@ -61,55 +61,6 @@ class Leave extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'type_id' => 'integer',
-            'user_id' => 'integer',
-            'review_by' => 'integer',
-            'apply_date' => 'date',
-            'from_date' => 'date',
-            'to_date' => 'date',
-            'pay_type' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
-     * Get the user for the leave.
-     *
-     * @return BelongsTo
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Get the user who reviewed the leave.
-     *
-     * @return BelongsTo
-     */
-    public function reviewBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'review_by');
-    }
-
-    /**
-     * Get the leave type for the leave.
-     *
-     * @return BelongsTo
-     */
-    public function leaveType(): BelongsTo
-    {
-        return $this->belongsTo(LeaveType::class, 'type_id');
-    }
-
-    /**
      * Get paid leave count in a month.
      *
      * @param int $id
@@ -196,6 +147,36 @@ class Leave extends Model
     }
 
     /**
+     * Get the user for the leave.
+     *
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the user who reviewed the leave.
+     *
+     * @return BelongsTo
+     */
+    public function reviewBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'review_by');
+    }
+
+    /**
+     * Get the leave type for the leave.
+     *
+     * @return BelongsTo
+     */
+    public function leaveType(): BelongsTo
+    {
+        return $this->belongsTo(LeaveType::class, 'type_id');
+    }
+
+    /**
      * Scope to filter leaves by status.
      *
      * @param Builder $query
@@ -205,5 +186,24 @@ class Leave extends Model
     public function scopeFilterByStatus($query, $status)
     {
         return $query->where('status', $status);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'type_id' => 'integer',
+            'user_id' => 'integer',
+            'review_by' => 'integer',
+            'apply_date' => 'date',
+            'from_date' => 'date',
+            'to_date' => 'date',
+            'pay_type' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -501,6 +501,41 @@ class AcademicService
     }
 
     /**
+     * Create section relationships (for new sections).
+     *
+     * @param Section $section Section instance
+     * @param array $data Section data containing programs, semesters, and items
+     * @return void
+     */
+    private function createSectionRelationships(Section $section, array $data): void
+    {
+        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
+            return;
+        }
+
+        $programs = $data['programs'];
+        $semesters = $data['semesters'];
+        $items = $data['items'];
+
+        foreach ($items as $index => $item) {
+            if (isset($programs[$index]) && isset($semesters[$index])) {
+                ProgramSemesterSection::query()->updateOrCreate(
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ],
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
      * Update an existing section.
      *
      * @param int $id Section ID to update
@@ -520,6 +555,43 @@ class AcademicService
     }
 
     /**
+     * Update section relationships (for existing sections).
+     *
+     * @param Section $section Section instance
+     * @param array $data Section data containing programs, semesters, and items
+     * @return void
+     */
+    private function updateSectionRelationships(Section $section, array $data): void
+    {
+        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
+            return;
+        }
+
+        $section->programSemesters()->delete();
+
+        $programs = $data['programs'];
+        $semesters = $data['semesters'];
+        $items = $data['items'];
+
+        foreach ($items as $index => $item) {
+            if (isset($programs[$index]) && isset($semesters[$index])) {
+                ProgramSemesterSection::query()->updateOrCreate(
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ],
+                    [
+                        'program_id' => $programs[$index],
+                        'semester_id' => $semesters[$index],
+                        'section_id' => $section->id,
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
      * Delete a section (Soft Delete).
      *
      * @param int $id Section ID to delete
@@ -535,6 +607,18 @@ class AcademicService
             return true;
         });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Semester Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle all semester-related operations including CRUD operations
+    | for semesters and semester filtering. Semester management includes creating,
+    | updating, deleting, and retrieving semester information with support for
+    | program associations, academic year filtering, and current semester tracking.
+    |
+    */
 
     /**
      * Bulk update section status.
@@ -572,18 +656,6 @@ class AcademicService
             return $deletedCount;
         });
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Semester Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle all semester-related operations including CRUD operations
-    | for semesters and semester filtering. Semester management includes creating,
-    | updating, deleting, and retrieving semester information with support for
-    | program associations, academic year filtering, and current semester tracking.
-    |
-    */
 
     /**
      * Get a paginated list of semesters with optional filtering and searching.
@@ -671,6 +743,19 @@ class AcademicService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Subject Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle all subject-related operations including CRUD operations
+    | for subjects and subject filtering. Subject management includes creating,
+    | updating, deleting, and retrieving subject information with support for
+    | program associations, faculty filtering, subject type classification, and
+    | credit hours management.
+    |
+    */
+
     /**
      * Bulk update semester status.
      *
@@ -708,19 +793,6 @@ class AcademicService
             return $deletedCount;
         });
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Subject Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle all subject-related operations including CRUD operations
-    | for subjects and subject filtering. Subject management includes creating,
-    | updating, deleting, and retrieving subject information with support for
-    | program associations, faculty filtering, subject type classification, and
-    | credit hours management.
-    |
-    */
 
     /**
      * Get a paginated list of subjects with optional filtering and searching.
@@ -814,6 +886,18 @@ class AcademicService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Academic Session Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle all academic session-related operations including CRUD operations
+    | for academic sessions and academic session filtering. Academic session management
+    | includes creating, updating, deleting, and retrieving session information with support
+    | for program associations, current session tracking, and comprehensive filtering.
+    |
+    */
+
     /**
      * Bulk update subject status.
      *
@@ -851,18 +935,6 @@ class AcademicService
             return $deletedCount;
         });
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Academic Session Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle all academic session-related operations including CRUD operations
-    | for academic sessions and academic session filtering. Academic session management
-    | includes creating, updating, deleting, and retrieving session information with support
-    | for program associations, current session tracking, and comprehensive filtering.
-    |
-    */
 
     /**
      * Get a paginated list of academic sessions with optional filtering and searching.
@@ -972,6 +1044,19 @@ class AcademicService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | ClassRoom Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle all classroom-related operations including CRUD operations
+    | for classrooms and classroom filtering. Classroom management includes creating,
+    | updating, deleting, and retrieving classroom information with support for
+    | program associations, room type classification, availability tracking, and
+    | capacity management.
+    |
+    */
+
     /**
      * Bulk delete academic sessions (Soft Delete).
      *
@@ -1020,19 +1105,6 @@ class AcademicService
             return $session;
         });
     }
-
-    /*
-    |--------------------------------------------------------------------------
-    | ClassRoom Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle all classroom-related operations including CRUD operations
-    | for classrooms and classroom filtering. Classroom management includes creating,
-    | updating, deleting, and retrieving classroom information with support for
-    | program associations, room type classification, availability tracking, and
-    | capacity management.
-    |
-    */
 
     /**
      * Get a paginated list of classrooms with optional filtering and searching.
@@ -1120,6 +1192,18 @@ class AcademicService
         });
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Section Relationship Helper Methods
+    |--------------------------------------------------------------------------
+    |
+    | These methods handle the complex many-to-many relationships for sections
+    | with programs, semesters, and items. These helper methods manage the
+    | intricate relationships between sections and their associated academic
+    | entities, ensuring data integrity and proper relationship management.
+    |
+    */
+
     /**
      * Bulk update classroom status.
      *
@@ -1160,90 +1244,6 @@ class AcademicService
 
     /*
     |--------------------------------------------------------------------------
-    | Section Relationship Helper Methods
-    |--------------------------------------------------------------------------
-    |
-    | These methods handle the complex many-to-many relationships for sections
-    | with programs, semesters, and items. These helper methods manage the
-    | intricate relationships between sections and their associated academic
-    | entities, ensuring data integrity and proper relationship management.
-    |
-    */
-
-    /**
-     * Create section relationships (for new sections).
-     *
-     * @param Section $section Section instance
-     * @param array $data Section data containing programs, semesters, and items
-     * @return void
-     */
-    private function createSectionRelationships(Section $section, array $data): void
-    {
-        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
-            return;
-        }
-
-        $programs = $data['programs'];
-        $semesters = $data['semesters'];
-        $items = $data['items'];
-
-        foreach ($items as $index => $item) {
-            if (isset($programs[$index]) && isset($semesters[$index])) {
-                ProgramSemesterSection::query()->updateOrCreate(
-                    [
-                        'program_id' => $programs[$index],
-                        'semester_id' => $semesters[$index],
-                        'section_id' => $section->id,
-                    ],
-                    [
-                        'program_id' => $programs[$index],
-                        'semester_id' => $semesters[$index],
-                        'section_id' => $section->id,
-                    ]
-                );
-            }
-        }
-    }
-
-    /**
-     * Update section relationships (for existing sections).
-     *
-     * @param Section $section Section instance
-     * @param array $data Section data containing programs, semesters, and items
-     * @return void
-     */
-    private function updateSectionRelationships(Section $section, array $data): void
-    {
-        if (!isset($data['programs']) || !isset($data['semesters']) || !isset($data['items'])) {
-            return;
-        }
-
-        $section->programSemesters()->delete();
-
-        $programs = $data['programs'];
-        $semesters = $data['semesters'];
-        $items = $data['items'];
-
-        foreach ($items as $index => $item) {
-            if (isset($programs[$index]) && isset($semesters[$index])) {
-                ProgramSemesterSection::query()->updateOrCreate(
-                    [
-                        'program_id' => $programs[$index],
-                        'semester_id' => $semesters[$index],
-                        'section_id' => $section->id,
-                    ],
-                    [
-                        'program_id' => $programs[$index],
-                        'semester_id' => $semesters[$index],
-                        'section_id' => $section->id,
-                    ]
-                );
-            }
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | Enroll Subject Methods
     |--------------------------------------------------------------------------
     |
@@ -1269,10 +1269,10 @@ class AcademicService
     public function getEnrollSubjects(int $perPage, ?int $programId = null, ?int $semesterId = null, ?int $sectionId = null, ?string $status = null, ?string $search = null): LengthAwarePaginator
     {
         $query = EnrollSubject::with(['program', 'semester', 'section', 'subjects'])
-            ->when($programId, fn ($q) => $q->filterByProgram($programId))
-            ->when($semesterId, fn ($q) => $q->filterBySemester($semesterId))
-            ->when($sectionId, fn ($q) => $q->filterBySection($sectionId))
-            ->when($status, fn ($q) => $q->filterByStatus($status));
+            ->when($programId, fn($q) => $q->filterByProgram($programId))
+            ->when($semesterId, fn($q) => $q->filterBySemester($semesterId))
+            ->when($sectionId, fn($q) => $q->filterBySection($sectionId))
+            ->when($status, fn($q) => $q->filterByStatus($status));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }

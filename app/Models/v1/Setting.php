@@ -76,6 +76,18 @@ class Setting extends Model
     ];
 
     /**
+     * Scope to filter settings by status.
+     *
+     * @param Builder $query
+     * @param string $status
+     * @return Builder
+     */
+    public function scopeFilterByStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -86,17 +98,5 @@ class Setting extends Model
             'decimal_place' => 'integer',
             'status' => 'boolean',
         ];
-    }
-
-    /**
-     * Scope to filter settings by status.
-     *
-     * @param Builder $query
-     * @param string $status
-     * @return Builder
-     */
-    public function scopeFilterByStatus($query, $status)
-    {
-        return $query->where('status', $status);
     }
 }

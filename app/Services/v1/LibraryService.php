@@ -2,7 +2,6 @@
 
 namespace App\Services\v1;
 
-use App\Enums\v1\BookCategoryStatus;
 use App\Enums\v1\IssueStatus;
 use App\Imports\v1\BookImport;
 use App\Models\v1\Book;
@@ -30,6 +29,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class LibraryService
 {
     use FileUploader;
+
     /*
     |--------------------------------------------------------------------------
     | Book Methods
@@ -57,11 +57,11 @@ class LibraryService
     public function getBooks(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?bool $available = null): LengthAwarePaginator
     {
         $query = Book::with(['bookCategory', 'issues'])
-            ->when($bookCategoryId, fn ($q) => $q->filterByBookCategory($bookCategoryId))
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($author, fn ($q) => $q->filterByAuthor($author))
-            ->when($search, fn ($q) => $q->search($search))
-            ->when($available !== null, fn ($q) => $q->filterByAvailability($available));
+            ->when($bookCategoryId, fn($q) => $q->filterByBookCategory($bookCategoryId))
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($author, fn($q) => $q->filterByAuthor($author))
+            ->when($search, fn($q) => $q->search($search))
+            ->when($available !== null, fn($q) => $q->filterByAvailability($available));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
@@ -296,7 +296,7 @@ class LibraryService
         } catch (Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Import failed: '.$e->getMessage(),
+                'message' => 'Import failed: ' . $e->getMessage(),
             ];
         }
     }
@@ -370,11 +370,11 @@ class LibraryService
     public function getBookRequests(int $perPage, ?int $bookCategoryId = null, ?string $status = null, ?string $author = null, ?string $search = null, ?string $requester = null): LengthAwarePaginator
     {
         $query = BookRequest::with(['bookCategory'])
-            ->when($bookCategoryId, fn ($q) => $q->filterByBookCategory($bookCategoryId))
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($author, fn ($q) => $q->filterByAuthor($author))
-            ->when($requester, fn ($q) => $q->filterByRequester($requester))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($bookCategoryId, fn($q) => $q->filterByBookCategory($bookCategoryId))
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($author, fn($q) => $q->filterByAuthor($author))
+            ->when($requester, fn($q) => $q->filterByRequester($requester))
+            ->when($search, fn($q) => $q->search($search));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
@@ -575,8 +575,8 @@ class LibraryService
     public function getBookCategories(int $perPage, ?string $search = null, ?string $status = null): LengthAwarePaginator
     {
         $query = BookCategory::query()->withCount('books')
-            ->when($status, fn ($q) => $q->filterByStatus($status))
-            ->when($search, fn ($q) => $q->search($search));
+            ->when($status, fn($q) => $q->filterByStatus($status))
+            ->when($search, fn($q) => $q->search($search));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
@@ -798,9 +798,9 @@ class LibraryService
     public function getBookIssues(int $perPage, ?string $status = null, ?int $memberId = null, ?int $bookId = null): LengthAwarePaginator
     {
         $query = IssueReturn::with(['book', 'member'])
-            ->when($status, fn ($q) => $q->where('status', $status))
-            ->when($memberId, fn ($q) => $q->where('member_id', $memberId))
-            ->when($bookId, fn ($q) => $q->where('book_id', $bookId));
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->when($memberId, fn($q) => $q->where('member_id', $memberId))
+            ->when($bookId, fn($q) => $q->where('book_id', $bookId));
 
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }

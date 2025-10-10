@@ -62,23 +62,6 @@ class Income extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'category_id' => 'integer',
-            'amount' => 'decimal:2',
-            'date' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the income category for the income.
      *
      * @return BelongsTo
@@ -123,5 +106,22 @@ class Income extends Model
             $q->whereLike('title', $search)
                 ->orWhereLike('invoice_id', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'category_id' => 'integer',
+            'amount' => 'decimal:2',
+            'date' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

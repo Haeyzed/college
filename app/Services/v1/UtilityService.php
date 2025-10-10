@@ -2,17 +2,15 @@
 
 namespace App\Services\v1;
 
-use App\Enums\v1\BookStatus;
+use App\Enums\v1\BloodGroup;
 use App\Enums\v1\BookCategoryStatus;
 use App\Enums\v1\BookRequestStatus;
-use App\Enums\v1\MemberType;
-use App\Enums\v1\IssueStatus;
-use App\Enums\v1\Status;
+use App\Enums\v1\BookStatus;
 use App\Enums\v1\Gender;
+use App\Enums\v1\IssueStatus;
 use App\Enums\v1\MaritalStatus;
-use App\Enums\v1\BloodGroup;
-use Exception;
-use Illuminate\Support\Facades\DB;
+use App\Enums\v1\MemberType;
+use App\Enums\v1\Status;
 
 /**
  * UtilityService - Version 1

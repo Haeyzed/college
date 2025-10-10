@@ -68,22 +68,6 @@ class Session extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'start_date' => 'date',
-            'end_date' => 'date',
-            'is_current' => 'boolean',
-            'status' => Status::class,
-            'deleted_at' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the programs for the session.
      *
      * @return BelongsToMany
@@ -137,5 +121,21 @@ class Session extends Model
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'LIKE', '%' . $search . '%');
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'is_current' => 'boolean',
+            'status' => Status::class,
+            'deleted_at' => 'datetime',
+        ];
     }
 }

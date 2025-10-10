@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\JsonResponse;
 
 /**
  * Base Request Class
@@ -27,20 +26,6 @@ abstract class BaseRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    /**
-     * Handle a failed validation attempt.
-     *
-     * @param Validator $validator
-     * @return void
-     * @throws HttpResponseException
-     */
-    protected function failedValidation(Validator $validator): void
-    {
-        $response = response()->validationError($validator->errors(),'Validation failed');
-
-        throw new HttpResponseException($response);
     }
 
     /**
@@ -95,5 +80,19 @@ abstract class BaseRequest extends FormRequest
             'subject_id' => 'subject',
             'category_id' => 'category',
         ];
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param Validator $validator
+     * @return void
+     * @throws HttpResponseException
+     */
+    protected function failedValidation(Validator $validator): void
+    {
+        $response = response()->validationError($validator->errors(), 'Validation failed');
+
+        throw new HttpResponseException($response);
     }
 }

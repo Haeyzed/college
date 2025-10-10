@@ -19,20 +19,6 @@ enum SubjectType: string
     case ELECTIVE = 'elective';
 
     /**
-     * Get the string representation of the subject type.
-     *
-     * @return string
-     */
-    public function label(): string
-    {
-        return match($this) {
-            self::COMPULSORY => 'Compulsory',
-            self::OPTIONAL => 'Optional',
-            self::ELECTIVE => 'Elective',
-        };
-    }
-
-    /**
      * Get all subject type values as an array.
      *
      * @return array
@@ -50,6 +36,20 @@ enum SubjectType: string
     public static function labels(): array
     {
         return array_map(fn($case) => $case->label(), self::cases());
+    }
+
+    /**
+     * Get the string representation of the subject type.
+     *
+     * @return string
+     */
+    public function label(): string
+    {
+        return match ($this) {
+            self::COMPULSORY => 'Compulsory',
+            self::OPTIONAL => 'Optional',
+            self::ELECTIVE => 'Elective',
+        };
     }
 
     /**

@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Create Class Routines Table Migration - Version 1
- * 
+ *
  * This migration creates the class_routines table for the College Management System.
  * It handles class routine information storage with proper indexing and constraints.
- * 
+ *
  * @package Database\Migrations
  * @version 1.0.0
  * @author Softmax Technologies
  */
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -37,7 +36,7 @@ return new class extends Migration
             $table->integer('day'); // 1=Monday, 2=Tuesday, etc.
             $table->string('status')->default('active');
             $table->timestamps();
-            
+
             $table->index(['teacher_id', 'session_id']);
             $table->index(['program_id', 'semester_id', 'section_id']);
             $table->index(['day', 'start_time']);

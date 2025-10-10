@@ -49,18 +49,6 @@ class StudentTransfer extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'transfer_date' => 'datetime',
-        ];
-    }
-
-    /**
      * Get the student that owns the transfer.
      *
      * @return BelongsTo
@@ -92,5 +80,17 @@ class StudentTransfer extends Model
     public function scopeFilterByStudent($query, $studentId)
     {
         return $query->where('student_id', $studentId);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'transfer_date' => 'datetime',
+        ];
     }
 }

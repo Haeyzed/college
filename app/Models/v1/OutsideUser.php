@@ -114,25 +114,6 @@ class OutsideUser extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'present_province' => 'integer',
-            'present_district' => 'integer',
-            'permanent_province' => 'integer',
-            'permanent_district' => 'integer',
-            'dob' => 'date',
-            'created_by' => 'integer',
-            'updated_by' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the library member for the outside user.
      *
      * @return MorphOne
@@ -209,5 +190,24 @@ class OutsideUser extends Model
                 ->orWhereLike('email', $search)
                 ->orWhereLike('phone', $search);
         });
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'present_province' => 'integer',
+            'present_district' => 'integer',
+            'permanent_province' => 'integer',
+            'permanent_district' => 'integer',
+            'dob' => 'date',
+            'created_by' => 'integer',
+            'updated_by' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }

@@ -48,19 +48,6 @@ class Gallery extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'language_id' => 'integer',
-            'status' => 'boolean',
-        ];
-    }
-
-    /**
      * Get the language for the gallery.
      *
      * @return BelongsTo
@@ -92,5 +79,18 @@ class Gallery extends Model
     public function scopeSearch($query, $search)
     {
         return $query->whereLike('title', $search);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'language_id' => 'integer',
+            'status' => 'boolean',
+        ];
     }
 }
