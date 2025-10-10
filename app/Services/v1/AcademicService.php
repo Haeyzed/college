@@ -1187,7 +1187,6 @@ class AcademicService
         $semesters = $data['semesters'];
         $items = $data['items'];
 
-        // Create new relationships using updateOrCreate
         foreach ($items as $index => $item) {
             if (isset($programs[$index]) && isset($semesters[$index])) {
                 ProgramSemesterSection::query()->updateOrCreate(
@@ -1219,14 +1218,12 @@ class AcademicService
             return;
         }
 
-        // Delete existing relationships first
         $section->programSemesters()->delete();
 
         $programs = $data['programs'];
         $semesters = $data['semesters'];
         $items = $data['items'];
 
-        // Create new relationships using updateOrCreate
         foreach ($items as $index => $item) {
             if (isset($programs[$index]) && isset($semesters[$index])) {
                 ProgramSemesterSection::query()->updateOrCreate(
@@ -1314,7 +1311,6 @@ class AcademicService
                 $data
             );
 
-            // Sync subjects using many-to-many relationship
             $enrollSubject->subjects()->sync($subjects);
 
             return $enrollSubject->load(['program', 'semester', 'section', 'subjects']);
@@ -1335,14 +1331,11 @@ class AcademicService
         return DB::transaction(function () use ($data, $id) {
             $enrollSubject = EnrollSubject::query()->findOrFail($id);
 
-            // Extract subjects from data
             $subjects = $data['subjects'] ?? null;
             unset($data['subjects']);
 
-            // Update main fields
             $enrollSubject->update($data);
 
-            // Sync subjects if provided
             if ($subjects !== null) {
                 $enrollSubject->subjects()->sync($subjects);
             }

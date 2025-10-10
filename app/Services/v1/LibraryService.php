@@ -163,7 +163,7 @@ class LibraryService
                 throw new Exception('Cannot delete book with active issues');
             }
 
-            $book->delete(); // Soft delete - image is preserved
+            $book->delete();
 
             return true;
         });
@@ -190,7 +190,7 @@ class LibraryService
                 throw new Exception('Cannot force delete book with active issues');
             }
 
-            $book->forceDelete(); // Force delete - image will be deleted in model boot
+            $book->forceDelete();
 
             return true;
         });
@@ -233,7 +233,7 @@ class LibraryService
                     continue;
                 }
 
-                $book->delete(); // Soft delete - images preserved
+                $book->delete();
                 $deletedCount++;
             }
 
@@ -263,7 +263,7 @@ class LibraryService
                     continue;
                 }
 
-                $book->forceDelete(); // Force delete - images will be deleted
+                $book->forceDelete();
                 $deletedCount++;
             }
 
@@ -468,7 +468,7 @@ class LibraryService
         return DB::transaction(function () use ($id) {
             $bookRequest = BookRequest::query()->findOrFail($id);
 
-            $bookRequest->delete(); // Soft delete - image preserved
+            $bookRequest->delete();
 
             return true;
         });
@@ -487,7 +487,7 @@ class LibraryService
         return DB::transaction(function () use ($id) {
             $bookRequest = BookRequest::query()->findOrFail($id);
 
-            $bookRequest->forceDelete(); // Force delete - image will be deleted
+            $bookRequest->forceDelete();
 
             return true;
         });
@@ -522,7 +522,7 @@ class LibraryService
             $deletedCount = 0;
 
             foreach ($bookRequests as $bookRequest) {
-                $bookRequest->delete(); // Soft delete - images preserved
+                $bookRequest->delete();
                 $deletedCount++;
             }
 
@@ -544,7 +544,7 @@ class LibraryService
             $deletedCount = 0;
 
             foreach ($bookRequests as $bookRequest) {
-                $bookRequest->forceDelete(); // Force delete - images will be deleted
+                $bookRequest->forceDelete();
                 $deletedCount++;
             }
 
@@ -716,12 +716,10 @@ class LibraryService
         return DB::transaction(function () use ($data) {
             $book = Book::query()->findOrFail($data['book_id']);
 
-            // Check availability
             if ($book->quantity <= 0) {
                 throw new Exception('Book is not available');
             }
 
-            // Check if member already has this book
             $existingIssue = IssueReturn::query()->where('book_id', $data['book_id'])
                 ->where('member_id', $data['member_id'])
                 ->where('status', IssueStatus::ISSUED->value)
@@ -731,7 +729,6 @@ class LibraryService
                 throw new Exception('Member already has this book');
             }
 
-            // Create issue record
             $issue = IssueReturn::query()->create([
                 'book_id' => $data['book_id'],
                 'member_id' => $data['member_id'],
@@ -740,7 +737,6 @@ class LibraryService
                 'status' => IssueStatus::ISSUED->value,
             ]);
 
-            // Update book quantity
             $book->decrement('quantity');
 
             return [
@@ -766,11 +762,10 @@ class LibraryService
                 ->where('status', IssueStatus::ISSUED->value)
                 ->firstOrFail();
 
-            // Calculate fine if overdue
             $fineAmount = 0;
             if ($issue->due_date < now()) {
                 $daysOverdue = now()->diffInDays($issue->due_date);
-                $fineAmount = $daysOverdue * 10; // 10 per day fine
+                $fineAmount = $daysOverdue * 10;
             }
 
             $issue->update([
@@ -779,7 +774,6 @@ class LibraryService
                 'status' => IssueStatus::RETURNED->value,
             ]);
 
-            // Update book quantity
             $book = Book::query()->findOrFail($data['book_id']);
             $book->increment('quantity');
 

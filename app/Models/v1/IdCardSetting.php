@@ -7,6 +7,7 @@ use App\Enums\v1\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 /**
  * IdCardSetting Model - Version 1
@@ -45,6 +46,7 @@ class IdCardSetting extends Model
      */
     protected $fillable = [
         'title',
+        'slug',
         'subtitle',
         'logo',
         'background',
@@ -57,6 +59,26 @@ class IdCardSetting extends Model
         'barcode',
         'status',
     ];
+
+    /**
+     * Boot the model.
+     * Generates slug before creation/update.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($setting) {
+            $setting->slug = Str::slug($setting->title);
+        });
+
+        static::updating(function ($setting) {
+            // Only update slug if title has changed
+            if ($setting->isDirty('title')) {
+                $setting->slug = Str::slug($setting->title);
+            }
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -97,7 +119,8 @@ class IdCardSetting extends Model
         return $query->where(function ($q) use ($search) {
             $q->whereLike('title', $search)
                 ->orWhereLike('subtitle', $search)
-                ->orWhereLike('address', $search);
+                ->orWhereLike('address', $search)
+                ->orWhereLike('slug', $search);
         });
     }
 }
