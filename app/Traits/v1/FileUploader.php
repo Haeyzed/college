@@ -500,4 +500,241 @@ trait FileUploader
 
         return round($bytes, 2) . ' ' . $units[$i];
     }
+
+    /**
+     * Upload media file to the specified directory.
+     *
+     * @param UploadedFile $file
+     * @param string $directory
+     * @param string $disk
+     * @param array $allowedExtensions
+     * @param int|null $maxSize
+     * @return string|null
+     */
+    public function uploadMedia(
+        UploadedFile $file,
+        string $directory = 'uploads',
+        string $disk = 'public',
+        array $allowedExtensions = [],
+        ?int $maxSize = null
+    ): ?string
+    {
+        try {
+            // Use default allowed extensions if none provided
+            if (empty($allowedExtensions)) {
+                $allowedExtensions = array_merge(
+                    $this->fileExtensions['image'],
+                    $this->fileExtensions['document'],
+                    $this->fileExtensions['spreadsheet'],
+                    $this->fileExtensions['presentation'],
+                    $this->fileExtensions['archive'],
+                    $this->fileExtensions['video'],
+                    $this->fileExtensions['audio']
+                );
+            }
+
+            // Validate file
+            if (!$this->validateFile($file, $allowedExtensions, $maxSize)) {
+                return null;
+            }
+
+            // Generate unique filename
+            $filename = $this->generateUniqueFilename($file);
+
+            // Store file
+            $path = $file->storeAs($directory, $filename, $disk);
+
+            Log::info("Media file uploaded successfully", [
+                'original_name' => $file->getClientOriginalName(),
+                'stored_path' => $path,
+                'disk' => $disk,
+                'size' => $file->getSize()
+            ]);
+
+            return $path;
+
+        } catch (Exception $e) {
+            Log::error("Media upload failed", [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Update media file in the specified directory.
+     *
+     * @param UploadedFile $file
+     * @param string $directory
+     * @param string $disk
+     * @param string|null $oldFilePath
+     * @param array $allowedExtensions
+     * @param int|null $maxSize
+     * @return string|null
+     */
+    public function updateMedia(
+        UploadedFile $file,
+        string $directory = 'uploads',
+        string $disk = 'public',
+        ?string $oldFilePath = null,
+        array $allowedExtensions = [],
+        ?int $maxSize = null
+    ): ?string
+    {
+        try {
+            // Delete old file if exists
+            if ($oldFilePath && Storage::disk($disk)->exists($oldFilePath)) {
+                Storage::disk($disk)->delete($oldFilePath);
+            }
+
+            // Upload new file
+            return $this->uploadMedia($file, $directory, $disk, $allowedExtensions, $maxSize);
+
+        } catch (Exception $e) {
+            Log::error("Media update failed", [
+                'error' => $e->getMessage(),
+                'file' => $file->getClientOriginalName(),
+                'old_path' => $oldFilePath
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Delete media file from the specified directory.
+     *
+     * @param string $filePath
+     * @param string $disk
+     * @return bool
+     */
+    public function deleteMedia(string $filePath, string $disk = 'public'): bool
+    {
+        try {
+            if (Storage::disk($disk)->exists($filePath)) {
+                Storage::disk($disk)->delete($filePath);
+
+                Log::info("Media file deleted successfully", [
+                    'file_path' => $filePath,
+                    'disk' => $disk
+                ]);
+
+                return true;
+            }
+
+            return false;
+
+        } catch (Exception $e) {
+            Log::error("Media deletion failed", [
+                'error' => $e->getMessage(),
+                'file_path' => $filePath,
+                'disk' => $disk
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Upload multiple media files to the specified directory.
+     *
+     * @param array $files
+     * @param string $directory
+     * @param string $disk
+     * @param array $allowedExtensions
+     * @param int|null $maxSize
+     * @return array
+     */
+    public function uploadMultiMedia(
+        array $files,
+        string $directory = 'uploads',
+        string $disk = 'public',
+        array $allowedExtensions = [],
+        ?int $maxSize = null
+    ): array
+    {
+        $uploadedFiles = [];
+
+        try {
+            foreach ($files as $file) {
+                if ($file instanceof UploadedFile) {
+                    $path = $this->uploadMedia($file, $directory, $disk, $allowedExtensions, $maxSize);
+                    if ($path) {
+                        $uploadedFiles[] = [
+                            'original_name' => $file->getClientOriginalName(),
+                            'stored_path' => $path,
+                            'size' => $file->getSize(),
+                            'mime_type' => $file->getMimeType()
+                        ];
+                    }
+                }
+            }
+
+            Log::info("Multiple media files uploaded successfully", [
+                'uploaded_count' => count($uploadedFiles),
+                'total_files' => count($files),
+                'directory' => $directory,
+                'disk' => $disk
+            ]);
+
+            return $uploadedFiles;
+
+        } catch (Exception $e) {
+            Log::error("Multiple media upload failed", [
+                'error' => $e->getMessage(),
+                'directory' => $directory,
+                'disk' => $disk
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Delete multiple media files from the specified directory.
+     *
+     * @param array $filePaths
+     * @param string $disk
+     * @return array
+     */
+    public function deleteMultiMedia(array $filePaths, string $disk = 'public'): array
+    {
+        $deletedFiles = [];
+        $failedFiles = [];
+
+        try {
+            foreach ($filePaths as $filePath) {
+                if ($this->deleteMedia($filePath, $disk)) {
+                    $deletedFiles[] = $filePath;
+                } else {
+                    $failedFiles[] = $filePath;
+                }
+            }
+
+            Log::info("Multiple media files deletion completed", [
+                'deleted_count' => count($deletedFiles),
+                'failed_count' => count($failedFiles),
+                'total_files' => count($filePaths),
+                'disk' => $disk
+            ]);
+
+            return [
+                'deleted' => $deletedFiles,
+                'failed' => $failedFiles,
+                'success_count' => count($deletedFiles),
+                'failed_count' => count($failedFiles)
+            ];
+
+        } catch (Exception $e) {
+            Log::error("Multiple media deletion failed", [
+                'error' => $e->getMessage(),
+                'file_paths' => $filePaths,
+                'disk' => $disk
+            ]);
+            return [
+                'deleted' => [],
+                'failed' => $filePaths,
+                'success_count' => 0,
+                'failed_count' => count($filePaths)
+            ];
+        }
+    }
 }
