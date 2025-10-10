@@ -131,52 +131,23 @@ class AdmissionController extends Controller
                 }
             }
 
-            // Check if we should create student immediately (like UniversitySystem)
-            $createStudent = $request->boolean('create_student', false);
-            $studentData = [];
+            // Create student immediately (like UniversitySystem)
+            $studentData = $request->only([
+                'student_id', 'session_id', 'semester_id', 'section_id',
+                'admission_date', 'relatives', 'documents'
+            ]);
 
-            if ($createStudent) {
-                $request->validate([
-                    'student_id' => 'required|string|unique:students,student_id',
-                    'session_id' => 'required|integer|exists:sessions,id',
-                    'semester_id' => 'required|integer|exists:semesters,id',
-                    'section_id' => 'required|integer|exists:sections,id',
-                    'admission_date' => 'nullable|date',
-                    'relatives' => 'nullable|array',
-                    'relatives.*.relation' => 'required_with:relatives|string',
-                    'relatives.*.name' => 'required_with:relatives|string',
-                    'relatives.*.occupation' => 'nullable|string',
-                    'relatives.*.phone' => 'nullable|string',
-                    'relatives.*.address' => 'nullable|string',
-                    'documents' => 'nullable|array',
-                    'documents.*.title' => 'required_with:documents|string',
-                    'documents.*.file' => 'required_with:documents|file',
-                ]);
+            $result = $this->admissionService->createApplication($validatedData, true, $studentData);
 
-                $studentData = $request->only([
-                    'student_id', 'session_id', 'semester_id', 'section_id',
-                    'admission_date', 'relatives', 'documents'
-                ]);
-            }
-
-            $result = $this->admissionService->createApplication($validatedData, $createStudent, $studentData);
-
-            if ($createStudent) {
-                return response()->success(
-                    [
-                        'application' => new ApplicationResource($result['application']),
-                        'student' => $result['student'],
-                        'enrollment' => $result['enrollment'],
-                        'temporary_password' => $result['password']
-                    ],
-                    'Application and student created successfully'
-                );
-            } else {
-                return response()->success(
-                    new ApplicationResource($result['application']),
-                    'Application created successfully'
-                );
-            }
+            return response()->success(
+                [
+                    'application' => new ApplicationResource($result['application']),
+                    'student' => $result['student'],
+                    'enrollment' => $result['enrollment'],
+                    'temporary_password' => $result['password']
+                ],
+                'Application and student created successfully'
+            );
         } catch (Exception $e) {
             return response()->internalServerError(
                 'Failed to create application: ' . $e->getMessage()

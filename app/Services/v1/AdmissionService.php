@@ -342,10 +342,10 @@ class AdmissionService
                     $documentModel = Document::query()->create([
                         'title' => $document['title'],
                         'file_path' => $filePath,
+                        'status' => \App\Enums\Status::ACTIVE->value,
                     ]);
 
                     $documentModel->students()->attach($studentId);
-                }
             }
         }
     }
@@ -366,6 +366,7 @@ class AdmissionService
             'semester_id' => $data['semester_id'],
             'section_id' => $data['section_id'],
             'created_by' => auth()->id() ?? 1,
+            'status' => 'active',
         ]);
     }
 

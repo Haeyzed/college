@@ -576,24 +576,14 @@ class ApplicationRequest extends BaseRequest
                 'max:5120'
             ],
 
-            // Student Creation Fields (Optional - only when create_student = true)
-            /**
-             * Whether to create student immediately.
-             * @var bool|null $create_student
-             * @example true
-             */
-            'create_student' => [
-                'nullable',
-                'boolean',
-            ],
-
+            // Student Creation Fields (Required for automatic student creation like UniversitySystem)
             /**
              * The student ID for immediate student creation.
-             * @var string|null $student_id
+             * @var string $student_id
              * @example "STU-2024-001"
              */
             'student_id' => [
-                'nullable',
+                'required',
                 'string',
                 'max:50',
                 'unique:students,student_id',
@@ -601,65 +591,110 @@ class ApplicationRequest extends BaseRequest
 
             /**
              * The session ID for student enrollment.
-             * @var int|null $session_id
+             * @var int $session_id
              * @example 1
              */
             'session_id' => [
-                'nullable',
+                'required',
                 'integer',
                 'exists:sessions,id',
             ],
 
             /**
              * The semester ID for student enrollment.
-             * @var int|null $semester_id
+             * @var int $semester_id
              * @example 1
              */
             'semester_id' => [
-                'nullable',
+                'required',
                 'integer',
                 'exists:semesters,id',
             ],
 
             /**
              * The section ID for student enrollment.
-             * @var int|null $section_id
+             * @var int $section_id
              * @example 1
              */
             'section_id' => [
-                'nullable',
+                'required',
                 'integer',
                 'exists:sections,id',
             ],
 
             /**
              * The admission date for the student.
-             * @var string|null $admission_date
+             * @var string $admission_date
              * @example "2024-01-15"
              */
             'admission_date' => [
-                'nullable',
+                'required',
                 'date',
             ],
 
             /**
              * Student relatives information.
-             * @var array|null $relatives
+             * @var array $relatives
              * @example [{"relation": "Father", "name": "John Doe", "occupation": "Engineer", "phone": "+1234567890", "address": "123 Main St"}]
              */
             'relatives' => [
-                'nullable',
+                'required',
                 'array',
+                'min:1',
+            ],
+
+            'relatives.*.relation' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'relatives.*.name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'relatives.*.occupation' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'relatives.*.phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'relatives.*.address' => [
+                'nullable',
+                'string',
+                'max:500',
             ],
 
             /**
              * Additional documents for the student.
-             * @var array|null $documents
+             * @var array $documents
              * @example [{"title": "Medical Certificate", "file": "medical_cert.pdf"}]
              */
             'documents' => [
-                'nullable',
+                'required',
                 'array',
+                'min:1',
+            ],
+
+            'documents.*.title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'documents.*.file' => [
+                'required',
+                'file',
+                'mimes:pdf,doc,docx,jpg,jpeg,png',
+                'max:5120', // 5MB
             ],
 
             /**
@@ -969,14 +1004,20 @@ class ApplicationRequest extends BaseRequest
             'college_graduation_point' => 'college graduation point',
             'college_transcript' => 'college transcript',
             'college_certificate' => 'college certificate',
-            'create_student' => 'create student',
             'student_id' => 'student ID',
             'session_id' => 'session',
             'semester_id' => 'semester',
             'section_id' => 'section',
             'admission_date' => 'admission date',
             'relatives' => 'relatives',
+            'relatives.*.relation' => 'relative relationship',
+            'relatives.*.name' => 'relative name',
+            'relatives.*.occupation' => 'relative occupation',
+            'relatives.*.phone' => 'relative phone',
+            'relatives.*.address' => 'relative address',
             'documents' => 'documents',
+            'documents.*.title' => 'document title',
+            'documents.*.file' => 'document file',
             'photo' => 'photo',
             'signature' => 'signature',
             'fee_amount' => 'fee amount',
