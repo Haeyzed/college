@@ -2,10 +2,14 @@
 
 namespace App\Models\v1;
 
+use App\Models\v1\Student;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
 
 /**
  * Document Model - Version 1
@@ -25,6 +29,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ *
+ * @property-read Collection<int, Student> $students
+ * @property-read Collection<int, User> $users
  */
 class Document extends Model
 {
@@ -38,10 +45,28 @@ class Document extends Model
     protected $fillable = [
         'title',
         'file_path',
-        'file_type',
-        'file_size',
         'status',
     ];
+
+    /**
+     * Get the students that own this document.
+     *
+     * @return MorphToMany
+     */
+    public function students(): MorphToMany
+    {
+        return $this->morphedByMany(Student::class, 'docable');
+    }
+
+    /**
+     * Get the users that own this document.
+     *
+     * @return MorphToMany
+     */
+    public function users(): MorphToMany
+    {
+        return $this->morphedByMany(User::class, 'docable');
+    }
 
     /**
      * Scope to filter documents by status.
@@ -56,18 +81,6 @@ class Document extends Model
     }
 
     /**
-     * Scope to filter documents by file type.
-     *
-     * @param Builder $query
-     * @param string $fileType
-     * @return Builder
-     */
-    public function scopeFilterByFileType(Builder $query, string $fileType): Builder
-    {
-        return $query->where('file_type', $fileType);
-    }
-
-    /**
      * Scope to search documents by title.
      *
      * @param Builder $query
@@ -77,17 +90,5 @@ class Document extends Model
     public function scopeSearch(Builder $query, string $search): Builder
     {
         return $query->whereLike('title', $search);
-    }
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'file_size' => 'integer',
-        ];
     }
 }

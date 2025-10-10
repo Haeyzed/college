@@ -11,6 +11,7 @@ use App\Models\v1\StudentEnroll;
 use App\Models\v1\StudentRelative;
 use App\Traits\v1\FileUploader;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -307,7 +308,7 @@ class AdmissionService
     {
         foreach ($relatives as $relative) {
             if (!empty($relative['relation']) && !empty($relative['name'])) {
-                StudentRelative::create([
+                StudentRelative::query()->create([
                     'student_id' => $studentId,
                     'relation' => $relative['relation'],
                     'name' => $relative['name'],
@@ -329,19 +330,18 @@ class AdmissionService
     protected function createStudentDocuments(int $studentId, array $documents): void
     {
         foreach ($documents as $document) {
-            if (!empty($document['title']) && !empty($document['file'])) {
+            if (!empty($document['title']) && !empty($document['file_path'])) {
                 $filePath = $this->uploadMedia(
-                    file: $document['file'],
+                    file: $document['file_path'],
                     directory: 'student-documents',
-                    disk: 'public',
                     allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
                     maxSize: 5 * 1024 * 1024 // 5MB
                 );
 
                 if ($filePath) {
-                    $documentModel = Document::create([
+                    $documentModel = Document::query()->create([
                         'title' => $document['title'],
-                        'attach' => $filePath,
+                        'file_path' => $filePath,
                     ]);
 
                     $documentModel->students()->attach($studentId);
@@ -359,7 +359,7 @@ class AdmissionService
      */
     protected function createStudentEnrollment(int $studentId, array $data): StudentEnroll
     {
-        return StudentEnroll::create([
+        return StudentEnroll::query()->create([
             'student_id' => $studentId,
             'program_id' => $data['program_id'],
             'session_id' => $data['session_id'],
@@ -378,10 +378,10 @@ class AdmissionService
      */
     protected function assignSubjectsToStudent(int $enrollmentId, array $data): void
     {
-        $enrollment = StudentEnroll::findOrFail($enrollmentId);
+        $enrollment = StudentEnroll::query()->findOrFail($enrollmentId);
 
         // Find enroll subject configuration
-        $enrollSubject = EnrollSubject::where('program_id', $data['program_id'])
+        $enrollSubject = EnrollSubject::query()->where('program_id', $data['program_id'])
             ->where('semester_id', $data['semester_id'])
             ->where('section_id', $data['section_id'])
             ->first();
